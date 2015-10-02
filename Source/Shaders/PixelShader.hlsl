@@ -24,7 +24,7 @@ struct VertexToPixel
     //  |   Name          Semantic
     //  |    |                |
     //  v    v                v
-    float4 position		: SV_POSITION;
+    float4 position     : SV_POSITION;
     float2 uv           : TEXCOORD;
     float3 normal       : NORMAL;
 };
