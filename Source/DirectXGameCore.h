@@ -12,6 +12,7 @@
 #pragma once
 
 #include "DirectX.hpp"
+#include "GameTime.hpp"
 #include <string>
 
 // --------------------------------------------------------
@@ -20,25 +21,25 @@
 class DirectXGameCore
 {
 public:
-    DirectXGameCore(HINSTANCE hInstance);
-    virtual ~DirectXGameCore(void);
-    
+    DirectXGameCore( HINSTANCE hInstance );
+    virtual ~DirectXGameCore( void );
+
     // The game loop
     int Run();
- 
+
     // Methods called by the game loop - override these in
     // derived classes to implement custom functionality
     virtual bool Init();
-    virtual void OnResize(); 
-    virtual void UpdateScene(float deltaTime, float totalTime) = 0;
-    virtual void DrawScene(float deltaTime, float totalTime)   = 0;
-    virtual LRESULT ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    virtual void OnResize();
+    virtual void UpdateScene( const GameTime& gameTime ) = 0;
+    virtual void DrawScene( const GameTime& gameTime ) = 0;
+    virtual LRESULT ProcessMessage( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
     // Convenience methods for handling mouse input, since we
     // can easily grab that information from OS-level messages
-    virtual void OnMouseDown(WPARAM btnState, int x, int y){ }
-    virtual void OnMouseUp(WPARAM btnState, int x, int y)  { }
-    virtual void OnMouseMove(WPARAM btnState, int x, int y){ }
+    virtual void OnMouseDown( WPARAM btnState, int x, int y ) {}
+    virtual void OnMouseUp( WPARAM btnState, int x, int y ) {}
+    virtual void OnMouseMove( WPARAM btnState, int x, int y ) {}
 
 protected:
     // Handles window and Direct3D initialization
@@ -58,7 +59,7 @@ protected:
     bool      minimized;
     bool      maximized;
     bool      resizing;
-    
+
     // DirectX related buffers, views, etc.
     ID3D11Device*             device;
     ID3D11DeviceContext*      deviceContext;
@@ -79,19 +80,11 @@ protected:
     int windowHeight;
 
 private:
-    // Timer related data
-    double perfCounterSeconds;
-    __int64 startTime;
-    __int64 currentTime;
-    __int64 previousTime;
-    float totalTime;
-    float deltaTime;
+    GameTime _gameTime;
 
-    // Updates the timer for this frame
-    void UpdateTimer();
-
-    // Calculates stats about the current frame and
-    // updates the window's title bar
+    /// <summary>
+    /// Calculates stats about the current frame and updates the window's title bar.
+    /// </summary>
     void CalculateFrameStats();
 };
 

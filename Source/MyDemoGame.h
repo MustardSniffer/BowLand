@@ -6,7 +6,7 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 #include "Entity.hpp"
-#include "Shaders/DirectionalLight.hpp"
+#include "Shaders/DirectionalLight.inl"
 #include <memory> // for std::shared_ptr
 #include <vector>
 
@@ -16,19 +16,19 @@
 class MyDemoGame : public DirectXGameCore
 {
 public:
-    MyDemoGame( HINSTANCE hInstance );
+    MyDemoGame(HINSTANCE hInstance);
     ~MyDemoGame() = default;
 
     // Overrides for base level methods
     bool Init();
     void OnResize();
-    void UpdateScene( const GameTime& gameTime );
-    void DrawScene( const GameTime& gameTime );
+    void UpdateScene(float deltaTime, float totalTime);
+    void DrawScene(float deltaTime, float totalTime);
 
     // For handing mouse input
-    void OnMouseDown( WPARAM btnState, int x, int y );
-    void OnMouseUp( WPARAM btnState, int x, int y );
-    void OnMouseMove( WPARAM btnState, int x, int y );
+    void OnMouseDown(WPARAM btnState, int x, int y);
+    void OnMouseUp(WPARAM btnState, int x, int y);
+    void OnMouseMove(WPARAM btnState, int x, int y);
 
 private:
     // Initialization for our "game" demo - Feel free to

@@ -1,5 +1,9 @@
 #include "OBJLoader.hpp"
 #include <fstream>
+#if defined( DEBUG ) || defined( _DEBUG )
+#   include "GameTime.hpp"
+#   include <sstream>
+#endif
 
 using namespace DirectX;
 
@@ -7,13 +11,18 @@ using namespace DirectX;
 std::shared_ptr<Mesh> OBJLoader::Load( const std::string& fname, ID3D11Device* device )
 {
     std::shared_ptr<Mesh> mesh = nullptr;
+#if defined( DEBUG ) || defined( _DEBUG )
+    GameTime timer;
+#endif
 
     // File input object
     std::ifstream obj( fname.c_str(), std::ios::in | std::ios::binary );
 
     // Check for successful open
     if ( !obj.is_open() )
+    {
         return mesh;
+    }
 
     // Variables used while reading the file
     std::vector<XMFLOAT3> positions;     // Positions from the file
@@ -112,10 +121,18 @@ std::shared_ptr<Mesh> OBJLoader::Load( const std::string& fname, ID3D11Device* d
     // Close the file
     obj.close();
 
+#if defined( DEBUG ) || defined( _DEBUG )
+    timer.Update();
+
+    std::ostringstream ss;
+    ss << "Read model '" << fname << "' in " << timer.GetTotalTime() << " seconds" << std::endl;
+    OutputDebugStringA( ss.str().c_str() );
+#endif
+
     // - At this point, "verts" is a vector of Vertex structs, and can be used
-    //    directly to create a vertex buffer:  &verts[0] is the first vert
+    //   directly to create a vertex buffer:  &verts[0] is the first vert
     // - The vector "indices" is similar. It's a vector of unsigned ints and
-    //    can be used directly for the index buffer: &indices[0] is the first int
+    //   can be used directly for the index buffer: &indices[0] is the first int
     // - "triangleCounter" is BOTH the number of vertices and the number of indices
 
     mesh = std::make_shared<Mesh>( device, verts, indices );

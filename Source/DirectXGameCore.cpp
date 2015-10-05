@@ -30,6 +30,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     // Forward the global callback params to our game's message handler
     return dxGame->ProcessMessage(hwnd, msg, wParam, lParam);
 }
+
 #pragma endregion
 
 
@@ -58,12 +59,6 @@ DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
     , driverType(D3D_DRIVER_TYPE_HARDWARE)
     , featureLevel(D3D_FEATURE_LEVEL_11_0)
     , aspectRatio(0.0f)
-    , perfCounterSeconds(0.0)
-    , startTime(0)
-    , currentTime(0)
-    , previousTime(0)
-    , totalTime(0.0f)
-    , deltaTime(0.0f)
 {
     // Zero out the viewport struct
     ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
@@ -71,11 +66,6 @@ DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
     // Set the global pointer to this DirectXGameCore object so we can forward
     // Windows messages to our object's message handling function
     dxGame = this;
-
-    // Query the performance counter for accurate timing information
-    __int64 perfFreq;
-    QueryPerformanceFrequency((LARGE_INTEGER*)&perfFreq);
-    perfCounterSeconds = 1.0 / (double)perfFreq;
 }
 
 // --------------------------------------------------------
@@ -320,17 +310,11 @@ void DirectXGameCore::OnResize()
 // --------------------------------------------------------
 int DirectXGameCore::Run()
 {
-    // Grab the start time
-    __int64 now;
-    QueryPerformanceCounter((LARGE_INTEGER*)&now);
-    startTime    = now;
-    currentTime  = now;
-    previousTime = now;
-
     // Create a variable to hold the current message
     MSG msg = {0};
 
     // Loop until we get a quit message from windows
+    _gameTime.Reset();
     while(msg.message != WM_QUIT)
     {
         // Peek at the next message (and remove it from the queue)
@@ -342,43 +326,17 @@ int DirectXGameCore::Run()
         }
         else // No message to handle
         {
-            // Update the timer for this frame
-            UpdateTimer();
-
             // Standard game loop type stuff
+            _gameTime.Update();
             CalculateFrameStats();
-            UpdateScene(deltaTime, totalTime);
-            DrawScene(deltaTime, totalTime);			
+            UpdateScene(_gameTime);
+            DrawScene(_gameTime);
         }
     }
 
     // If we make it outside the game loop, return the most
     // recent message's exit code
     return (int)msg.wParam;
-}
-
-
-// --------------------------------------------------------
-// Updates the timer stats for this frame
-// --------------------------------------------------------
-void DirectXGameCore::UpdateTimer()
-{
-    // Grab the current time
-    __int64 now;
-    QueryPerformanceCounter((LARGE_INTEGER*)&now);
-    previousTime = currentTime;
-    currentTime = now;
-
-    // Calculate delta time and clamp to zero if negative.
-    //  - This could happen if the processor goes into a
-    //    power save mode or the process itself gets moved
-    //    to another processor core.
-    deltaTime = (float)((currentTime - previousTime) * perfCounterSeconds);
-    if (deltaTime < 0.0f)
-        deltaTime = 0.0f;
-
-    // Calculate total time
-    totalTime = (float)((currentTime - startTime) * perfCounterSeconds);
 }
 
 // --------------------------------------------------------
@@ -389,7 +347,9 @@ void DirectXGameCore::CalculateFrameStats()
 {
     static int frameCount = 0;
     static float timeElapsed = 0.0f;
+    static float totalTime = 0.0f;
 
+    totalTime += _gameTime.GetElapsedTime();
     frameCount++;
 
     // Compute averages over ONE SECOND.
@@ -578,7 +538,3 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
 }
 
 #pragma endregion
-
-
-
-

@@ -12,69 +12,105 @@
     <Filter Include="Shader Files">
       <UniqueIdentifier>{e11479ef-8a44-4ba5-9d5a-c14237485115}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics">
+      <UniqueIdentifier>{e5584c61-a90c-459b-a378-3e4e5771f12a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{c82c8e30-bc82-4519-8b2b-876f27f2e3ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{bcc4339a-29e9-4263-a896-47ce0e36bff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{694ef72c-efab-46df-9388-3be9b9b27b90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{4300fab1-55cc-4139-930b-7ddd0797c134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{de54111f-e6c7-4f6c-ba78-3093eb0608ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dxerr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MyDemoGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleShader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="DirectXGameCore.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="dxerr.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTime.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleShader.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyDemoGame.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="OBJLoader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DirectX.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Material.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="OBJLoader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyDemoGame.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Mesh.hpp">
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="SimpleShader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXGameCore.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.hpp">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="dxerr.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXGameCore.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="MyDemoGame.hpp">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTime.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="OBJLoader.hpp">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,11 +122,14 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Types.hpp">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="Shaders\DirectionalLight.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics</Filter>
+    </None>
+    <None Include="Shaders\SharedTypes.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </None>
+    <None Include="GameObject.inl">
+      <Filter>Header Files\Utility</Filter>
     </None>
   </ItemGroup>
 </Project>

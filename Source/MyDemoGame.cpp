@@ -24,6 +24,8 @@
 #include "MyDemoGame.hpp"
 #include "Vertex.hpp"
 #include "OBJLoader.hpp"
+#include "GameObject.hpp"
+#include "Component.hpp"
 #include <DirectXColors.h>
 
 // Include run-time memory checking in debug builds, so 
@@ -216,7 +218,7 @@ void MyDemoGame::OnResize()
 // --------------------------------------------------------
 // Update your game here - take input, move objects, etc.
 // --------------------------------------------------------
-void MyDemoGame::UpdateScene( float deltaTime, float totalTime )
+void MyDemoGame::UpdateScene( const GameTime& gameTime )
 {
     // Quit if the escape key is pressed
     if ( GetAsyncKeyState( VK_ESCAPE ) )
@@ -224,10 +226,9 @@ void MyDemoGame::UpdateScene( float deltaTime, float totalTime )
         Quit();
     }
 
-
     // Update the camera based on input
-    float moveSpeed = deltaTime * 4.0f;
-    float rotSpeed  = deltaTime * 10.0f;
+    float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
+    float rotSpeed  = gameTime.GetElapsedTime() * 8.0f;
     if ( IsKeyDown( VK_LSHIFT ) )
     {
         moveSpeed *= 2.0f;
@@ -269,7 +270,7 @@ void MyDemoGame::UpdateScene( float deltaTime, float totalTime )
     for ( auto iter = _entities.begin(); iter != _entities.end(); ++iter )
     {
         std::shared_ptr<Entity> entity = *iter;
-        entity->Rotate( deltaTime, deltaTime, 0 );
+        entity->Rotate( gameTime.GetElapsedTime(), gameTime.GetElapsedTime(), 0 );
     }
 
     // After everything, we can get rid of mouse delta positions
@@ -279,7 +280,7 @@ void MyDemoGame::UpdateScene( float deltaTime, float totalTime )
 // --------------------------------------------------------
 // Clear the screen, redraw everything, present to the user
 // --------------------------------------------------------
-void MyDemoGame::DrawScene( float deltaTime, float totalTime )
+void MyDemoGame::DrawScene( const GameTime& gameTime )
 {
     // Background color (Cornflower Blue in this case) for clearing
     const float color[ 4 ] = { 0.4f, 0.6f, 0.75f, 0.0f };

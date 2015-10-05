@@ -1,4 +1,4 @@
-#include "Types.hpp"
+#include "SharedTypes.hpp"
 
 // Defines a directional light
 struct DirectionalLight
