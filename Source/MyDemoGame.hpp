@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include "DirectXGameCore.h"
 #include "SimpleShader.h"
-#include "Camera.hpp"
+#include "Camera.h"
 #include "Material.hpp"
 #include "Entity.hpp"
 #include "Shaders/DirectionalLight.hpp"

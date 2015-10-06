@@ -1,5 +1,5 @@
 #include "Material.hpp"
-#include "Camera.hpp"
+#include "Camera.h"
 #include <DirectXTK/WICTextureLoader.h>
 
 // Macro for updating a D3D11 resource
@@ -61,8 +61,8 @@ Material::~Material()
 // Apply a camera to this material
 void Material::ApplyCamera( const Camera& camera )
 {
-    _vertexShader->SetMatrix4x4( "view", camera.GetViewMatrix() );
-    _vertexShader->SetMatrix4x4( "projection", camera.GetProjectionMatrix() );
+    _vertexShader->SetMatrix4x4( "view", camera.GetView() );
+    _vertexShader->SetMatrix4x4( "projection", camera.GetProjection() );
 }
 
 // Get the vertex shader

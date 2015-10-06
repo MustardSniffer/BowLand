@@ -127,7 +127,7 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClCompile Include="SimpleShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.hpp" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="DirectX.hpp" />
     <ClInclude Include="Entity.hpp" />

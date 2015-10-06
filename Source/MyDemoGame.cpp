@@ -50,12 +50,10 @@ enum Model
     Model_COUNT
 };
 
-#pragma region Win32 Entry Point (WinMain)
 // --------------------------------------------------------
 // Win32 Entry Point - Where your program starts
 // --------------------------------------------------------
-int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance,
-                    PSTR cmdLine, int showCmd )
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd )
 {
     // Enable run-time memory check for debug builds.
 #if defined( DEBUG ) || defined( _DEBUG )
@@ -74,9 +72,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance,
     return game.Run();
 }
 
-#pragma endregion
-
-#pragma region Constructor / Destructor
 // --------------------------------------------------------
 // Base class constructor will set up all of the underlying
 // fields, and then we can overwrite any that we'd like
@@ -96,16 +91,9 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     windowHeight = 720;
 
     // Re-create the camera's projection matrix
-    camera = std::make_shared<Camera>( XM_PIDIV4, static_cast<float>( windowWidth ) / windowHeight, 0.125f, 1024.0f );
-
-    // Move the camera
-    camera->MoveImmediate( 0, 0, -5 );
-    camera->Update();
+    camera = std::make_shared<Camera>( 0.0f, 0.0f, -5.0f );
+    camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
 }
-
-#pragma endregion
-
-#pragma region Initialization
 
 // --------------------------------------------------------
 // Initializes the base class (including the window and D3D),
@@ -193,10 +181,6 @@ void MyDemoGame::LoadShaders()
     assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 
-#pragma endregion
-
-#pragma region Window Resizing
-
 // --------------------------------------------------------
 // Handles resizing DirectX "stuff" to match the (usually) new
 // window size and updating our projection matrix to match
@@ -207,11 +191,8 @@ void MyDemoGame::OnResize()
     DirectXGameCore::OnResize();
     
     // Update the camera's projection
-    camera->UpdateProjection( XM_PIDIV4, static_cast<float>( windowWidth ) / windowHeight, 0.125f, 1024.0f );
+    camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
 }
-#pragma endregion
-
-#pragma region Game Loop
 
 #define IsKeyDown(key) (GetAsyncKeyState(key) & 0x8000)
 
@@ -235,27 +216,27 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     }
     if ( IsKeyDown( 'W' ) )
     {
-        camera->Move( 0, 0, moveSpeed );
+        camera->MoveRelative( 0, 0, moveSpeed );
     }
     if ( IsKeyDown( 'S' ) )
     {
-        camera->Move( 0, 0, -moveSpeed );
+        camera->MoveRelative( 0, 0, -moveSpeed );
     }
     if ( IsKeyDown( 'D' ) )
     {
-        camera->Move( moveSpeed, 0, 0 );
+        camera->MoveRelative( moveSpeed, 0, 0 );
     }
     if ( IsKeyDown( 'A' ) )
     {
-        camera->Move( -moveSpeed, 0, 0 );
+        camera->MoveRelative( -moveSpeed, 0, 0 );
     }
     if ( IsKeyDown( 'E' ) )
     {
-        camera->MoveImmediate( 0, moveSpeed, 0 );
+        camera->MoveAbsolute( 0, moveSpeed, 0 );
     }
     if ( IsKeyDown( 'Q' ) )
     {
-        camera->MoveImmediate( 0, -moveSpeed, 0 );
+        camera->MoveAbsolute( 0, -moveSpeed, 0 );
     }
     if ( hasMouseFocus )
     {
@@ -263,8 +244,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
         camera->Rotate( rotSpeed * ( currMousePos.y - prevMousePos.y ),
                         rotSpeed * ( currMousePos.x - prevMousePos.x ) );
     }
-    camera->Update();
-
+    camera->UpdateViewMatrix();
 
     // Rotate our entity
     for ( auto iter = _entities.begin(); iter != _entities.end(); ++iter )
@@ -317,10 +297,6 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     HR( swapChain->Present( 0, 0 ) );
 }
 
-#pragma endregion
-
-#pragma region Mouse Input
-
 // --------------------------------------------------------
 // Helper method for mouse clicking.  We get this information
 // from the OS-level messages anyway, so these helpers have
@@ -371,5 +347,3 @@ void MyDemoGame::OnMouseMove( WPARAM btnState, int x, int y )
     currMousePos.x = x;
     currMousePos.y = y;
 }
-
-#pragma endregion

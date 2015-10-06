@@ -85,9 +85,6 @@
     <ClInclude Include="Vertex.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Component.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -110,6 +107,9 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="OBJLoader.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
