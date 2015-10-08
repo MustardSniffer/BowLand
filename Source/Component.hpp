@@ -37,5 +37,12 @@ public:
     /// <summary>
     /// Updates this component.
     /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
     virtual void Update( const GameTime& gameTime ) = 0;
+
+    /// <summary>
+    /// Draws this component.
+    /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    virtual void Draw( const GameTime& gameTime ) { }
 };

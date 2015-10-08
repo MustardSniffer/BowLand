@@ -41,9 +41,6 @@
     <ClCompile Include="dxerr.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
     </ClInclude>
     <ClInclude Include="MyDemoGame.hpp">
       <Filter>Header Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.hpp">
       <Filter>Header Files\Utility</Filter>

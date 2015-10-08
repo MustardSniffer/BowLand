@@ -5,7 +5,6 @@
 #include "SimpleShader.h"
 #include "Camera.h"
 #include "Material.hpp"
-#include "Entity.hpp"
 #include "Shaders/DirectionalLight.hpp"
 #include <memory> // for std::shared_ptr
 #include <vector>
@@ -31,17 +30,9 @@ public:
     void OnMouseMove( WPARAM btnState, int x, int y );
 
 private:
-    // Initialization for our "game" demo - Feel free to
-    // expand, alter, rename or remove these once you
-    // start doing something more advanced!
-    void CreateGeometry();
     void LoadShaders();
 
 private:
-    // Entities to draw/move
-    std::vector<std::shared_ptr<Mesh>> _meshes;
-    std::vector<std::shared_ptr<Entity>> _entities;
-
     DirectionalLight _directionalLight0;
     DirectionalLight _directionalLight1;
 

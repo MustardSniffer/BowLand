@@ -38,18 +38,6 @@
 // For the DirectX Math library
 using namespace DirectX;
 
-enum Model
-{
-    Model_Cone,
-    Model_Cube,
-    Model_Cylinder,
-    Model_Helix,
-    Model_Sphere,
-    Model_Torus,
-
-    Model_COUNT
-};
-
 // --------------------------------------------------------
 // Win32 Entry Point - Where your program starts
 // --------------------------------------------------------
@@ -110,7 +98,6 @@ bool MyDemoGame::Init()
     // with and set up matrices so we can see how to pass data to the GPU.
     //  - For your own projects, feel free to expand/replace these.
     LoadShaders();
-    CreateGeometry();
 
     // Tell the input assembler stage of the pipeline what kind of
     // geometric primitives we'll be using and how to interpret them
@@ -127,40 +114,6 @@ bool MyDemoGame::Init()
 
     // Successfully initialized
     return true;
-}
-
-// --------------------------------------------------------
-// Creates the geometry we're going to draw
-// --------------------------------------------------------
-void MyDemoGame::CreateGeometry()
-{
-    // Load the models
-    _meshes.resize( Model_COUNT );
-    _meshes[ Model_Cone ]     = OBJLoader::Load( "Models/cone.obj", device );
-    _meshes[ Model_Cube ]     = OBJLoader::Load( "Models/cube.obj", device );
-    _meshes[ Model_Cylinder ] = OBJLoader::Load( "Models/cylinder.obj", device );
-    _meshes[ Model_Helix ]    = OBJLoader::Load( "Models/helix.obj", device );
-    _meshes[ Model_Sphere ]   = OBJLoader::Load( "Models/sphere.obj", device );
-    _meshes[ Model_Torus ]    = OBJLoader::Load( "Models/torus.obj", device );
-
-    // Add the helix
-    _entities.push_back( std::make_shared<Entity>( _meshes[ Model_Helix ], brickMaterial ) );
-
-    // Add the cube
-    _entities.push_back( std::make_shared<Entity>( _meshes[ Model_Cube ], metalMaterial ) );
-    _entities.back()->Move( 2.5f, 0.0f, 0.0f );
-
-    // Add the torus
-    _entities.push_back( std::make_shared<Entity>( _meshes[ Model_Torus ], brickMaterial ) );
-    _entities.back()->Move( -2.5f, 0.0f, 0.0f );
-
-    // Add the cone
-    _entities.push_back( std::make_shared<Entity>( _meshes[ Model_Cone ], metalMaterial ) );
-    _entities.back()->Move( 0.0f, 2.5f, 0.0f );
-
-    // Add the cylinder
-    _entities.push_back( std::make_shared<Entity>( _meshes[ Model_Cylinder ], metalMaterial ) );
-    _entities.back()->Move( 0.0f, -2.5f, 0.0f );
 }
 
 // --------------------------------------------------------
@@ -202,7 +155,7 @@ void MyDemoGame::OnResize()
 void MyDemoGame::UpdateScene( const GameTime& gameTime )
 {
     // Quit if the escape key is pressed
-    if ( GetAsyncKeyState( VK_ESCAPE ) )
+    if ( IsKeyDown( VK_ESCAPE ) )
     {
         Quit();
     }
@@ -246,13 +199,6 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     }
     camera->UpdateViewMatrix();
 
-    // Rotate our entity
-    for ( auto iter = _entities.begin(); iter != _entities.end(); ++iter )
-    {
-        std::shared_ptr<Entity> entity = *iter;
-        entity->Rotate( gameTime.GetElapsedTime(), gameTime.GetElapsedTime(), 0 );
-    }
-
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;
 }
@@ -280,14 +226,6 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     metalMaterial->ApplyCamera( *( camera.get() ) );
     metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
     metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
-
-
-    // Draw all of the entities
-    for ( auto iter = _entities.begin(); iter != _entities.end(); ++iter )
-    {
-        Entity* entity = iter->get();
-        entity->Draw( deviceContext );
-    }
 
 
     // Present the buffer

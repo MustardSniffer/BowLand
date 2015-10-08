@@ -14,6 +14,7 @@ class Component;
 class GameObject
 {
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
+    GameObject* _parent;
 
     // Prevent the use of the copy constructor and copy assignment operator
     GameObject( const GameObject& ) = delete;
@@ -27,12 +28,12 @@ public:
     /// <summary>
     /// Creates a new game object.
     /// </summary>
-    GameObject() = default;
+    GameObject();
 
     /// <summary>
     /// Destroys this game object.
     /// </summary>
-    ~GameObject() = default;
+    ~GameObject();
 
     /// <summary>
     /// Adds a component to this game object and then returns it.
@@ -50,9 +51,21 @@ public:
     template<class T> T* GetComponent();
 
     /// <summary>
-    /// Updates this game object and all components inside of it.
+    /// Gets this game object's world matrix.
     /// </summary>
+    DirectX::XMFLOAT4X4 GetWorldMatrix() const;
+
+    /// <summary>
+    /// Draws this game object and all components inside of it.
+    /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
     void Update( const GameTime& gameTime );
+
+    /// <summary>
+    /// Draws this component.
+    /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    void Draw( const GameTime& gameTime );
 };
 
 #include "GameObject.inl"

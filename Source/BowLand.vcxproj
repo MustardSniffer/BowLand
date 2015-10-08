@@ -115,7 +115,6 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -130,7 +129,6 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="DirectX.hpp" />
-    <ClInclude Include="Entity.hpp" />
     <ClInclude Include="GameObject.hpp" />
     <ClInclude Include="GameTime.hpp" />
     <ClInclude Include="Material.hpp" />
