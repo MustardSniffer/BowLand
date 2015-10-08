@@ -15,6 +15,14 @@ GameObject::~GameObject()
     _parent = nullptr;
 }
 
+// Add  a child to this game object
+GameObject* GameObject::AddChild()
+{
+    auto child = std::make_shared<GameObject>();
+    child->_parent = this;
+    return child;
+}
+
 // Get this game object's world matrix
 XMFLOAT4X4 GameObject::GetWorldMatrix() const
 {
@@ -41,19 +49,34 @@ XMFLOAT4X4 GameObject::GetWorldMatrix() const
 // Update all components
 void GameObject::Update( const GameTime& gameTime )
 {
+    // Update all of our components
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
         component->Update( gameTime );
+    }
+
+    // Now update all of our children
+    for ( auto iter = _children.begin(); iter != _children.end(); ++iter )
+    {
+        iter->get()->Update( gameTime );
     }
 }
 
 // Draw all components
 void GameObject::Draw( const GameTime& gameTime )
 {
+    // Draw all of our components
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
         component->Draw( gameTime );
+    }
+
+    // Now update all of our children
+    for ( auto iter = _children.begin(); iter != _children.end(); ++iter )
+    {
+        // TODO - Add some kind of renderer to sort these by depth
+        iter->get()->Draw( gameTime );
     }
 }

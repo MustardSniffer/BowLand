@@ -3,6 +3,7 @@
 #include <memory> // for std::shared_ptr
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "GameTime.hpp"
 // TODO - Transform
 
@@ -14,6 +15,7 @@ class Component;
 class GameObject
 {
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
+    std::vector<std::shared_ptr<GameObject>> _children;
     GameObject* _parent;
 
     // Prevent the use of the copy constructor and copy assignment operator
@@ -34,6 +36,11 @@ public:
     /// Destroys this game object.
     /// </summary>
     ~GameObject();
+
+    /// <summary>
+    /// Adds a child to this game object.
+    /// </summary>
+    GameObject* AddChild();
 
     /// <summary>
     /// Adds a component to this game object and then returns it.
