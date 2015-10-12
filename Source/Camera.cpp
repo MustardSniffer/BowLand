@@ -57,28 +57,14 @@ void Camera::Rotate(float x, float y)
 // Camera's update, which looks for key presses
 void Camera::Update(float dt)
 {
-    // Current speed
-	float speed = dt * 3;
-
-    // Speed up when shift is pressed
-	if (GetAsyncKeyState(VK_SHIFT)) { speed *= 5; }
-
-    // Movement
-	if (GetAsyncKeyState('W') & 0x8000) { MoveRelative(0, 0, speed); }
-	if (GetAsyncKeyState('S') & 0x8000) { MoveRelative(0, 0, -speed); }
-	if (GetAsyncKeyState('A') & 0x8000) { MoveRelative(-speed, 0, 0); }
-	if (GetAsyncKeyState('D') & 0x8000) { MoveRelative(speed, 0, 0); }
-	if (GetAsyncKeyState('X') & 0x8000) { MoveAbsolute(0, -speed, 0); }
-	if (GetAsyncKeyState(' ') & 0x8000) { MoveAbsolute(0, speed, 0); }
-
-    // Check for reset
-    if (GetAsyncKeyState('R') & 0x8000)
-    {
-        position = startPosition;
-        xRotation = 0;
-        xRotation = 0;
-        XMStoreFloat4(&rotation, XMQuaternionIdentity());
-    }
+	// Check for reset
+	if (GetAsyncKeyState('R') & 0x8000)
+	{
+		position = startPosition;
+		xRotation = 0;
+		xRotation = 0;
+		XMStoreFloat4(&rotation, XMQuaternionIdentity());
+	}
 
     // Update the view every frame - could be optimized
 	UpdateViewMatrix();

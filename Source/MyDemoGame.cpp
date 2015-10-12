@@ -26,7 +26,14 @@
 #include "OBJLoader.hpp"
 #include "GameObject.hpp"
 #include "Component.hpp"
+
+#include "Transform.hpp"
+#include "MeshRenderer.h"
+
 #include <DirectXColors.h>
+
+#include <iostream>
+#include <fstream>
 
 // Include run-time memory checking in debug builds, so 
 // we can be notified of memory leaks
@@ -44,9 +51,9 @@ using namespace DirectX;
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd )
 {
     // Enable run-time memory check for debug builds.
-#if defined( DEBUG ) || defined( _DEBUG )
-    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
+	#if defined( DEBUG ) || defined( _DEBUG )
+		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	#endif
 
     // Create the game object.
     MyDemoGame game( hInstance );
@@ -112,6 +119,14 @@ bool MyDemoGame::Init()
     _directionalLight1.DiffuseColor = XMFLOAT4( Colors::Wheat );
     _directionalLight1.Direction    = XMFLOAT3( -1, 0, 0 );
 
+	helix = OBJLoader::Load("Models/helix.obj", device);
+	helix->SetDeviceContext(deviceContext);
+
+	obj = new GameObject();
+	MeshRenderer* mr = obj->AddComponent<MeshRenderer>();
+	mr->SetMaterial(brickMaterial);
+	mr->SetMesh(helix);
+
     // Successfully initialized
     return true;
 }
@@ -125,13 +140,13 @@ void MyDemoGame::LoadShaders()
 {
     // Load the brick material
     brickMaterial = std::make_shared<Material>( device, deviceContext );
-    assert( brickMaterial->LoadVertexShader( L"VertexShader.cso" ) && "Failed to load vertex shader!" );
-    assert( brickMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
-    assert( brickMaterial->LoadDiffuseTexture( L"Textures/Bricks.jpg" ) && "Failed to brick texture!" );
+    assert( brickMaterial->LoadVertexShader( L"../Build/x86/Debug/VertexShader.cso" ) && "Failed to load vertex shader!" );
+    assert( brickMaterial->LoadPixelShader( L"../Build/x86/Debug/PixelShader.cso" ) && "Failed to load pixel shader!" );
+    assert( brickMaterial->LoadDiffuseTexture( L"../Build/x86/Debug/Textures/Bricks.jpg" ) && "Failed to brick texture!" );
 
     // Load the metal material, using the same shaders
     metalMaterial = std::make_shared<Material>( *brickMaterial );
-    assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
+    assert( metalMaterial->LoadDiffuseTexture( L"../Build/x86/Debug/Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 
 // --------------------------------------------------------
@@ -163,34 +178,18 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
     float rotSpeed  = gameTime.GetElapsedTime() * 8.0f;
-    if ( IsKeyDown( VK_LSHIFT ) )
-    {
-        moveSpeed *= 2.0f;
-    }
-    if ( IsKeyDown( 'W' ) )
-    {
-        camera->MoveRelative( 0, 0, moveSpeed );
-    }
-    if ( IsKeyDown( 'S' ) )
-    {
-        camera->MoveRelative( 0, 0, -moveSpeed );
-    }
-    if ( IsKeyDown( 'D' ) )
-    {
-        camera->MoveRelative( moveSpeed, 0, 0 );
-    }
-    if ( IsKeyDown( 'A' ) )
-    {
-        camera->MoveRelative( -moveSpeed, 0, 0 );
-    }
-    if ( IsKeyDown( 'E' ) )
-    {
-        camera->MoveAbsolute( 0, moveSpeed, 0 );
-    }
-    if ( IsKeyDown( 'Q' ) )
-    {
-        camera->MoveAbsolute( 0, -moveSpeed, 0 );
-    }
+
+	// Speed up when shift is pressed
+	if IsKeyDown(VK_SHIFT) { moveSpeed *= 5; }
+
+	// Movement
+	if IsKeyDown('W') { camera->MoveRelative(0, 0, moveSpeed); }
+	if IsKeyDown('S') { camera->MoveRelative(0, 0, -moveSpeed); }
+	if IsKeyDown('A') { camera->MoveRelative(-moveSpeed, 0, 0); }
+	if IsKeyDown('D') { camera->MoveRelative(moveSpeed, 0, 0); }
+	if IsKeyDown('X') { camera->MoveAbsolute(0, -moveSpeed, 0); }
+	if IsKeyDown(' ') { camera->MoveAbsolute(0, moveSpeed, 0); }
+	
     if ( hasMouseFocus )
     {
         // Rotate the camera
@@ -201,6 +200,9 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;
+
+	obj->Update(gameTime);
+
 }
 
 // --------------------------------------------------------
@@ -227,6 +229,10 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
     metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
 
+	if (obj->isWorldMatrixDirty()){
+		obj->UpdateWorldMatrix();
+	}
+	obj->Draw(gameTime);
 
     // Present the buffer
     //  - Puts the image we're drawing into the window so the user can see it

@@ -11,6 +11,7 @@ class Mesh
 {
     ID3D11Buffer* _vertexBuffer;
     ID3D11Buffer* _indexBuffer;
+	ID3D11DeviceContext* _deviceContext;
     int _indexCount;
     
 public:
@@ -46,11 +47,16 @@ public:
     /// </summary>
     ~Mesh();
 
+	/// <summary>
+	/// Sets the device context to be used for drawing.
+	/// </summary>
+	/// <param name="deviceContext">The device context to use to draw.</param>
+	void SetDeviceContext(ID3D11DeviceContext* deviceContext);
+
     /// <summary>
     /// Draws this mesh.
     /// </summary>
-    /// <param name="deviceContext">The device context to use to draw.</param>
-    void Draw( ID3D11DeviceContext* deviceContext );
+    void Draw( );
 
     /// <summary>
     /// Gets this mesh's vertex buffer.

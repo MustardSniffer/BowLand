@@ -119,11 +119,13 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="MyDemoGame.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DirectXGameCore.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -133,11 +135,13 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClInclude Include="GameTime.hpp" />
     <ClInclude Include="Material.hpp" />
     <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="MyDemoGame.hpp" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DirectXGameCore.h" />
     <ClInclude Include="OBJLoader.hpp" />
     <ClInclude Include="SimpleShader.h" />
+    <ClInclude Include="Transform.hpp" />
     <ClInclude Include="Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>

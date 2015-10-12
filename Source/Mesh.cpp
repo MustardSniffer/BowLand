@@ -58,16 +58,21 @@ Mesh::~Mesh()
     _indexCount = 0;
 }
 
+// Sets the device context
+void Mesh::SetDeviceContext(ID3D11DeviceContext* deviceContext){
+	_deviceContext = deviceContext;
+}
+
 // Draw this mesh
-void Mesh::Draw( ID3D11DeviceContext* deviceContext )
+void Mesh::Draw( )
 {
     const UINT stride = sizeof( Vertex );
     const UINT offset = 0;
 
-    deviceContext->IASetVertexBuffers( 0, 1, &_vertexBuffer, &stride, &offset );
-    deviceContext->IASetIndexBuffer( _indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+    _deviceContext->IASetVertexBuffers( 0, 1, &_vertexBuffer, &stride, &offset );
+    _deviceContext->IASetIndexBuffer( _indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
 
-    deviceContext->DrawIndexed( _indexCount, 0, 0 );
+    _deviceContext->DrawIndexed( _indexCount, 0, 0 );
 }
 
 // Get vertex buffer

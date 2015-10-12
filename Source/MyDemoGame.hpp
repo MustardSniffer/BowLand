@@ -5,7 +5,9 @@
 #include "SimpleShader.h"
 #include "Camera.h"
 #include "Material.hpp"
+#include "Mesh.hpp"
 #include "Shaders/DirectionalLight.hpp"
+#include "GameObject.hpp"
 #include <memory> // for std::shared_ptr
 #include <vector>
 
@@ -47,4 +49,7 @@ private:
     // determining how far the mouse moved in a single frame.
     POINT currMousePos;
     POINT prevMousePos;
+	
+	GameObject* obj;
+	std::shared_ptr<Mesh> helix;
 };
