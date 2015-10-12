@@ -1,5 +1,7 @@
 #include <typeinfo>
 
+// TODO - Find some way to reduce code duplication in the const/non-const versions of GetComponent and GetComponentsOfType
+
 // Add a component to this game object.
 template<class T> T* GameObject::AddComponent()
 {
@@ -55,4 +57,44 @@ template<class T> T* GameObject::GetComponent()
     }
 
     return nullptr;
+}
+
+// Get all of the components of the given type
+template<class T> void GameObject::GetComponentsOfType( std::vector<const T*>& components ) const
+{
+    // First, clear the list
+    components.clear();
+
+    // Then iterate over all of our components to check if we have the given type
+    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    {
+        const std::shared_ptr<Component>& component = iter->second;
+        const T* typedComponent = dynamic_cast<const T*>( component.get() );
+
+        // If the casted component is not null, then it's of the given type
+        if ( typedComponent != nullptr )
+        {
+            components.push_back( typedComponent );
+        }
+    }
+}
+
+// Get all of the components of the given type
+template<class T> void GameObject::GetComponentsOfType( std::vector<T*>& components )
+{
+    // First, clear the list
+    components.clear();
+
+    // Then iterate over all of our components to check if we have the given type
+    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    {
+        const std::shared_ptr<Component>& component = iter->second;
+        T* typedComponent = dynamic_cast<T*>( component.get() );
+
+        // If the casted component is not null, then it's of the given type
+        if ( typedComponent != nullptr )
+        {
+            components.push_back( typedComponent );
+        }
+    }
 }

@@ -25,7 +25,8 @@
 #include "Vertex.hpp"
 #include "OBJLoader.hpp"
 #include "GameObject.hpp"
-#include "Component.hpp"
+#include "Tweener.hpp"
+#include <sstream>
 #include <DirectXColors.h>
 
 // Include run-time memory checking in debug builds, so 
@@ -66,6 +67,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
 // --------------------------------------------------------
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
+    , _tweenerTarget( 0.0f )
 {
     // Set up a custom caption for the game window.
     // - The "L" before the string signifies a "wide character" string
@@ -81,6 +83,22 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     // Re-create the camera's projection matrix
     camera = std::make_shared<Camera>( 0.0f, 0.0f, -5.0f );
     camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
+}
+
+// Cleans up the demo game
+MyDemoGame::~MyDemoGame()
+{
+#if defined( _DEBUG ) || defined( DEBUG )
+    ID3D11Debug* debug = nullptr;
+    device->QueryInterface( __uuidof( ID3D11Debug ), reinterpret_cast<void**>( &debug ) );
+#endif
+
+    DirectXGameCore::~DirectXGameCore();
+
+#if defined( _DEBUG ) || defined( DEBUG )
+    debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+    debug->Release();
+#endif
 }
 
 // --------------------------------------------------------
@@ -111,6 +129,15 @@ bool MyDemoGame::Init()
     _directionalLight1.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
     _directionalLight1.DiffuseColor = XMFLOAT4( Colors::Wheat );
     _directionalLight1.Direction    = XMFLOAT3( -1, 0, 0 );
+
+
+    Tweener* tweener = _testGameObject.AddComponent<Tweener>();
+    tweener->SetStartValue( -10.0f );
+    tweener->SetEndValue  (  10.0f );
+    tweener->SetDuration  (   4.0f );
+    tweener->SetTweenMethod( TweenMethod::ExponentialEaseOut );
+    tweener->Start( _gameTime, &_tweenerTarget );
+
 
     // Successfully initialized
     return true;
@@ -159,6 +186,17 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     {
         Quit();
     }
+
+
+
+
+    _testGameObject.Update( gameTime );
+    std::ostringstream ss;
+    ss << "Value: " << _tweenerTarget << std::endl;
+    OutputDebugStringA( ss.str().c_str() );
+
+
+
 
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;

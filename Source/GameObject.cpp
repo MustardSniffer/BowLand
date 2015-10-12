@@ -19,14 +19,15 @@ GameObject::~GameObject()
 GameObject* GameObject::AddChild()
 {
     auto child = std::make_shared<GameObject>();
+    _children.push_back( child );
     child->_parent = this;
-    return child;
+    return child.get();
 }
 
 // Get this game object's world matrix
 XMFLOAT4X4 GameObject::GetWorldMatrix() const
 {
-    // TODO - Input values from transform
+    // TODO - Input values from transform or get the transform's world matrix directly
     XMMATRIX rotation = XMMatrixRotationX( 0 )
                       * XMMatrixRotationY( 0 )
                       * XMMatrixRotationZ( 0 );
@@ -53,7 +54,20 @@ void GameObject::Update( const GameTime& gameTime )
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
-        component->Update( gameTime );
+        if ( component->IsEnabled() )
+        {
+            component->Update( gameTime );
+        }
+    }
+
+    // Perform the late update on all of our components
+    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    {
+        std::shared_ptr<Component>& component = iter->second;
+        if ( component->IsEnabled() && component->UsesLateUpdate() )
+        {
+            component->LateUpdate( gameTime );
+        }
     }
 
     // Now update all of our children
@@ -70,7 +84,10 @@ void GameObject::Draw( const GameTime& gameTime )
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
-        component->Draw( gameTime );
+        if ( component->IsDrawable() )
+        {
+            component->Draw( gameTime );
+        }
     }
 
     // Now update all of our children

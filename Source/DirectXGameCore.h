@@ -79,9 +79,9 @@ protected:
     int windowWidth;
     int windowHeight;
 
-private:
     GameTime _gameTime;
 
+private:
     /// <summary>
     /// Calculates stats about the current frame and updates the window's title bar.
     /// </summary>

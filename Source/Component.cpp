@@ -3,6 +3,8 @@
 // Create a new component
 Component::Component( GameObject* gameObject )
     : _gameObject( gameObject )
+    , _isEnabled( true )
+    , _isDrawable( false )
 {
 }
 
@@ -16,4 +18,10 @@ const GameObject* Component::GetGameObject() const
 GameObject* Component::GetGameObject()
 {
     return _gameObject;
+}
+
+// Sets whether or not this component is enabled
+void Component::SetEnabled( bool enabled )
+{
+    _isEnabled = enabled;
 }

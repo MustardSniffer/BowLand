@@ -4,7 +4,7 @@
 
 // Macro for updating a D3D11 resource
 #define UpdateD3DResource(oldOne, newOne) \
-    ReleaseMacro(oldOne); \
+    if (oldOne != nullptr) oldOne->Release(); \
     oldOne = newOne; \
     if (oldOne) oldOne->AddRef();
 

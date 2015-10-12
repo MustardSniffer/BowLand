@@ -124,6 +124,7 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClCompile Include="DirectXGameCore.cpp" />
     <ClCompile Include="OBJLoader.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
+    <ClCompile Include="Tweener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -138,6 +139,7 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClInclude Include="DirectXGameCore.h" />
     <ClInclude Include="OBJLoader.hpp" />
     <ClInclude Include="SimpleShader.h" />
+    <ClInclude Include="Tweener.hpp" />
     <ClInclude Include="Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
