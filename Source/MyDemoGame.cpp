@@ -28,8 +28,10 @@
 #include "Component.hpp"
 
 #include "Transform.hpp"
-#include "MeshRenderer.h"
+#include "MeshRenderer.hpp"
 
+#include "Tweener.hpp"
+#include <sstream>
 #include <DirectXColors.h>
 
 #include <iostream>
@@ -73,6 +75,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
 // --------------------------------------------------------
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
+    , _tweenerTarget( 0.0f )
 {
     // Set up a custom caption for the game window.
     // - The "L" before the string signifies a "wide character" string
@@ -88,6 +91,22 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     // Re-create the camera's projection matrix
     camera = std::make_shared<Camera>( 0.0f, 0.0f, -5.0f );
     camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
+}
+
+// Cleans up the demo game
+MyDemoGame::~MyDemoGame()
+{
+#if defined( _DEBUG ) || defined( DEBUG )
+    ID3D11Debug* debug = nullptr;
+    device->QueryInterface( __uuidof( ID3D11Debug ), reinterpret_cast<void**>( &debug ) );
+#endif
+
+    DirectXGameCore::~DirectXGameCore();
+
+#if defined( _DEBUG ) || defined( DEBUG )
+    debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+    debug->Release();
+#endif
 }
 
 // --------------------------------------------------------
@@ -126,6 +145,14 @@ bool MyDemoGame::Init()
 	MeshRenderer* mr = obj->AddComponent<MeshRenderer>();
 	mr->SetMaterial(brickMaterial);
 	mr->SetMesh(helix);
+	mr->SetDrawable(true);
+
+    Tweener* tweener = _testGameObject.AddComponent<Tweener>();
+    tweener->SetStartValue( -10.0f );
+    tweener->SetEndValue  (  10.0f );
+    tweener->SetDuration  (   4.0f );
+    tweener->SetTweenMethod( TweenMethod::ExponentialEaseOut );
+    tweener->Start( _gameTime, &_tweenerTarget );
 
     // Successfully initialized
     return true;
@@ -140,13 +167,13 @@ void MyDemoGame::LoadShaders()
 {
     // Load the brick material
     brickMaterial = std::make_shared<Material>( device, deviceContext );
-    assert( brickMaterial->LoadVertexShader( L"../Build/x86/Debug/VertexShader.cso" ) && "Failed to load vertex shader!" );
-    assert( brickMaterial->LoadPixelShader( L"../Build/x86/Debug/PixelShader.cso" ) && "Failed to load pixel shader!" );
-    assert( brickMaterial->LoadDiffuseTexture( L"../Build/x86/Debug/Textures/Bricks.jpg" ) && "Failed to brick texture!" );
+    assert( brickMaterial->LoadVertexShader( L"VertexShader.cso" ) && "Failed to load vertex shader!" );
+    assert( brickMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
+    assert( brickMaterial->LoadDiffuseTexture( L"Textures/Bricks.jpg" ) && "Failed to brick texture!" );
 
     // Load the metal material, using the same shaders
     metalMaterial = std::make_shared<Material>( *brickMaterial );
-    assert( metalMaterial->LoadDiffuseTexture( L"../Build/x86/Debug/Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
+    assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 
 // --------------------------------------------------------
@@ -174,6 +201,15 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     {
         Quit();
     }
+	
+	//----------------------------------------------------------
+	// Test code
+	//----------------------------------------------------------
+
+    obj->Update( gameTime );
+    std::cout << "Value: " << _tweenerTarget << std::endl;
+
+	//----------------------------------------------------------
 
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
@@ -200,9 +236,6 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;
-
-	obj->Update(gameTime);
-
 }
 
 // --------------------------------------------------------

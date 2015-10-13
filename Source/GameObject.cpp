@@ -21,6 +21,7 @@ GameObject::~GameObject()
 GameObject* GameObject::AddChild()
 {
     auto child = std::make_shared<GameObject>();
+    _children.push_back( child );
     child->_parent = this;
     return child.get();
 }
@@ -38,21 +39,19 @@ void GameObject::UpdateWorldMatrix(){
 	XMFLOAT3 rot = t->GetRotation();
 	XMFLOAT3 sca = t->GetScale();
 
-	XMMATRIX rotation = XMMatrixRotationX(rot.x)
-		* XMMatrixRotationY(rot.y)
-		* XMMatrixRotationZ(rot.z);
-	XMMATRIX world = XMMatrixScaling(sca.x, sca.y, sca.z)
-		* rotation
-		* XMMatrixTranslation(pos.x, pos.y, pos.z);
-
+	XMMATRIX POS = XMMatrixTranslation(pos.x, pos.y, pos.z);
+	XMMATRIX SCALE = XMMatrixScaling(sca.x, sca.y, sca.z);
+	XMMATRIX ROT = XMMatrixRotationX(rot.x) * XMMatrixRotationY(rot.y) * XMMatrixRotationZ(rot.z);
+	XMMATRIX WORLD = SCALE * ROT * POS;
+	
 	// Check if we have a parent, then combine the matrices if necessary
 	if (_parent)
 	{
 		XMFLOAT4X4 parentWorld = _parent->GetWorldMatrix();
-		world = XMLoadFloat4x4(&parentWorld) * world;
+		WORLD = XMLoadFloat4x4(&parentWorld) * WORLD;
 	}
 
-	XMStoreFloat4x4(&worldMat, world);
+	XMStoreFloat4x4(&worldMat, XMMatrixTranspose(WORLD));
 	dirtyWorldMatrix = false;
 }
 
@@ -71,7 +70,20 @@ void GameObject::Update( const GameTime& gameTime )
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
-        component->Update( gameTime );
+        if ( component->IsEnabled() )
+        {
+            component->Update( gameTime );
+        }
+    }
+
+    // Perform the late update on all of our components
+    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    {
+        std::shared_ptr<Component>& component = iter->second;
+        if ( component->IsEnabled() && component->UsesLateUpdate() )
+        {
+            component->LateUpdate( gameTime );
+        }
     }
 
     // Now update all of our children
@@ -88,7 +100,10 @@ void GameObject::Draw( const GameTime& gameTime )
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {
         std::shared_ptr<Component>& component = iter->second;
-        component->Draw( gameTime );
+        if ( component->IsDrawable() )
+        {
+            component->Draw( gameTime );
+        }
     }
 
     // Now update all of our children

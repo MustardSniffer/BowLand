@@ -61,6 +61,6 @@ DirectX::XMFLOAT3 Transform::GetRotation() const{
 }
 
 void Transform::Update(const GameTime& gameTime){
-
+	
 }
 

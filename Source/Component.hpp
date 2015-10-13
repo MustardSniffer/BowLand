@@ -11,6 +11,9 @@ class Component
 {
 protected:
     GameObject* const _gameObject;
+    bool _isEnabled;
+    bool _usesLateUpdate;
+    bool _isDrawable;
 
 public:
     /// <summary>
@@ -35,10 +38,52 @@ public:
     GameObject* GetGameObject();
 
     /// <summary>
+    /// Checks to see if this component is enabled.
+    /// </summary>
+    inline bool IsEnabled() const
+    {
+        return _isEnabled;
+    }
+
+    /// <summary>
+    /// Checks to see if this component is drawable.
+    /// </summary>
+    inline bool IsDrawable() const
+    {
+        return _isDrawable;
+    }
+
+    /// <summary>
+    /// Checks to see if this component uses LateUpdate.
+    /// </summary>
+    inline bool UsesLateUpdate() const
+    {
+        return _usesLateUpdate;
+    }
+
+    /// <summary>
+    /// Sets whether or not this component is enabled.
+    /// </summary>
+    /// <param name="enabled">True to enable the component, false to disable it.</param>
+    void SetEnabled( bool enabled );
+
+	/// <summary>
+	/// Sets whether or not this component is drawable.
+	/// </summary>
+	/// <param name="enabled">True to draw the component, false to hide it.</param>
+	void SetDrawable(bool enabled);
+
+    /// <summary>
     /// Updates this component.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     virtual void Update( const GameTime& gameTime ) = 0;
+
+    /// <summary>
+    /// Performs a late update on this component.
+    /// </summary>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    virtual void LateUpdate( const GameTime& gameTime ) { }
 
     /// <summary>
     /// Draws this component.

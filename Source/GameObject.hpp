@@ -62,6 +62,18 @@ public:
     template<class T> T* GetComponent();
 
     /// <summary>
+    /// Gets all of the components of the given type.
+    /// </summary>
+    /// <param name="components">The list of components to populate.</param>
+    template<class T> void GetComponentsOfType( std::vector<const T*>& components ) const;
+
+    /// <summary>
+    /// Gets all of the components of the given type.
+    /// </summary>
+    /// <param name="components">The list of components to populate.</param>
+    template<class T> void GetComponentsOfType( std::vector<T*>& components );
+
+    /// <summary>
     /// Gets this game object's world matrix.
     /// </summary>
     DirectX::XMFLOAT4X4 GetWorldMatrix() const;

@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 #include "DirectXGameCore.h"
 #include "SimpleShader.h"
-#include "Camera.h"
+#include "Camera.hpp"
 #include "Material.hpp"
 #include "Mesh.hpp"
 #include "Shaders/DirectionalLight.hpp"
@@ -18,7 +18,7 @@ class MyDemoGame : public DirectXGameCore
 {
 public:
     MyDemoGame( HINSTANCE hInstance );
-    ~MyDemoGame() = default;
+    ~MyDemoGame();
 
     // Overrides for base level methods
     bool Init();
@@ -37,6 +37,9 @@ private:
 private:
     DirectionalLight _directionalLight0;
     DirectionalLight _directionalLight1;
+    
+    GameObject _testGameObject;
+    float _tweenerTarget;
 
     // The materials to use
     std::shared_ptr<Material> brickMaterial;

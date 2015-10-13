@@ -1,10 +1,10 @@
 #include "Material.hpp"
-#include "Camera.h"
+#include "Camera.hpp"
 #include <DirectXTK/WICTextureLoader.h>
 
 // Macro for updating a D3D11 resource
 #define UpdateD3DResource(oldOne, newOne) \
-    ReleaseMacro(oldOne); \
+    if (oldOne != nullptr) oldOne->Release(); \
     oldOne = newOne; \
     if (oldOne) oldOne->AddRef();
 
