@@ -46,10 +46,9 @@ XMFLOAT4X4 GameObject::GetWorldMatrix() const
 
 void GameObject::UpdateWorldMatrix(){
 
-    const Transform* t = GetComponent<Transform>();
-    XMFLOAT3 pos = t->GetPosition();
-    XMFLOAT3 rot = t->GetRotation();
-    XMFLOAT3 sca = t->GetScale();
+    XMFLOAT3 pos = _transform->GetPosition();
+    XMFLOAT3 rot = _transform->GetRotation();
+    XMFLOAT3 sca = _transform->GetScale();
 
     XMMATRIX POS = XMMatrixTranslation(pos.x, pos.y, pos.z);
     XMMATRIX SCALE = XMMatrixScaling(sca.x, sca.y, sca.z);
@@ -108,6 +107,12 @@ void GameObject::Update( const GameTime& gameTime )
 // Draw all components
 void GameObject::Draw( const GameTime& gameTime )
 {
+    // If our world matrix is dirty, update it
+    if ( dirtyWorldMatrix )
+    {
+        UpdateWorldMatrix();
+    }
+
     // Draw all of our components
     for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
     {

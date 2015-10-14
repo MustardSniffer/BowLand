@@ -271,9 +271,7 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
     metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
 
-    if (_testGameObject.isWorldMatrixDirty()){
-        _testGameObject.UpdateWorldMatrix();
-    }
+    // Draw the game object
     _testGameObject.Draw( gameTime );
 
     // Present the buffer

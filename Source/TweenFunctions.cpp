@@ -40,7 +40,7 @@ using namespace DirectX;
         e = end; \
         t = time * 2.0f - duration; \
     } \
-    return function( s, e, t, duration );
+    return function( s, e, t, duration )
 
 // Creates all of the tween functions
 void Tweener::CreateTweenFunctions()
