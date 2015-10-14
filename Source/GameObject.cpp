@@ -5,9 +5,14 @@
 using namespace DirectX;
 
 // Create a new game object
-GameObject::GameObject()
+GameObject::GameObject( ID3D11Device* device, ID3D11DeviceContext* deviceContext )
     : _parent( nullptr )
+    , _device( nullptr )
+    , _deviceContext( nullptr )
+    , _transform( nullptr )
 {
+    UpdateD3DResource( _device, device );
+    UpdateD3DResource( _deviceContext, deviceContext );
     _transform = AddComponent<Transform>();
 }
 
@@ -15,15 +20,42 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
     _parent = nullptr;
+    _transform = nullptr;
+    ReleaseMacro( _device );
+    ReleaseMacro( _deviceContext );
 }
 
 // Add  a child to this game object
 GameObject* GameObject::AddChild()
 {
-    auto child = std::make_shared<GameObject>();
+    auto child = std::make_shared<GameObject>( _device, _deviceContext );
     _children.push_back( child );
     child->_parent = this;
     return child.get();
+}
+
+// Get device
+const ID3D11Device* GameObject::GetDevice() const
+{
+    return _device;
+}
+
+// Get device
+ID3D11Device* GameObject::GetDevice()
+{
+    return _device;
+}
+
+// Get device context
+const ID3D11DeviceContext* GameObject::GetDeviceContext() const
+{
+    return _deviceContext;
+}
+
+// Get device context
+ID3D11DeviceContext* GameObject::GetDeviceContext()
+{
+    return _deviceContext;
 }
 
 // Get the transform
@@ -44,6 +76,7 @@ XMFLOAT4X4 GameObject::GetWorldMatrix() const
     return worldMat;
 }
 
+// Update world matrix
 void GameObject::UpdateWorldMatrix(){
 
     XMFLOAT3 pos = _transform->GetPosition();
@@ -66,10 +99,12 @@ void GameObject::UpdateWorldMatrix(){
     dirtyWorldMatrix = false;
 }
 
+// Check if the world matrix needs to be updated
 bool GameObject::isWorldMatrixDirty() const{
     return dirtyWorldMatrix;
 }
 
+// Set that the world matrix needs to be updated
 void GameObject::SetWorldMatrixDirty(){
     dirtyWorldMatrix = true;
 }

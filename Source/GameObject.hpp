@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "DirectXMath.h"
+#include "DirectX.hpp"
 #include "GameTime.hpp"
 
 class Component;
@@ -19,6 +19,8 @@ class GameObject
     std::vector<std::shared_ptr<GameObject>> _children;
     GameObject* _parent;
     Transform* _transform;
+    ID3D11Device* _device;
+    ID3D11DeviceContext* _deviceContext;
 
     DirectX::XMFLOAT4X4 worldMat;
     bool dirtyWorldMatrix;
@@ -35,7 +37,9 @@ public:
     /// <summary>
     /// Creates a new game object.
     /// </summary>
-    GameObject();
+    /// <param name="device">The device this game object belongs to.</param>
+    /// <param name="deviceContext">The device context this game object belongs to.</param>
+    GameObject( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
 
     /// <summary>
     /// Destroys this game object.
@@ -85,9 +89,24 @@ public:
     template<class T> void GetComponentsOfType( std::vector<T*>& components );
 
     /// <summary>
-    /// Gets this game object's world matrix.
+    /// Gets the D3D11 device this game object is associated with.
     /// </summary>
-    DirectX::XMFLOAT4X4 GetWorldMatrix() const;
+    const ID3D11Device* GetDevice() const;
+
+    /// <summary>
+    /// Gets the D3D11 device this game object is associated with.
+    /// </summary>
+    ID3D11Device* GetDevice();
+
+    /// <summary>
+    /// Gets the D3D11 device context this game object is associated with.
+    /// </summary>
+    const ID3D11DeviceContext* GetDeviceContext() const;
+
+    /// <summary>
+    /// Gets the D3D11 device context this game object is associated with.
+    /// </summary>
+    ID3D11DeviceContext* GetDeviceContext();
 
     /// <summary>
     /// Gets this game object's transform.
@@ -98,6 +117,11 @@ public:
     /// Gets this game object's transform.
     /// </summary>
     Transform* GetTransform();
+
+    /// <summary>
+    /// Gets this game object's world matrix.
+    /// </summary>
+    DirectX::XMFLOAT4X4 GetWorldMatrix() const;
 
     /// <summary>
     /// Updates the world matrix based on the current transform.
