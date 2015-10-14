@@ -43,10 +43,12 @@ enum class TweenMethod
     ElasticEaseIn,
     ElasticEaseInOut,
     ElasticEaseOutIn,
+    /*
     BounceEaseOut,
     BounceEaseIn,
     BounceEaseInOut,
     BounceEaseOutIn,
+    */
     BackEaseOut,
     BackEaseIn,
     BackEaseInOut,

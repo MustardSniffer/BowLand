@@ -29,8 +29,8 @@
 
 #include "Transform.hpp"
 #include "MeshRenderer.hpp"
-
 #include "Tweener.hpp"
+
 #include <sstream>
 #include <DirectXColors.h>
 
@@ -147,11 +147,12 @@ bool MyDemoGame::Init()
     mr->SetMesh(helix);
     mr->SetDrawable(true);
 
+    // Add a test tween component
     Tweener* tweener = _testGameObject.AddComponent<Tweener>();
-    tweener->SetStartValue( XMFLOAT3( -3, 0, 0 ) );
-    tweener->SetEndValue  ( XMFLOAT3(  3, 0, 0 ) );
+    tweener->SetStartValue( XMFLOAT3( -2.5f,  0.5f, 0 ) );
+    tweener->SetEndValue  ( XMFLOAT3(  2.5f, -0.5f, 0 ) );
     tweener->SetDuration( 2.0f );
-    tweener->SetTweenMethod( TweenMethod::ExponentialEaseOut );
+    tweener->SetTweenMethod( TweenMethod::QuadraticEaseInOut );
 
     // Successfully initialized
     return true;
@@ -209,6 +210,12 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     Tweener* tweener = _testGameObject.GetComponent<Tweener>();
     if ( tweener && !tweener->IsEnabled() )
     {
+        // Swap the start and end values
+        TweenValue start = tweener->GetStartValue();
+        tweener->SetStartValue( tweener->GetEndValue() );
+        tweener->SetEndValue( start );
+
+        // Restart the animation
         tweener->Start( gameTime, _testGameObject.GetTransform()->GetPositionPtr(), true );
     }
 
@@ -247,7 +254,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
 void MyDemoGame::DrawScene( const GameTime& gameTime )
 {
     // Background color (Cornflower Blue in this case) for clearing
-    const float color[ 4 ] = { 0.4f, 0.6f, 0.75f, 0.0f };
+    const float* color = Colors::CornflowerBlue;
 
 
     // Clear the render target and depth buffer (erases what's on the screen)
