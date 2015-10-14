@@ -38,7 +38,7 @@ private:
     DirectionalLight _directionalLight0;
     DirectionalLight _directionalLight1;
     
-    GameObject _testGameObject;
+    std::shared_ptr<GameObject> _testGameObject;
     std::shared_ptr<Mesh> helix;
 
     // The materials to use

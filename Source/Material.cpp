@@ -2,16 +2,11 @@
 #include "Camera.hpp"
 #include <DirectXTK/WICTextureLoader.h>
 
-// Macro for updating a D3D11 resource
-#define UpdateD3DResource(oldOne, newOne) \
-    ReleaseMacro( oldOne ); \
-    oldOne = newOne; \
-    AddRefMacro( oldOne )
-
 // Create a new material
 Material::Material( ID3D11Device* device, ID3D11DeviceContext* deviceContext )
     : _device( nullptr )
     , _deviceContext( nullptr )
+    // The shaders /have/ to be initialized here??
     , _vertexShader( new SimpleVertexShader( device, deviceContext ) )
     , _pixelShader( new SimplePixelShader( device, deviceContext ) )
     , _samplerState( nullptr )
@@ -62,10 +57,10 @@ Material::Material( const Material& other )
 // Destroy this material
 Material::~Material()
 {
-    ReleaseMacro( _device );
-    ReleaseMacro( _deviceContext );
-    ReleaseMacro( _samplerState );
     ReleaseMacro( _diffuseTexture );
+    ReleaseMacro( _samplerState );
+    ReleaseMacro( _deviceContext );
+    ReleaseMacro( _device );
 }
 
 // Copy data from another material

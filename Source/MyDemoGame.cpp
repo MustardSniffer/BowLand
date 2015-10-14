@@ -69,10 +69,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
     return game.Run();
 }
 
-// --------------------------------------------------------
-// Base class constructor will set up all of the underlying
-// fields, and then we can overwrite any that we'd like
-// --------------------------------------------------------
+// Creates a new game
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
 {
@@ -92,26 +89,13 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
 }
 
-// Cleans up the demo game
+// Cleans up the game
 MyDemoGame::~MyDemoGame()
 {
-#if defined( _DEBUG ) || defined( DEBUG )
-    ID3D11Debug* debug = nullptr;
-    device->QueryInterface( __uuidof( ID3D11Debug ), reinterpret_cast<void**>( &debug ) );
-#endif
-
     DirectXGameCore::~DirectXGameCore();
-
-#if defined( _DEBUG ) || defined( DEBUG )
-    debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
-    debug->Release();
-#endif
 }
 
-// --------------------------------------------------------
-// Initializes the base class (including the window and D3D),
-// sets up our geometry and loads the shaders (among other things)
-// --------------------------------------------------------
+// Initialize the game
 bool MyDemoGame::Init()
 {
     // Call the base class's Init() method to create the window,
@@ -137,18 +121,21 @@ bool MyDemoGame::Init()
     _directionalLight1.DiffuseColor = XMFLOAT4( Colors::Wheat );
     _directionalLight1.Direction    = XMFLOAT3( -1, 0, 0 );
 
+    // Create the game object
+    _testGameObject = std::make_shared<GameObject>( device, deviceContext );
+
     // Load helix model
     helix = OBJLoader::Load("Models/helix.obj", device);
     helix->SetDeviceContext(deviceContext);
 
     // Add a mesh renderer to the test game object
-    MeshRenderer* mr = _testGameObject.AddComponent<MeshRenderer>();
+    MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
     mr->SetMaterial(brickMaterial);
     mr->SetMesh(helix);
     mr->SetDrawable(true);
 
     // Add a test tween component
-    Tweener* tweener = _testGameObject.AddComponent<Tweener>();
+    Tweener* tweener = _testGameObject->AddComponent<Tweener>();
     tweener->SetStartValue( XMFLOAT3( -2.5f,  0.5f, 0 ) );
     tweener->SetEndValue  ( XMFLOAT3(  2.5f, -0.5f, 0 ) );
     tweener->SetDuration( 2.0f );
@@ -158,11 +145,7 @@ bool MyDemoGame::Init()
     return true;
 }
 
-// --------------------------------------------------------
-// Loads shaders from compiled shader object (.cso) files
-// - These simple shaders provide helpful methods for sending
-//   data to individual variables on the GPU
-// --------------------------------------------------------
+// Load the shaders
 void MyDemoGame::LoadShaders()
 {
     // Load the brick material
@@ -171,15 +154,15 @@ void MyDemoGame::LoadShaders()
     assert( brickMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
     assert( brickMaterial->LoadDiffuseTexture( L"Textures/Bricks.jpg" ) && "Failed to brick texture!" );
 
-    // Load the metal material, using the same shaders
-    metalMaterial = std::make_shared<Material>( *brickMaterial );
+    // Load the metal material
+    // metalMaterial = std::make_shared<Material>( *brickMaterial ); // Memory leak bug when copying materials??
+    metalMaterial = std::make_shared<Material>( device, deviceContext );
+    assert( metalMaterial->LoadVertexShader( L"VertexShader.cso" ) && "Failed to load vertex shader!" );
+    assert( metalMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
     assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 
-// --------------------------------------------------------
-// Handles resizing DirectX "stuff" to match the (usually) new
-// window size and updating our projection matrix to match
-// --------------------------------------------------------
+// Handle the window resizing
 void MyDemoGame::OnResize()
 {
     // Handle base-level DX resize stuff
@@ -191,9 +174,7 @@ void MyDemoGame::OnResize()
 
 #define IsKeyDown(key) (GetAsyncKeyState(key) & 0x8000)
 
-// --------------------------------------------------------
-// Update your game here - take input, move objects, etc.
-// --------------------------------------------------------
+// Updates the scene
 void MyDemoGame::UpdateScene( const GameTime& gameTime )
 {
     // Quit if the escape key is pressed
@@ -206,8 +187,8 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     // Test code
     //----------------------------------------------------------
     
-    _testGameObject.Update( gameTime );
-    Tweener* tweener = _testGameObject.GetComponent<Tweener>();
+    _testGameObject->Update( gameTime );
+    Tweener* tweener = _testGameObject->GetComponent<Tweener>();
     if ( tweener && !tweener->IsEnabled() )
     {
         // Swap the start and end values
@@ -216,7 +197,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
         tweener->SetEndValue( start );
 
         // Restart the animation
-        tweener->Start( gameTime, _testGameObject.GetTransform()->GetPositionPtr(), true );
+        tweener->Start( gameTime, _testGameObject->GetTransform()->GetPositionPtr(), true );
     }
 
     //----------------------------------------------------------
@@ -248,9 +229,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     prevMousePos = currMousePos;
 }
 
-// --------------------------------------------------------
-// Clear the screen, redraw everything, present to the user
-// --------------------------------------------------------
+// Draws the scene
 void MyDemoGame::DrawScene( const GameTime& gameTime )
 {
     // Background color (Cornflower Blue in this case) for clearing
@@ -264,15 +243,21 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
     // Apply the camera to the materials and set the material as active
-    brickMaterial->ApplyCamera( *( camera.get() ) );
-    brickMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
-    brickMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
-    metalMaterial->ApplyCamera( *( camera.get() ) );
-    metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
-    metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
+    if ( brickMaterial )
+    {
+        brickMaterial->ApplyCamera( camera.get() );
+        brickMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
+        brickMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
+    }
+    if ( metalMaterial )
+    {
+        metalMaterial->ApplyCamera( camera.get() );
+        metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
+        metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
+    }
 
     // Draw the game object
-    _testGameObject.Draw( gameTime );
+    _testGameObject->Draw( gameTime );
 
     // Present the buffer
     //  - Puts the image we're drawing into the window so the user can see it
