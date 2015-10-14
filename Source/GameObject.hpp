@@ -63,6 +63,16 @@ public:
     template<class T> T* GetComponent();
 
     /// <summary>
+    /// Gets the component of the given base type, if it exists.
+    /// </summary>
+    template<class T> const T* GetComponentOfType() const;
+
+    /// <summary>
+    /// Gets the component of the given base type, if it exists.
+    /// </summary>
+    template<class T> T* GetComponentOfType();
+
+    /// <summary>
     /// Gets all of the components of the given type.
     /// </summary>
     /// <param name="components">The list of components to populate.</param>
