@@ -18,6 +18,12 @@ class Material
     ID3D11SamplerState* _samplerState;
     ID3D11ShaderResourceView* _diffuseTexture;
 
+    /// <summary>
+    /// Copies values from the given material.
+    /// </summary>
+    /// <param name="other">The other material.</param>
+    void CopyFrom( const Material& other );
+
     // Disallow the move constructor and assignment operator
     Material( Material&& ) = delete;
     Material& operator=( Material&& ) = delete;
@@ -46,6 +52,12 @@ public:
     /// </summary>
     /// <param name="camera">The camera to apply.</param>
     void ApplyCamera( const Camera& camera );
+
+    /// <summary>
+    /// Applies the given camera to this material.
+    /// </summary>
+    /// <param name="camera">The camera to apply.</param>
+    void ApplyCamera( const Camera* camera );
 
     /// <summary>
     /// Gets this material's vertex shader.

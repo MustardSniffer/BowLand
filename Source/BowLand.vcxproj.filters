@@ -53,9 +53,6 @@
     <ClCompile Include="GameTime.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleShader.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -89,12 +86,12 @@
     <ClCompile Include="TweenFunctions.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.hpp">
@@ -146,6 +143,9 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="TweenType.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>

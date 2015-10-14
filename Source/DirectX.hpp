@@ -8,13 +8,18 @@
 #include <DirectXMath.h>
 #include "dxerr.h"
 
-// --------------------------------------------------------
-// Convenience macro for releasing COM objects.
-//
-// Any time you get a reference from the DirectX API, you
-// must release that reference.  This macro simplifies that.
-// --------------------------------------------------------
-#define ReleaseMacro(x) { if(x){ x->Release(); x = 0; } }
+/// <summary>
+/// Safely releases the given COM pointer.
+/// </summary>
+/// <param name="x">The COM pointer.</param>
+#define ReleaseMacro(x) { if ( x ) { x->Release(); x = nullptr; } }
+
+/// <summary>
+/// Safely adds a reference the given COM pointer.
+/// </summary>
+/// <param name="x">The COM pointer.</param>
+#define AddRefMacro(x) if ( x ) x->AddRef()
+
 
 // --------------------------------------------------------
 // Macro for checking the result of a DirectX function call.  This will
