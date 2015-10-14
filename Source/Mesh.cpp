@@ -60,7 +60,7 @@ Mesh::~Mesh()
 
 // Sets the device context
 void Mesh::SetDeviceContext(ID3D11DeviceContext* deviceContext){
-	_deviceContext = deviceContext;
+    _deviceContext = deviceContext;
 }
 
 // Draw this mesh

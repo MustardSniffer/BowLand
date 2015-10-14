@@ -126,7 +126,6 @@ bool MyDemoGame::Init()
 
     // Load helix model
     helix = OBJLoader::Load("Models/helix.obj", device);
-    helix->SetDeviceContext(deviceContext);
 
     // Add a mesh renderer to the test game object
     MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
