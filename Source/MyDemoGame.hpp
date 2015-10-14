@@ -39,7 +39,7 @@ private:
     DirectionalLight _directionalLight1;
     
     GameObject _testGameObject;
-    float _tweenerTarget;
+    std::shared_ptr<Mesh> helix;
 
     // The materials to use
     std::shared_ptr<Material> brickMaterial;
@@ -52,7 +52,4 @@ private:
     // determining how far the mouse moved in a single frame.
     POINT currMousePos;
     POINT prevMousePos;
-	
-	GameObject* obj;
-	std::shared_ptr<Mesh> helix;
 };

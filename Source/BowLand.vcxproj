@@ -127,6 +127,8 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClCompile Include="SimpleShader.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Tweener.cpp" />
+    <ClCompile Include="TweenTarget.cpp" />
+    <ClCompile Include="TweenValue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
@@ -144,6 +146,9 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="Tweener.hpp" />
+    <ClInclude Include="TweenTarget.hpp" />
+    <ClInclude Include="TweenType.hpp" />
+    <ClInclude Include="TweenValue.hpp" />
     <ClInclude Include="Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>

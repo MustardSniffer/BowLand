@@ -8,7 +8,7 @@ using namespace DirectX;
 GameObject::GameObject()
     : _parent( nullptr )
 {
-	Transform* t = AddComponent<Transform>();
+    _transform = AddComponent<Transform>();
 }
 
 // Destroy this game object
@@ -26,6 +26,18 @@ GameObject* GameObject::AddChild()
     return child.get();
 }
 
+// Get the transform
+const Transform* GameObject::GetTransform() const
+{
+    return _transform;
+}
+
+// Get the transform
+Transform* GameObject::GetTransform()
+{
+    return _transform;
+}
+
 // Get this game object's world matrix
 XMFLOAT4X4 GameObject::GetWorldMatrix() const
 {
@@ -34,33 +46,33 @@ XMFLOAT4X4 GameObject::GetWorldMatrix() const
 
 void GameObject::UpdateWorldMatrix(){
 
-	const Transform* t = GetComponent<Transform>();
-	XMFLOAT3 pos = t->GetPosition();
-	XMFLOAT3 rot = t->GetRotation();
-	XMFLOAT3 sca = t->GetScale();
+    const Transform* t = GetComponent<Transform>();
+    XMFLOAT3 pos = t->GetPosition();
+    XMFLOAT3 rot = t->GetRotation();
+    XMFLOAT3 sca = t->GetScale();
 
-	XMMATRIX POS = XMMatrixTranslation(pos.x, pos.y, pos.z);
-	XMMATRIX SCALE = XMMatrixScaling(sca.x, sca.y, sca.z);
-	XMMATRIX ROT = XMMatrixRotationX(rot.x) * XMMatrixRotationY(rot.y) * XMMatrixRotationZ(rot.z);
-	XMMATRIX WORLD = SCALE * ROT * POS;
-	
-	// Check if we have a parent, then combine the matrices if necessary
-	if (_parent)
-	{
-		XMFLOAT4X4 parentWorld = _parent->GetWorldMatrix();
-		WORLD = XMLoadFloat4x4(&parentWorld) * WORLD;
-	}
+    XMMATRIX POS = XMMatrixTranslation(pos.x, pos.y, pos.z);
+    XMMATRIX SCALE = XMMatrixScaling(sca.x, sca.y, sca.z);
+    XMMATRIX ROT = XMMatrixRotationX(rot.x) * XMMatrixRotationY(rot.y) * XMMatrixRotationZ(rot.z);
+    XMMATRIX WORLD = SCALE * ROT * POS;
+    
+    // Check if we have a parent, then combine the matrices if necessary
+    if (_parent)
+    {
+        XMFLOAT4X4 parentWorld = _parent->GetWorldMatrix();
+        WORLD = XMLoadFloat4x4(&parentWorld) * WORLD;
+    }
 
-	XMStoreFloat4x4(&worldMat, XMMatrixTranspose(WORLD));
-	dirtyWorldMatrix = false;
+    XMStoreFloat4x4(&worldMat, XMMatrixTranspose(WORLD));
+    dirtyWorldMatrix = false;
 }
 
 bool GameObject::isWorldMatrixDirty() const{
-	return dirtyWorldMatrix;
+    return dirtyWorldMatrix;
 }
 
 void GameObject::SetWorldMatrixDirty(){
-	dirtyWorldMatrix = true;
+    dirtyWorldMatrix = true;
 }
 
 // Update all components

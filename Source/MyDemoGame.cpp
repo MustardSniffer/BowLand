@@ -53,9 +53,9 @@ using namespace DirectX;
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd )
 {
     // Enable run-time memory check for debug builds.
-	#if defined( DEBUG ) || defined( _DEBUG )
-		_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	#endif
+    #if defined( DEBUG ) || defined( _DEBUG )
+        _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+    #endif
 
     // Create the game object.
     MyDemoGame game( hInstance );
@@ -75,7 +75,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
 // --------------------------------------------------------
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
-    , _tweenerTarget( 0.0f )
 {
     // Set up a custom caption for the game window.
     // - The "L" before the string signifies a "wide character" string
@@ -138,21 +137,21 @@ bool MyDemoGame::Init()
     _directionalLight1.DiffuseColor = XMFLOAT4( Colors::Wheat );
     _directionalLight1.Direction    = XMFLOAT3( -1, 0, 0 );
 
-	helix = OBJLoader::Load("Models/helix.obj", device);
-	helix->SetDeviceContext(deviceContext);
+    // Load helix model
+    helix = OBJLoader::Load("Models/helix.obj", device);
+    helix->SetDeviceContext(deviceContext);
 
-	obj = new GameObject();
-	MeshRenderer* mr = obj->AddComponent<MeshRenderer>();
-	mr->SetMaterial(brickMaterial);
-	mr->SetMesh(helix);
-	mr->SetDrawable(true);
+    // Add a mesh renderer to the test game object
+    MeshRenderer* mr = _testGameObject.AddComponent<MeshRenderer>();
+    mr->SetMaterial(brickMaterial);
+    mr->SetMesh(helix);
+    mr->SetDrawable(true);
 
     Tweener* tweener = _testGameObject.AddComponent<Tweener>();
-    tweener->SetStartValue( -10.0f );
-    tweener->SetEndValue  (  10.0f );
-    tweener->SetDuration  (   4.0f );
+    tweener->SetStartValue( XMFLOAT3( -3, 0, 0 ) );
+    tweener->SetEndValue  ( XMFLOAT3(  3, 0, 0 ) );
+    tweener->SetDuration( 2.0f );
     tweener->SetTweenMethod( TweenMethod::ExponentialEaseOut );
-    tweener->Start( _gameTime, &_tweenerTarget );
 
     // Successfully initialized
     return true;
@@ -201,31 +200,35 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     {
         Quit();
     }
-	
-	//----------------------------------------------------------
-	// Test code
-	//----------------------------------------------------------
+    
+    //----------------------------------------------------------
+    // Test code
+    //----------------------------------------------------------
+    
+    _testGameObject.Update( gameTime );
+    Tweener* tweener = _testGameObject.GetComponent<Tweener>();
+    if ( tweener && !tweener->IsEnabled() )
+    {
+        tweener->Start( gameTime, _testGameObject.GetTransform()->GetPositionPtr(), true );
+    }
 
-    obj->Update( gameTime );
-    std::cout << "Value: " << _tweenerTarget << std::endl;
-
-	//----------------------------------------------------------
+    //----------------------------------------------------------
 
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
     float rotSpeed  = gameTime.GetElapsedTime() * 8.0f;
 
-	// Speed up when shift is pressed
-	if IsKeyDown(VK_SHIFT) { moveSpeed *= 5; }
+    // Speed up when shift is pressed
+    if ( IsKeyDown(VK_SHIFT) ) { moveSpeed *= 5; }
 
-	// Movement
-	if IsKeyDown('W') { camera->MoveRelative(0, 0, moveSpeed); }
-	if IsKeyDown('S') { camera->MoveRelative(0, 0, -moveSpeed); }
-	if IsKeyDown('A') { camera->MoveRelative(-moveSpeed, 0, 0); }
-	if IsKeyDown('D') { camera->MoveRelative(moveSpeed, 0, 0); }
-	if IsKeyDown('X') { camera->MoveAbsolute(0, -moveSpeed, 0); }
-	if IsKeyDown(' ') { camera->MoveAbsolute(0, moveSpeed, 0); }
-	
+    // Movement
+    if ( IsKeyDown('W') ) { camera->MoveRelative(0, 0, moveSpeed); }
+    if ( IsKeyDown('S') ) { camera->MoveRelative(0, 0, -moveSpeed); }
+    if ( IsKeyDown('A') ) { camera->MoveRelative(-moveSpeed, 0, 0); }
+    if ( IsKeyDown('D') ) { camera->MoveRelative(moveSpeed, 0, 0); }
+    if ( IsKeyDown('Q') ) { camera->MoveAbsolute(0, -moveSpeed, 0); }
+    if ( IsKeyDown('E') ) { camera->MoveAbsolute(0, moveSpeed, 0); }
+    
     if ( hasMouseFocus )
     {
         // Rotate the camera
@@ -253,7 +256,6 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     deviceContext->ClearRenderTargetView( renderTargetView, color );
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-
     // Apply the camera to the materials and set the material as active
     brickMaterial->ApplyCamera( *( camera.get() ) );
     brickMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
@@ -262,10 +264,10 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
     metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
 
-	if (obj->isWorldMatrixDirty()){
-		obj->UpdateWorldMatrix();
-	}
-	obj->Draw(gameTime);
+    if (_testGameObject.isWorldMatrixDirty()){
+        _testGameObject.UpdateWorldMatrix();
+    }
+    _testGameObject.Draw( gameTime );
 
     // Present the buffer
     //  - Puts the image we're drawing into the window so the user can see it

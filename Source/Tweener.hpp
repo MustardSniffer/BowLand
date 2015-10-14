@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Component.hpp"
+#include "TweenTarget.hpp"
+#include "TweenValue.hpp"
 #include <vector>
 
 /// <summary>
@@ -71,18 +73,25 @@ class Tweener : public Component
     static std::vector<TweenFunction> _tweenFunctions;
 
     // TODO - Create TweenTarget class to support float, float2, float3, etc.
-    float* _targetValue;
+    TweenTarget _targetValue;
     TweenMethod _tweenMethod;
     TweenFunction _tweenFunction;
-    float _startValue;
-    float _endingValue;
+    TweenValue _startValue;
+    TweenValue _endValue;
     float _duration;
     float _startTime;
+    bool _areValuesCompatible;
+    bool _isAffectingTransform;
 
     /// <summary>
     /// Creates all of the tween functions.
     /// </summary>
     static void CreateTweenFunctions();
+
+    /// <summary>
+    /// Checks to see if the start, end, and target values are compatible.
+    /// </summary>
+    void CheckForCompatibleValues();
 
 public:
     /// <summary>
@@ -99,7 +108,7 @@ public:
     /// <summary>
     /// Gets this tween animation's starting value.
     /// </summary>
-    inline float GetStartValue()
+    inline TweenValue GetStartValue()
     {
         return _startValue;
     }
@@ -107,9 +116,9 @@ public:
     /// <summary>
     /// Gets this tween animation's ending value.
     /// </summary>
-    inline float GetEndValue()
+    inline TweenValue GetEndValue()
     {
-        return _endingValue;
+        return _endValue;
     }
 
     /// <summary>
@@ -132,13 +141,13 @@ public:
     /// Sets this tweener's starting value.
     /// </summary>
     /// <param name="value">The new start value.</param>
-    void SetStartValue( float value );
+    void SetStartValue( TweenValue value );
 
     /// <summary>
     /// Sets this tweener's ending value.
     /// </summary>
     /// <param name="value">The new end value.</param>
-    void SetEndValue( float value );
+    void SetEndValue( TweenValue value );
 
     /// <summary>
     /// Sets this tweener's duration.
@@ -157,11 +166,12 @@ public:
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     /// <param name="target">The target value to modify.</param>
-    void Start( const GameTime& gameTime, float* target );
+    /// <param name="targetIsTransform">True if the target belongs to the transform of the owner game object, false if not.</param>
+    void Start( const GameTime& gameTime, TweenTarget target, bool targetIsTransform = false );
 
     /// <summary>
     /// Updates this tweening component.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime );
+    void Update( const GameTime& gameTime ) override;
 };

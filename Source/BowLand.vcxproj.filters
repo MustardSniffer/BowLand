@@ -68,17 +68,23 @@
     <ClCompile Include="OBJLoader.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Tweener.cpp">
-      <Filter>Source Files\Utility</Filter>
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="TweenTarget.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="TweenValue.cpp">
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,9 +102,6 @@
     </ClInclude>
     <ClInclude Include="Vertex.hpp">
       <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.hpp">
-      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="dxerr.h">
       <Filter>Header Files\Utility</Filter>
@@ -121,14 +124,26 @@
     <ClInclude Include="Transform.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Tweener.hpp">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="MeshRenderer.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Camera.hpp">
       <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Tweener.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TweenTarget.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TweenValue.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TweenType.hpp">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

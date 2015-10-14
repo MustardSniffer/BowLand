@@ -6,9 +6,9 @@
 #include <vector>
 #include "DirectXMath.h"
 #include "GameTime.hpp"
-// TODO - Transform
 
 class Component;
+class Transform;
 
 /// <summary>
 /// Defines a game object.
@@ -18,9 +18,10 @@ class GameObject
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
     std::vector<std::shared_ptr<GameObject>> _children;
     GameObject* _parent;
+    Transform* _transform;
 
-	DirectX::XMFLOAT4X4 worldMat;
-	bool dirtyWorldMatrix;
+    DirectX::XMFLOAT4X4 worldMat;
+    bool dirtyWorldMatrix;
 
     // Prevent the use of the copy constructor and copy assignment operator
     GameObject( const GameObject& ) = delete;
@@ -78,21 +79,31 @@ public:
     /// </summary>
     DirectX::XMFLOAT4X4 GetWorldMatrix() const;
 
-	/// <summary>
-	/// Updates the world matrix based on the current transform.
-	/// </summary>
-	void UpdateWorldMatrix();
+    /// <summary>
+    /// Gets this game object's transform.
+    /// </summary>
+    const Transform* GetTransform() const;
 
-	/// <summary>
-	/// Returns true if the object has been moved, rotated, or scaled and
-	/// the world matrix has not been updated
-	/// </summary>
-	bool isWorldMatrixDirty() const;
+    /// <summary>
+    /// Gets this game object's transform.
+    /// </summary>
+    Transform* GetTransform();
 
-	/// <summary>
-	/// Sets the world matrix to 'dirty' and let's the object know it needs to be updated
-	/// </summary>
-	void SetWorldMatrixDirty();
+    /// <summary>
+    /// Updates the world matrix based on the current transform.
+    /// </summary>
+    void UpdateWorldMatrix();
+
+    /// <summary>
+    /// Returns true if the object has been moved, rotated, or scaled and
+    /// the world matrix has not been updated
+    /// </summary>
+    bool isWorldMatrixDirty() const;
+
+    /// <summary>
+    /// Sets the world matrix to 'dirty' and let's the object know it needs to be updated
+    /// </summary>
+    void SetWorldMatrixDirty();
 
     /// <summary>
     /// Draws this game object and all components inside of it.
