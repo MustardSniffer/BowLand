@@ -73,7 +73,8 @@
       <Command>mkdir "$(OutDir)Models"
 mkdir "$(OutDir)Textures"
 xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d</Command>
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
+xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>
@@ -106,7 +107,8 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d</Command>
       <Command>mkdir "$(OutDir)Models"
 mkdir "$(OutDir)Textures"
 xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d</Command>
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
+xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>
