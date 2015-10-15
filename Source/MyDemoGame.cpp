@@ -138,7 +138,7 @@ bool MyDemoGame::Init()
     tweener->SetStartValue( XMFLOAT3( -2.5f,  0.5f, 0 ) );
     tweener->SetEndValue  ( XMFLOAT3(  2.5f, -0.5f, 0 ) );
     tweener->SetDuration( 2.0f );
-    tweener->SetTweenMethod( TweenMethod::QuadraticEaseInOut );
+    tweener->SetTweenMethod( TweenMethod::QuinticEaseInOut );
 
     // Successfully initialized
     return true;

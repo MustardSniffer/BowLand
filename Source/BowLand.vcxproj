@@ -59,7 +59,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -72,8 +72,8 @@
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)Models"
 mkdir "$(OutDir)Textures"
-xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
+xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>
@@ -92,7 +92,7 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp.lib;d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -105,8 +105,8 @@ xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)Models"
 mkdir "$(OutDir)Textures"
-xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y</Command>
+xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>

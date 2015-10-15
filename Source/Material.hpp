@@ -11,10 +11,10 @@ class Camera; // forward declaration
 /// </summary>
 class Material
 {
-    ID3D11Device* _device;
-    ID3D11DeviceContext* _deviceContext;
     std::shared_ptr<SimpleVertexShader> _vertexShader;
     std::shared_ptr<SimplePixelShader> _pixelShader;
+    ID3D11Device* _device;
+    ID3D11DeviceContext* _deviceContext;
     ID3D11SamplerState* _samplerState;
     ID3D11ShaderResourceView* _diffuseTexture;
 
