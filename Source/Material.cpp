@@ -78,10 +78,10 @@ void Material::CopyFrom( const Material& other )
     }
 
     // Update our resources
-    UpdateD3DResource( _device, other._device );
-    UpdateD3DResource( _deviceContext, other._deviceContext );
-    UpdateD3DResource( _samplerState, other._samplerState );
     UpdateD3DResource( _diffuseTexture, other._diffuseTexture );
+    UpdateD3DResource( _samplerState, other._samplerState );
+    UpdateD3DResource( _deviceContext, other._deviceContext );
+    UpdateD3DResource( _device, other._device );
 }
 
 // Apply a camera to this material
@@ -130,6 +130,7 @@ bool Material::LoadVertexShader( const TCHAR* fname )
 // Attempt to load the diffuse texture
 bool Material::LoadDiffuseTexture( const wchar_t* fname )
 {
+    ReleaseMacro( _diffuseTexture );
     return !FAILED( DirectX::CreateWICTextureFromFile( _device, _deviceContext, fname, nullptr, &_diffuseTexture ) );
 }
 

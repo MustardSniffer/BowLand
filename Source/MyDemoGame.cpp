@@ -153,11 +153,8 @@ void MyDemoGame::LoadShaders()
     assert( brickMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
     assert( brickMaterial->LoadDiffuseTexture( L"Textures/Bricks.jpg" ) && "Failed to brick texture!" );
 
-    // Load the metal material
-    // metalMaterial = std::make_shared<Material>( *brickMaterial ); // Memory leak bug when copying materials??
-    metalMaterial = std::make_shared<Material>( device, deviceContext );
-    assert( metalMaterial->LoadVertexShader( L"VertexShader.cso" ) && "Failed to load vertex shader!" );
-    assert( metalMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
+    // Load the metal material using the same shaders as the brick material
+    metalMaterial = std::make_shared<Material>( *brickMaterial );
     assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 

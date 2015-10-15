@@ -12,7 +12,7 @@
 /// Safely releases the given COM pointer.
 /// </summary>
 /// <param name="x">The COM pointer.</param>
-#define ReleaseMacro(x) { if ( x ) { x->Release(); x = nullptr; } }
+#define ReleaseMacro(x) if ( x ) { x->Release(); x = nullptr; }
 
 /// <summary>
 /// Safely adds a reference the given COM pointer.
