@@ -58,6 +58,17 @@ enum class TweenMethod
 };
 
 /// <summary>
+/// An enumeration of possible tween play modes.
+/// </summary>
+enum class TweenPlayMode
+{
+    None,
+    Once,
+    Loop,
+    PingPong
+};
+
+/// <summary>
 /// Defines the base for tween components.
 /// </summary>
 class Tweener : public Component
@@ -80,6 +91,7 @@ class Tweener : public Component
     TweenFunction _tweenFunction;
     TweenValue _startValue;
     TweenValue _endValue;
+    TweenPlayMode _playMode;
     float _duration;
     float _startTime;
     bool _areValuesCompatible;
@@ -94,6 +106,12 @@ class Tweener : public Component
     /// Checks to see if the start, end, and target values are compatible.
     /// </summary>
     void CheckForCompatibleValues();
+
+    /// <summary>
+    /// Handles when this tweener is done.
+    /// </summary>
+    /// <param name="gameTime">The time when the end occurred.</param>
+    virtual void OnEnd( const GameTime& gameTime );
 
 public:
     /// <summary>
@@ -110,34 +128,27 @@ public:
     /// <summary>
     /// Gets this tween animation's starting value.
     /// </summary>
-    inline TweenValue GetStartValue()
-    {
-        return _startValue;
-    }
+    inline TweenValue GetStartValue() const;
 
     /// <summary>
     /// Gets this tween animation's ending value.
     /// </summary>
-    inline TweenValue GetEndValue()
-    {
-        return _endValue;
-    }
+    inline TweenValue GetEndValue() const;
 
     /// <summary>
     /// Gets this tween animation's duration.
     /// </summary>
-    inline float GetDuration()
-    {
-        return _duration;
-    }
+    inline float GetDuration() const;
 
     /// <summary>
     /// Gets this tweener's tween method.
     /// </summary>
-    inline TweenMethod GetTweenMethod() const
-    {
-        return _tweenMethod;
-    }
+    inline TweenMethod GetTweenMethod() const;
+
+    /// <summary>
+    /// Gets this tweener's play mode.
+    /// </summary>
+    inline TweenPlayMode GetPlayMode() const;
 
     /// <summary>
     /// Sets this tweener's starting value.
@@ -156,6 +167,12 @@ public:
     /// </summary>
     /// <param name="duration">The new duration.</param>
     void SetDuration( float duration );
+
+    /// <summary>
+    /// Sets this tweener's play mode.
+    /// </summary>
+    /// <param name="mode">The new tween mode.</param>
+    void SetPlayMode( TweenPlayMode mode );
 
     /// <summary>
     /// Sets this tweener's tween method.

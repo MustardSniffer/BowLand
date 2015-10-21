@@ -79,14 +79,15 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     // - "Wide" characters take up more space in memory (hence the name)
     // - This allows for an extended character set (more fancy letters/symbols)
     // - Lots of Windows functions want "wide characters", so we use the "L"
-    windowCaption = L"My Super Fancy GGP Game";
+    windowCaption = L"Bow Land";
 
     // Custom window size - will be created by Init() later
     windowWidth = 1280;
     windowHeight = 720;
 
     // Re-create the camera's projection matrix
-    camera = std::make_shared<Camera>( 0.0f, 0.0f, -5.0f );
+    camera = std::make_shared<Camera>( 5.0f, 0.0f, 0.0f );
+    camera->Rotate( 0, -XM_PIDIV2 );
     camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
 }
 
@@ -117,14 +118,16 @@ bool MyDemoGame::Init()
     _testGameObject->GetTransform()->SetScale( XMFLOAT3( 3, 3, 3 ) );
 
     // Load helix model
-    helix = MeshLoader::Load( "Models/sphere.obj", device, deviceContext );
+    helix = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
+
+
 
     // Add a default material to the game object
     DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
-    material->LoadDiffuseMap( L"Textures\\DryDirt.jpg" );
-    material->LoadNormalMap( L"Textures\\DryDirtNormals.jpg" );
-    material->UseSpecularity( true );
-    material->SetSpecularPower( 128.0f );
+    material->LoadDiffuseMap( L"Textures\\Rocks.jpg" );
+    material->LoadNormalMap( L"Textures\\RocksNormals.jpg" );
+    material->UseSpecularity( false );
+    material->SetSpecularPower( 256.0f );
 
     // Set the lights' information
     DirectionalLight dLight;
@@ -148,8 +151,10 @@ bool MyDemoGame::Init()
     Tweener* tweener = _testGameObject->AddComponent<Tweener>();
     tweener->SetStartValue( XMFLOAT3( 0.0f, 0.0f, 0 ) );
     tweener->SetEndValue  ( XMFLOAT3( 0.0f, XM_2PI, 0 ) );
-    tweener->SetDuration( 10.0f );
+    tweener->SetDuration( 20.0f );
     tweener->SetTweenMethod( TweenMethod::Linear );
+    tweener->SetPlayMode( TweenPlayMode::Loop );
+    tweener->Start( _gameTime, _testGameObject->GetTransform()->GetRotationPtr(), true );
 
     // Successfully initialized
     return true;
@@ -181,18 +186,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     //----------------------------------------------------------
     
     _testGameObject->Update( gameTime );
-    Tweener* tweener = _testGameObject->GetComponent<Tweener>();
-    if ( tweener && !tweener->IsEnabled() )
-    {
-        // Swap the start and end values
-        /* TweenValue start = tweener->GetStartValue();
-        tweener->SetStartValue( tweener->GetEndValue() );
-        tweener->SetEndValue( start ); */
-
-        // Restart the animation
-        tweener->Start( gameTime, _testGameObject->GetTransform()->GetRotationPtr(), true );
-    }
-
+    
     //----------------------------------------------------------
 
     // Update the camera based on input

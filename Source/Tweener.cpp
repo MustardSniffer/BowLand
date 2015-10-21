@@ -14,6 +14,7 @@ std::vector<Tweener::TweenFunction> Tweener::_tweenFunctions;
 Tweener::Tweener( GameObject* gameObject )
     : Component( gameObject )
     , _tweenMethod( TweenMethod::Linear )
+    , _playMode( TweenPlayMode::Once )
     , _tweenFunction( nullptr )
     , _duration( 1.0f )
     , _startTime( 0.0f )
@@ -51,6 +52,69 @@ void Tweener::CheckForCompatibleValues()
                          && ( _startValue.GetValueType() == _targetValue.GetTargetType() );
 }
 
+// Handle when our animation ends
+void Tweener::OnEnd( const GameTime& gameTime )
+{
+    switch ( _playMode )
+    {
+        case TweenPlayMode::Loop:
+        {
+            this->Start( gameTime, _targetValue, _isAffectingTransform );
+        }
+        break;
+
+        case TweenPlayMode::PingPong:
+        {
+            // Swap the start and end values
+            TweenValue end = _endValue;
+            _endValue = _startValue;
+            _startValue = end;
+
+            // Begin again
+            this->Start( gameTime, _targetValue, _isAffectingTransform );
+        }
+        break;
+
+        case TweenPlayMode::None:
+        case TweenPlayMode::Once:
+        default:
+        {
+            this->SetEnabled( false );
+        }
+        break;
+    }
+}
+
+// Get the start value
+TweenValue Tweener::GetStartValue() const
+{
+    return _startValue;
+}
+
+// Get the end value
+TweenValue Tweener::GetEndValue() const
+{
+    return _endValue;
+}
+
+// Get the tween duration
+float Tweener::GetDuration() const
+{
+    return _duration;
+}
+
+// Get the tween method
+TweenMethod Tweener::GetTweenMethod() const
+{
+    return _tweenMethod;
+}
+
+// Get the play mode
+TweenPlayMode Tweener::GetPlayMode() const
+{
+    return _playMode;
+}
+
 // Set start value
 void Tweener::SetStartValue( TweenValue value )
 {
@@ -69,6 +133,12 @@ void Tweener::SetEndValue( TweenValue value )
 void Tweener::SetDuration( float duration )
 {
     _duration = duration;
+}
+
+// Set play mode
+void Tweener::SetPlayMode( TweenPlayMode mode )
+{
+    _playMode = mode;
 }
 
 // Set tween method
@@ -105,7 +175,7 @@ void Tweener::Update( const GameTime& gameTime )
     if ( time >= _duration )
     {
         time = _duration;
-        SetEnabled( false );
+        OnEnd( gameTime );
     }
 
     // Modify the target value
