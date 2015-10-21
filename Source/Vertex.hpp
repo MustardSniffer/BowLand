@@ -1,13 +1,14 @@
 #pragma once
 
-#include <DirectXMath.h>
+#include "Shaders/SharedTypes.hpp"
 
-// --------------------------------------------------------
-// A custom vertex definition - You will eventually ADD TO this!
-// --------------------------------------------------------
+/// <summary>
+/// Defines a vertex in a mesh.
+/// </summary>
 struct Vertex
 {
-    DirectX::XMFLOAT3 Position;	    // The position of the vertex
-    DirectX::XMFLOAT2 UV;           // The texture coordinates of the vertex
-    DirectX::XMFLOAT3 Normal;       // The color of the vertex
+    DirectX::XMFLOAT3 Position;
+    DirectX::XMFLOAT2 UV;
+    DirectX::XMFLOAT3 Normal;
+    DirectX::XMFLOAT3 Tangent;
 };

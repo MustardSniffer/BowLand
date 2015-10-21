@@ -1,27 +1,22 @@
 #include "Mesh.hpp"
 
 // Create a new mesh
-Mesh::Mesh( ID3D11Device* device, const std::vector<Vertex>& vertices, const std::vector<UINT>& indices )
-    : Mesh( device,
-            &vertices[ 0 ], static_cast<unsigned int>( vertices.size() ),
-            &indices[ 0 ], static_cast<unsigned int>( indices.size() ) )
+Mesh::Mesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std::vector<Vertex>& vertices, const std::vector<UINT>& indices )
+    : _deviceContext( nullptr )
+    , _indexCount( static_cast<UINT>( indices.size() ) )
 {
-}
+    UpdateD3DResource( _deviceContext, deviceContext );
 
-// Create a new mesh
-Mesh::Mesh( ID3D11Device* device, const Vertex* vertices, unsigned int vertexCount, const UINT* indices, unsigned int indexCount )
-    : _indexCount( static_cast<int>( indexCount ) )
-{
     // Create the vertex buffer description
     D3D11_BUFFER_DESC bufferDesc;
     ZeroMemory( &bufferDesc, sizeof( D3D11_BUFFER_DESC ) );
-    bufferDesc.Usage        = D3D11_USAGE_IMMUTABLE;
-    bufferDesc.ByteWidth    = sizeof(Vertex) * vertexCount;
-    bufferDesc.BindFlags    = D3D11_BIND_VERTEX_BUFFER;
+    bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+    bufferDesc.ByteWidth = sizeof( Vertex ) * vertices.size();
+    bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
     // Create the vertex buffer resource data
     D3D11_SUBRESOURCE_DATA resourceData;
-    resourceData.pSysMem = vertices;
+    resourceData.pSysMem = &vertices[ 0 ];
 
     // Send the vertex data to DirectX
     HR( device->CreateBuffer( &bufferDesc, &resourceData, &_vertexBuffer ) );
@@ -29,11 +24,11 @@ Mesh::Mesh( ID3D11Device* device, const Vertex* vertices, unsigned int vertexCou
 
 
     // Reuse the buffer description for the index buffer
-    bufferDesc.ByteWidth = sizeof( int ) * indexCount;
+    bufferDesc.ByteWidth = sizeof( UINT ) * indices.size();
     bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
     // Reuse the resource data for the indices
-    resourceData.pSysMem = indices;
+    resourceData.pSysMem = &indices[ 0 ];
 
     // Send the index data to DirectX
     HR( device->CreateBuffer( &bufferDesc, &resourceData, &_indexBuffer ) );
@@ -41,12 +36,12 @@ Mesh::Mesh( ID3D11Device* device, const Vertex* vertices, unsigned int vertexCou
 
 // Copy another mesh
 Mesh::Mesh( const Mesh& other )
-    : _vertexBuffer( other._vertexBuffer )
-    , _indexBuffer( other._indexBuffer )
-    , _indexCount( other._indexCount )
+    : _vertexBuffer( nullptr )
+    , _indexBuffer( nullptr )
+    , _deviceContext( nullptr )
+    , _indexCount( 0 )
 {
-    _vertexBuffer->AddRef();
-    _indexBuffer->AddRef();
+    CopyFrom( other );
 }
 
 // Destroy this mesh
@@ -54,17 +49,23 @@ Mesh::~Mesh()
 {
     ReleaseMacro( _vertexBuffer );
     ReleaseMacro( _indexBuffer );
+    ReleaseMacro( _deviceContext );
 
     _indexCount = 0;
 }
 
-// Sets the device context
-void Mesh::SetDeviceContext(ID3D11DeviceContext* deviceContext){
-    _deviceContext = deviceContext;
+// Copy the given mesh
+void Mesh::CopyFrom( const Mesh& mesh )
+{
+    UpdateD3DResource( _vertexBuffer, mesh._vertexBuffer );
+    UpdateD3DResource( _indexBuffer, mesh._indexBuffer );
+    UpdateD3DResource( _deviceContext, mesh._deviceContext );
+    
+    _indexCount = mesh._indexCount;
 }
 
 // Draw this mesh
-void Mesh::Draw( )
+void Mesh::Draw()
 {
     const UINT stride = sizeof( Vertex );
     const UINT offset = 0;
@@ -96,15 +97,6 @@ int Mesh::GetIndexCount()
 // Copy another mesh
 Mesh& Mesh::operator=( const Mesh& other )
 {
-    ReleaseMacro( _vertexBuffer );
-    ReleaseMacro( _indexBuffer );
-
-    _vertexBuffer = other._vertexBuffer;
-    _indexBuffer = other._indexBuffer;
-    _indexCount = other._indexCount;
-
-    _vertexBuffer->AddRef();
-    _indexBuffer->AddRef();
-
+    CopyFrom( other );
     return *this;
 }

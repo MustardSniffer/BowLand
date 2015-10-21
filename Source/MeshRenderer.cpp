@@ -17,7 +17,6 @@ void MeshRenderer::CopyMeshRenderer(MeshRenderer* nRender){
 
 void MeshRenderer::SetMesh(std::shared_ptr<Mesh> nMesh){
     _mesh = nMesh;
-    _mesh->SetDeviceContext( _gameObject->GetDeviceContext() );
 }
 
 void MeshRenderer::SetMaterial(std::shared_ptr<Material> nMaterial){

@@ -23,7 +23,7 @@
 
 #include "MyDemoGame.hpp"
 #include "Vertex.hpp"
-#include "OBJLoader.hpp"
+#include "MeshLoader.hpp"
 #include "GameObject.hpp"
 #include "Component.hpp"
 
@@ -125,7 +125,7 @@ bool MyDemoGame::Init()
     _testGameObject = std::make_shared<GameObject>( device, deviceContext );
 
     // Load helix model
-    helix = OBJLoader::Load("Models/helix.obj", device);
+    helix = MeshLoader::Load("Models/helix.obj", device, deviceContext);
 
     // Add a mesh renderer to the test game object
     MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();

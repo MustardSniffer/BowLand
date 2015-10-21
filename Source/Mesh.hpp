@@ -14,24 +14,25 @@ class Mesh
     ID3D11DeviceContext* _deviceContext;
     int _indexCount;
     
+    /// <summary>
+    /// Copies the given mesh.
+    /// </summary>
+    /// <param name="mesh">The mesh to copy.</param>
+    void CopyFrom( const Mesh& mesh );
+
+    // Prevent use of the move constructor and assignment operator
+    Mesh( Mesh&& ) = delete;
+    Mesh& operator=( Mesh&& ) = delete;
+
 public:
     /// <summary>
     /// Creates a new mesh.
     /// </summary>
-    /// <param name="device">The D3D device to use.</param>
+    /// <param name="device">The graphics device context to create our buffers on..</param>
+    /// <param name="device">The device context to use to draw.</param>
     /// <param name="vertices">The vertices to use.</param>
     /// <param name="indices">The indices to use.</param>
-    Mesh( ID3D11Device* device, const std::vector<Vertex>& vertices, const std::vector<UINT>& indices );
-
-    /// <summary>
-    /// Creates a new mesh.
-    /// </summary>
-    /// <param name="device">The D3D device to use.</param>
-    /// <param name="vertices">The vertices to use.</param>
-    /// <param name="vertexCount">The number of vertices.</param>
-    /// <param name="indices">The indices to use.</param>
-    /// <param name="indexCount">The number of indices.</param>
-    Mesh( ID3D11Device* device, const Vertex* vertices, unsigned int vertexCount, const UINT* indices, unsigned int indexCount );
+    Mesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std::vector<Vertex>& vertices, const std::vector<UINT>& indices );
 
     /// <summary>
     /// Copies another mesh.
@@ -39,19 +40,10 @@ public:
     /// <param name="other">The other mesh.</param>
     Mesh( const Mesh& other );
 
-    // Prevent use of the move constructor
-    Mesh( Mesh&& ) = delete;
-
     /// <summary>
     /// Destroys this mesh.
     /// </summary>
     ~Mesh();
-
-    /// <summary>
-    /// Sets the device context to be used for drawing.
-    /// </summary>
-    /// <param name="deviceContext">The device context to use to draw.</param>
-    void SetDeviceContext(ID3D11DeviceContext* deviceContext);
 
     /// <summary>
     /// Draws this mesh.
@@ -78,7 +70,4 @@ public:
     /// </summary>
     /// <param name="other">The other mesh.</param>
     Mesh& operator=( const Mesh& other );
-    
-    // Prevent the use of the move assignment operator
-    Mesh& operator=( Mesh&& ) = delete;
 };
