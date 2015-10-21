@@ -10,6 +10,7 @@ cbuffer __extern__ : register( b0 )
     matrix Projection;
     DirectionalLight Light0;
     DirectionalLight Light1;
+    float NormalMapWeight;
 };
 
 /// <summary>
@@ -20,6 +21,7 @@ struct ProgramToVertex
     float3 Position     : SV_POSITION;
     float2 UV           : TEXCOORD;
     float3 Normal       : NORMAL;
+    float3 Tangent      : TANGENT;
 };
 
 /// <summary>
@@ -28,6 +30,8 @@ struct ProgramToVertex
 struct VertexToPixel
 {
     float4 Position     : SV_POSITION;
-    float2 UV           : TEXCOORD;
     float3 Normal       : NORMAL;
+    float3 Tangent      : TANGENT;
+    float2 UV           : TEXCOORD0;
+    float3 WorldPosition : TEXCOORD1;
 };

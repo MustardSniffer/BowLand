@@ -13,11 +13,17 @@ VertexToPixel main( ProgramToVertex input )
     matrix worldViewProj = mul( mul( World, View ), Projection );
 
     // Transform the world position
-    output.Position = mul( float4( input.Position, 1.0f ), worldViewProj );
+    output.Position = mul( float4( input.Position, 1.0 ), worldViewProj );
 
-    // Pass the UV and normal through
+    // Calculate the normal and tangent
+    output.Normal = mul( input.Normal, (float3x3)World );
+    output.Tangent = mul( input.Tangent, (float3x3)World );
+
+    // Calculate the world space position of the position
+    output.WorldPosition = mul( float4( input.Position, 1.0 ), World ).xyz;
+
+    // Pass the UV through
     output.UV = input.UV;
-    output.Normal = normalize( mul( input.Normal, (float3x3)World ) );
 
     return output;
 }

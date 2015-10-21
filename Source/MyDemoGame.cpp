@@ -114,14 +114,15 @@ bool MyDemoGame::Init()
     {
         return false;
     }
+    _testGameObject->GetTransform()->SetScale( XMFLOAT3( 4, 4, 4 ) );
 
     // Load helix model
-    helix = MeshLoader::Load( "Models/helix.obj", device, deviceContext );
+    helix = MeshLoader::Load( "Models/sphere.obj", device, deviceContext );
 
     // Add a default material to the game object
     DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
-    material->LoadDiffuseTexture( L"Textures\\Bricks.jpg" );
-
+    material->LoadDiffuseMap( L"Textures\\Rocks2.jpg" );
+    material->LoadNormalMap( L"Textures\\Rocks2Normals.jpg" );
 
 
     // Set the lights' information
@@ -145,10 +146,10 @@ bool MyDemoGame::Init()
 
     // Add a test tween component
     Tweener* tweener = _testGameObject->AddComponent<Tweener>();
-    tweener->SetStartValue( XMFLOAT3( -2.5f, 0.0f, 0 ) );
-    tweener->SetEndValue  ( XMFLOAT3(  2.5f, 0.0f, 0 ) );
-    tweener->SetDuration( 2.0f );
-    tweener->SetTweenMethod( TweenMethod::QuinticEaseInOut );
+    tweener->SetStartValue( XMFLOAT3( 0.0f, 0.0f, 0 ) );
+    tweener->SetEndValue  ( XMFLOAT3( 0.0f, XM_2PI, 0 ) );
+    tweener->SetDuration( 10.0f );
+    tweener->SetTweenMethod( TweenMethod::Linear );
 
     // Successfully initialized
     return true;
@@ -184,12 +185,12 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     if ( tweener && !tweener->IsEnabled() )
     {
         // Swap the start and end values
-        TweenValue start = tweener->GetStartValue();
+        /* TweenValue start = tweener->GetStartValue();
         tweener->SetStartValue( tweener->GetEndValue() );
-        tweener->SetEndValue( start );
+        tweener->SetEndValue( start ); */
 
         // Restart the animation
-        tweener->Start( gameTime, _testGameObject->GetTransform()->GetPositionPtr(), true );
+        tweener->Start( gameTime, _testGameObject->GetTransform()->GetRotationPtr(), true );
     }
 
     //----------------------------------------------------------

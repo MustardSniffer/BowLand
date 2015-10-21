@@ -6,7 +6,8 @@
 // Create a new default material
 DefaultMaterial::DefaultMaterial( GameObject* gameObject )
     : Material( gameObject )
-    , _diffuseTexture( nullptr )
+    , _diffuseMap( nullptr )
+    , _normalMap( nullptr )
     , _samplerState( nullptr )
 {
     // Create our default sampler state
@@ -20,7 +21,9 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
 // Copy another default material
 DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
     : Material( other._gameObject )
-    , _diffuseTexture( nullptr )
+    , _diffuseMap( nullptr )
+    , _normalMap( nullptr )
+    , _samplerState( nullptr )
 {
     CopyFrom( &other );
 }
@@ -28,7 +31,8 @@ DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
 // Destroy this default material
 DefaultMaterial::~DefaultMaterial()
 {
-    ReleaseMacro( _diffuseTexture );
+    ReleaseMacro( _diffuseMap );
+    ReleaseMacro( _normalMap );
     ReleaseMacro( _samplerState );
 }
 
@@ -41,18 +45,30 @@ void DefaultMaterial::CopyFrom( const Material* other )
 
     // Now copy from the given default material
     const DefaultMaterial* dm = reinterpret_cast<const DefaultMaterial*>( other );
-    UpdateD3DResource( _diffuseTexture, dm->_diffuseTexture );
+    UpdateD3DResource( _diffuseMap, dm->_diffuseMap );
+    UpdateD3DResource( _normalMap, dm->_normalMap );
+    UpdateD3DResource( _samplerState, dm->_samplerState );
 }
 
 
-// Load a diffuse texture from a file
-bool DefaultMaterial::LoadDiffuseTexture( const String& fname )
+// Load a diffuse map from a file
+bool DefaultMaterial::LoadDiffuseMap( const String& fname )
 {
-    ReleaseMacro( _diffuseTexture );
+    ReleaseMacro( _diffuseMap );
 
     ID3D11Device* device = _gameObject->GetDevice();
     ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, &_diffuseTexture ) );
+    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, &_diffuseMap ) );
+}
+
+// Load a normal map from a file
+bool DefaultMaterial::LoadNormalMap( const String& fname )
+{
+    ReleaseMacro( _normalMap );
+
+    ID3D11Device* device = _gameObject->GetDevice();
+    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, &_normalMap ) );
 }
 
 // Set the first test light
@@ -76,8 +92,10 @@ void DefaultMaterial::Update( const GameTime& gameTime )
 void DefaultMaterial::UpdateShaderData()
 {
     // Send stuff
-    _pixelShader->SetShaderResourceView( "DiffuseTexture", _diffuseTexture );
-    _pixelShader->SetSamplerState( "TextureSampler", _samplerState );
+    assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap ) );
+    assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap ) );
+    assert( _pixelShader->SetSamplerState( "TextureSampler", _samplerState ) );
+    assert( _pixelShader->SetFloat( "NormalMapWeight", static_cast<float>( _normalMap != nullptr ) ) );
 
     // Perform the base update
     Material::UpdateShaderData();

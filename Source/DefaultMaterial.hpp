@@ -9,7 +9,8 @@
 class DefaultMaterial : public Material
 {
     ID3D11SamplerState* _samplerState;
-    ID3D11ShaderResourceView* _diffuseTexture;
+    ID3D11ShaderResourceView* _diffuseMap;
+    ID3D11ShaderResourceView* _normalMap;
 
 protected:
     /// <summary>
@@ -37,10 +38,16 @@ public:
     ~DefaultMaterial();
 
     /// <summary>
-    /// Loads the diffuse texture for this material from a file.
+    /// Loads the diffuse map for this material from a file.
     /// </summary>
     /// <param name="fname">The name of the file to load.</param>
-    bool LoadDiffuseTexture( const String& fname );
+    bool LoadDiffuseMap( const String& fname );
+
+    /// <summary>
+    /// Loads the normal map for this material from a file.
+    /// </summary>
+    /// <param name="fname">The name of the file to load.</param>
+    bool LoadNormalMap( const String& fname );
 
     /// <summary>
     /// Sets the first directional light's value.
