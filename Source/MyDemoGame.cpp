@@ -117,17 +117,18 @@ bool MyDemoGame::Init()
     }
     _testGameObject->GetTransform()->SetScale( XMFLOAT3( 3, 3, 3 ) );
 
-    // Load helix model
-    helix = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
+    // Load the object mesh model
+    std::shared_ptr<Mesh> mesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
 
 
 
     // Add a default material to the game object
     DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
-    material->LoadDiffuseMap( L"Textures\\Rocks.jpg" );
-    material->LoadNormalMap( L"Textures\\RocksNormals.jpg" );
-    material->UseSpecularity( false );
-    material->SetSpecularPower( 256.0f );
+    material->LoadDiffuseMap( L"Textures\\Rocks2.jpg" );
+    material->LoadNormalMap( L"Textures\\Rocks2Normals.jpg" );
+    material->UseNormalMap( true );
+    material->UseSpecularity( true );
+    material->SetSpecularPower( 256 );
 
     // Set the lights' information
     DirectionalLight dLight;
@@ -145,7 +146,7 @@ bool MyDemoGame::Init()
     // Add a mesh renderer to the test game object
     MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
     mr->SetMaterial( material );
-    mr->SetMesh( helix );
+    mr->SetMesh( mesh );
 
     // Add a test tween component
     Tweener* tweener = _testGameObject->AddComponent<Tweener>();
@@ -181,28 +182,24 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
         Quit();
     }
     
-    //----------------------------------------------------------
-    // Test code
-    //----------------------------------------------------------
-    
+
     _testGameObject->Update( gameTime );
     
-    //----------------------------------------------------------
 
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
     float rotSpeed  = gameTime.GetElapsedTime() * 8.0f;
 
     // Speed up when shift is pressed
-    if ( IsKeyDown(VK_SHIFT) ) { moveSpeed *= 5; }
+    if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }
 
     // Movement
-    if ( IsKeyDown('W') ) { camera->MoveRelative(0, 0, moveSpeed); }
-    if ( IsKeyDown('S') ) { camera->MoveRelative(0, 0, -moveSpeed); }
-    if ( IsKeyDown('A') ) { camera->MoveRelative(-moveSpeed, 0, 0); }
-    if ( IsKeyDown('D') ) { camera->MoveRelative(moveSpeed, 0, 0); }
-    if ( IsKeyDown('Q') ) { camera->MoveAbsolute(0, -moveSpeed, 0); }
-    if ( IsKeyDown('E') ) { camera->MoveAbsolute(0, moveSpeed, 0); }
+    if ( IsKeyDown( 'W' ) ) { camera->MoveRelative(0, 0, moveSpeed); }
+    if ( IsKeyDown( 'S' ) ) { camera->MoveRelative(0, 0, -moveSpeed); }
+    if ( IsKeyDown( 'A' ) ) { camera->MoveRelative(-moveSpeed, 0, 0); }
+    if ( IsKeyDown( 'D' ) ) { camera->MoveRelative(moveSpeed, 0, 0); }
+    if ( IsKeyDown( 'Q' ) ) { camera->MoveAbsolute(0, -moveSpeed, 0); }
+    if ( IsKeyDown( 'E' ) ) { camera->MoveAbsolute(0, moveSpeed, 0); }
     
     if ( hasMouseFocus )
     {

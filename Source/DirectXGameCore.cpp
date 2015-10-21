@@ -10,14 +10,13 @@
 // -------------------------------------------------------------
 
 #include "DirectXGameCore.h"
+#include "Time.hpp"
 #include <WindowsX.h>
 #include <sstream>
 
-#pragma region Global Window Callback
-
 // We need a global reference to the DirectX Game so that we can
 // pass OS-level window messages to our application.
-DirectXGameCore* dxGame = 0;
+static DirectXGameCore* dxGame = nullptr;
 
 // --------------------------------------------------------
 // The global callback function for handling windows OS-level messages.
@@ -30,11 +29,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     // Forward the global callback params to our game's message handler
     return dxGame->ProcessMessage(hwnd, msg, wParam, lParam);
 }
-
-#pragma endregion
-
-
-#pragma region Constructor / Destructor
 
 // --------------------------------------------------------
 // Constructor - Set up fields and timer
@@ -87,9 +81,6 @@ DirectXGameCore::~DirectXGameCore(void)
     ReleaseMacro(deviceContext);
     ReleaseMacro(device);
 }
-#pragma endregion
-
-#pragma region Initialization
 
 // --------------------------------------------------------
 // Handles the window and Direct3D initialization
@@ -236,9 +227,6 @@ bool DirectXGameCore::InitDirect3D()
     OnResize();
     return true;
 }
-#pragma endregion
-
-#pragma region Window Resizing
 
 // --------------------------------------------------------
 // When the window is resized, the underlying buffers (textures) must
@@ -300,9 +288,6 @@ void DirectXGameCore::OnResize()
     // Recalculate the aspect ratio, since it probably changed
     aspectRatio = (float)windowWidth / windowHeight;
 }
-#pragma endregion
-
-#pragma region Game Loop
 
 // --------------------------------------------------------
 // The actual game loop, which processes the windows message queue
@@ -315,6 +300,7 @@ int DirectXGameCore::Run()
 
     // Loop until we get a quit message from windows
     _gameTime.Reset();
+    Time::Start();
     while(msg.message != WM_QUIT)
     {
         // Peek at the next message (and remove it from the queue)
@@ -328,6 +314,7 @@ int DirectXGameCore::Run()
         {
             // Standard game loop type stuff
             _gameTime.Update();
+            Time::Update();
             CalculateFrameStats();
             UpdateScene(_gameTime);
             DrawScene(_gameTime);
@@ -397,10 +384,6 @@ void DirectXGameCore::Quit()
 {
     PostQuitMessage(0);
 }
-
-#pragma endregion
-
-#pragma region Windows Message Processing
 
 // --------------------------------------------------------
 // Handles messages that are sent to our window by the
@@ -536,5 +519,3 @@ LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPAR
     // Some other message was sent, so call the default window procedure for it
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
-
-#pragma endregion

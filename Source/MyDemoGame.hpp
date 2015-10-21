@@ -33,7 +33,6 @@ public:
 
 private:
     std::shared_ptr<GameObject> _testGameObject;
-    std::shared_ptr<Mesh> helix;
 
     // The matrices to go from model space to screen space
     std::shared_ptr<Camera> camera;
