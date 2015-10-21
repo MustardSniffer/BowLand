@@ -82,5 +82,5 @@ float4 main( VertexToPixel input ) : SV_TARGET
 
 
     // Return the final lighted and textured color
-    return ( dirLightColor + pointLightColor ) * textureColor + float4( specularity.xxx, 1.0 ) + AmbientColor;
+    return ( dirLightColor + pointLightColor + AmbientColor ) * textureColor + float4( specularity.xxx, 1.0 );
 }
