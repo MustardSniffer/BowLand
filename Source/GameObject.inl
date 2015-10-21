@@ -74,6 +74,8 @@ template<class T> const T* GameObject::GetComponentOfType() const
             return typedComponent;
         }
     }
+
+    return nullptr;
 }
 
 // Get the component of the given base type, if it exists
@@ -91,6 +93,8 @@ template<class T> T* GameObject::GetComponentOfType()
             return typedComponent;
         }
     }
+
+    return nullptr;
 }
 
 // Get all of the components of the given type

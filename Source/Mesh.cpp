@@ -16,7 +16,7 @@ Mesh::Mesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std:
 
     // Create the vertex buffer resource data
     D3D11_SUBRESOURCE_DATA resourceData;
-    resourceData.pSysMem = &vertices[ 0 ];
+    resourceData.pSysMem = &( vertices[ 0 ] );
 
     // Send the vertex data to DirectX
     HR( device->CreateBuffer( &bufferDesc, &resourceData, &_vertexBuffer ) );
@@ -28,7 +28,7 @@ Mesh::Mesh( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std:
     bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
     // Reuse the resource data for the indices
-    resourceData.pSysMem = &indices[ 0 ];
+    resourceData.pSysMem = &( indices[ 0 ] );
 
     // Send the index data to DirectX
     HR( device->CreateBuffer( &bufferDesc, &resourceData, &_indexBuffer ) );

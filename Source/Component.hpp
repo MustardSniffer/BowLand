@@ -67,11 +67,11 @@ public:
     /// <param name="enabled">True to enable the component, false to disable it.</param>
     void SetEnabled( bool enabled );
 
-	/// <summary>
-	/// Sets whether or not this component is drawable.
-	/// </summary>
-	/// <param name="enabled">True to draw the component, false to hide it.</param>
-	void SetDrawable(bool enabled);
+    /// <summary>
+    /// Sets whether or not this component is drawable.
+    /// </summary>
+    /// <param name="enabled">True to draw the component, false to hide it.</param>
+    void SetDrawable( bool enabled );
 
     /// <summary>
     /// Updates this component.

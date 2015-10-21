@@ -2,6 +2,7 @@
 
 #include "DirectX.hpp"
 #include "SimpleShader.h"
+#include "Component.hpp"
 #include <memory> // for std::shared_ptr
 
 class Camera; // forward declaration
@@ -9,32 +10,55 @@ class Camera; // forward declaration
 /// <summary>
 /// Defines a material.
 /// </summary>
-class Material
+class Material : public Component
 {
+    // Disallow the move constructor and assignment operator
+    Material( Material&& ) = delete;
+    Material& operator=( Material&& ) = delete;
+
+protected:
+    static Material* ActiveMaterial;
+
     std::shared_ptr<SimpleVertexShader> _vertexShader;
     std::shared_ptr<SimplePixelShader> _pixelShader;
     ID3D11Device* _device;
     ID3D11DeviceContext* _deviceContext;
-    ID3D11SamplerState* _samplerState;
-    ID3D11ShaderResourceView* _diffuseTexture;
 
     /// <summary>
     /// Copies values from the given material.
     /// </summary>
     /// <param name="other">The other material.</param>
-    void CopyFrom( const Material& other );
+    virtual void CopyFrom( const Material* other );
 
-    // Disallow the move constructor and assignment operator
-    Material( Material&& ) = delete;
-    Material& operator=( Material&& ) = delete;
+    /// <summary>
+    /// Creates a sampler state.
+    /// </summary>
+    /// <param name="samplerState">The sampler state.</param>
+    /// <param name="filter">The filter mode.</param>
+    /// <param name="addressMode">The address mode.</param>
+    /// <param name="anisotropy">The max anisotropy level allowed.</param>
+    /// <param name="minLod">The minimum LOD.</param>
+    /// <param name="maxLod">The maximum LOD.</param>
+    void CreateSamplerState( ID3D11SamplerState** samplerState, D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode, UINT anisotropy, float minLod, float maxLod );
+
+    /// <summary>
+    /// Attempts to load the given pixel shader.
+    /// </summary>
+    /// <param name="fname">The file name to load.</param>
+    bool LoadPixelShader( const String& fname );
+
+    /// <summary>
+    /// Attempts to load the given vertex shader.
+    /// </summary>
+    /// <param name="fname">The file name to load.</param>
+    bool LoadVertexShader( const String& fname );
 
 public:
     /// <summary>
-    /// Creates a new, empty material.
+    /// Creates a new, empty material component.
     /// </summary>
-    /// <param name="device">The device to use.</param>
-    /// <param name="deviceContext">The device context to use.</param>
-    Material( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
+    /// <param name="gameObject">The game object we are being added to.</param>
+    Material( GameObject* gameObject );
 
     /// <summary>
     /// Copies an existing material.
@@ -45,13 +69,17 @@ public:
     /// <summary>
     /// Destroys this material.
     /// </summary>
-    ~Material();
+    virtual ~Material();
 
     /// <summary>
-    /// Applies the given camera to this material.
+    /// Checks to see if this material is the currently active material.
     /// </summary>
-    /// <param name="camera">The camera to apply.</param>
-    void ApplyCamera( const Camera& camera );
+    bool IsActive() const;
+
+    /// <summary>
+    /// Activates this material to be the current material.
+    /// </summary>
+    void Activate();
 
     /// <summary>
     /// Applies the given camera to this material.
@@ -62,46 +90,23 @@ public:
     /// <summary>
     /// Gets this material's vertex shader.
     /// </summary>
-    SimpleVertexShader* GetVertexShader();
+    SimpleVertexShader* GetVertexShader();  // Remove in favor of "set" methods
 
     /// <summary>
     /// Gets this material's pixel shader.
     /// </summary>
-    SimplePixelShader* GetPixelShader();
+    SimplePixelShader* GetPixelShader();    // Remove in favor of "set" methods
 
     /// <summary>
-    /// Gets this material's diffuse texture.
+    /// Updates this material.
     /// </summary>
-    ID3D11ShaderResourceView* GetDiffuseTexture();
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    virtual void Update( const GameTime& gameTime ) = 0;
 
     /// <summary>
-    /// Attempts to load the given pixel shader.
+    /// Sends this material's information to the shaders.
     /// </summary>
-    /// <param name="fname">The file name to load.</param>
-    bool LoadPixelShader( const TCHAR* fname );
-
-    /// <summary>
-    /// Attempts to load the given vertex shader.
-    /// </summary>
-    /// <param name="fname">The file name to load.</param>
-    bool LoadVertexShader( const TCHAR* fname );
-
-    /// <summary>
-    /// Attempts to load the diffuse texture.
-    /// </summary>
-    /// <param name="fname">The file name to load.</param>
-    bool LoadDiffuseTexture( const wchar_t* fname );
-
-    /// <summary>
-    /// Sets this material's diffuse texture.
-    /// </summary>
-    /// <param name="texture">The new diffuse texture.</param>
-    void SetDiffuseTexture( ID3D11ShaderResourceView* texture );
-
-    /// <summary>
-    /// Sets this material as the currently active material.
-    /// </summary>
-    void SetActive();
+    virtual void UpdateShaderData();
 
     /// <summary>
     /// Copies another material's data into this material.

@@ -1,3 +1,7 @@
+#if defined( __cplusplus)
+#   pragma once
+#endif
+
 #include "SharedTypes.hpp"
 
 // Defines a directional light

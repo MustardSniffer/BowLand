@@ -7,6 +7,12 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "dxerr.h"
+#include <string>
+
+/// <summary>
+/// The string type used by DirectX.
+/// </summary>
+typedef std::wstring String;
 
 /// <summary>
 /// Safely releases the given COM pointer.
@@ -21,10 +27,10 @@
 #define AddRefMacro(x) if ( x ) x->AddRef()
 
 /// <summary>
-/// Updates a D3D resource,
+/// Updates a D3D resource by releasing it, assigning it a new value, and adding a reference to it.
 /// </summary>
-/// <param name=""></param>
-/// <param name=""></param>
+/// <param name="resource">The resource to update.</param>
+/// <param name="value">The new value.</param>
 #define UpdateD3DResource(resource, value) \
     ReleaseMacro( resource ); \
     resource = value; \

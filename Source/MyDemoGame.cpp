@@ -30,6 +30,7 @@
 #include "Transform.hpp"
 #include "MeshRenderer.hpp"
 #include "Tweener.hpp"
+#include "DefaultMaterial.hpp"
 
 #include <sstream>
 #include <DirectXColors.h>
@@ -103,59 +104,55 @@ bool MyDemoGame::Init()
     if ( !DirectXGameCore::Init() )
         return false;
 
-    // Helper methods to create something to draw, load shaders to draw it 
-    // with and set up matrices so we can see how to pass data to the GPU.
-    //  - For your own projects, feel free to expand/replace these.
-    LoadShaders();
-
     // Tell the input assembler stage of the pipeline what kind of
     // geometric primitives we'll be using and how to interpret them
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-    // Set the directional light's data
-    _directionalLight0.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
-    _directionalLight0.DiffuseColor = XMFLOAT4( Colors::Chocolate );
-    _directionalLight0.Direction    = XMFLOAT3( 1, 0, 0 );
-
-    _directionalLight1.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
-    _directionalLight1.DiffuseColor = XMFLOAT4( Colors::Wheat );
-    _directionalLight1.Direction    = XMFLOAT3( -1, 0, 0 );
-
     // Create the game object
     _testGameObject = std::make_shared<GameObject>( device, deviceContext );
+    if ( !_testGameObject )
+    {
+        return false;
+    }
 
     // Load helix model
-    helix = MeshLoader::Load("Models/helix.obj", device, deviceContext);
+    helix = MeshLoader::Load( "Models/helix.obj", device, deviceContext );
+
+    // Add a default material to the game object
+    DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
+    material->LoadDiffuseTexture( L"Textures\\Bricks.jpg" );
+
+
+
+    // Set the lights' information
+    DirectionalLight light;
+    light.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
+    light.DiffuseColor = XMFLOAT4( Colors::Chocolate );
+    light.Direction = XMFLOAT3( 1, 0, 0 );
+    material->SetLight0( light );
+
+    light.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
+    light.DiffuseColor = XMFLOAT4( Colors::Wheat );
+    light.Direction = XMFLOAT3( -1, 0, 0 );
+    material->SetLight1( light );
+
+
 
     // Add a mesh renderer to the test game object
     MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
-    mr->SetMaterial(brickMaterial);
-    mr->SetMesh(helix);
-    mr->SetDrawable(true);
+    mr->SetMaterial( material );
+    mr->SetMesh( helix );
+    mr->SetDrawable( true );
 
     // Add a test tween component
     Tweener* tweener = _testGameObject->AddComponent<Tweener>();
-    tweener->SetStartValue( XMFLOAT3( -2.5f,  0.5f, 0 ) );
-    tweener->SetEndValue  ( XMFLOAT3(  2.5f, -0.5f, 0 ) );
+    tweener->SetStartValue( XMFLOAT3( -2.5f, 0.0f, 0 ) );
+    tweener->SetEndValue  ( XMFLOAT3(  2.5f, 0.0f, 0 ) );
     tweener->SetDuration( 2.0f );
     tweener->SetTweenMethod( TweenMethod::QuinticEaseInOut );
 
     // Successfully initialized
     return true;
-}
-
-// Load the shaders
-void MyDemoGame::LoadShaders()
-{
-    // Load the brick material
-    brickMaterial = std::make_shared<Material>( device, deviceContext );
-    assert( brickMaterial->LoadVertexShader( L"VertexShader.cso" ) && "Failed to load vertex shader!" );
-    assert( brickMaterial->LoadPixelShader( L"PixelShader.cso" ) && "Failed to load pixel shader!" );
-    assert( brickMaterial->LoadDiffuseTexture( L"Textures/Bricks.jpg" ) && "Failed to brick texture!" );
-
-    // Load the metal material using the same shaders as the brick material
-    metalMaterial = std::make_shared<Material>( *brickMaterial );
-    assert( metalMaterial->LoadDiffuseTexture( L"Textures/ScratchedMetal.jpg" ) && "Failed to load metal texture!" );
 }
 
 // Handle the window resizing
@@ -238,18 +235,11 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     deviceContext->ClearRenderTargetView( renderTargetView, color );
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-    // Apply the camera to the materials and set the material as active
-    if ( brickMaterial )
+    // Get the material and apply the camera to it (won't be needed when the camera is a global component)
+    Material* material = _testGameObject->GetComponentOfType<Material>();
+    if ( material )
     {
-        brickMaterial->ApplyCamera( camera.get() );
-        brickMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
-        brickMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
-    }
-    if ( metalMaterial )
-    {
-        metalMaterial->ApplyCamera( camera.get() );
-        metalMaterial->GetPixelShader()->SetData( "light0", &_directionalLight0, sizeof( DirectionalLight ) );
-        metalMaterial->GetPixelShader()->SetData( "light1", &_directionalLight1, sizeof( DirectionalLight ) );
+        material->ApplyCamera( camera.get() );
     }
 
     // Draw the game object
