@@ -43,6 +43,26 @@ public:
     ~DefaultMaterial();
 
     /// <summary>
+    /// Gets this material's ambient color.
+    /// </summary>
+    DirectX::XMFLOAT4 GetAmbientColor() const;
+
+    /// <summary>
+    /// Gets this material's specular power.
+    /// </summary>
+    float GetSpecularPower() const;
+
+    /// <summary>
+    /// Checks to see if this material uses the normal map.
+    /// </summary>
+    bool UsesNormalMap() const;
+
+    /// <summary>
+    /// Checks to see if this material uses specularity.
+    /// </summary>
+    bool UsesSpecularity() const;
+
+    /// <summary>
     /// Loads the diffuse map for this material from a file.
     /// </summary>
     /// <param name="fname">The name of the file to load.</param>
@@ -67,6 +87,12 @@ public:
     void SetPointLight( const PointLight& light );
 
     /// <summary>
+    /// Sets this material's specular power.
+    /// </summary>
+    /// <param name="value">The new specular power.</param>
+    void SetSpecularPower( float value );
+
+    /// <summary>
     /// Updates this material.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
@@ -76,6 +102,18 @@ public:
     /// Sends this material's information to the shaders.
     /// </summary>
     void UpdateShaderData() override;
+
+    /// <summary>
+    /// Tells this material whether or not to use the normal map.
+    /// </summary>
+    /// <param name="value">True to use the normal map, false to not.</param>
+    void UseNormalMap( bool value );
+
+    /// <summary>
+    /// Tells this material whether or not to use specularity.
+    /// </summary>
+    /// <param name="value">True to use the specularity, false to not.</param>
+    void UseSpecularity( bool value );
 
     /// <summary>
     /// Copies another default material's data into this material.

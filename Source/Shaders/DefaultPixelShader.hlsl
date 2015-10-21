@@ -28,8 +28,9 @@ float4 GetPointLightColor( PointLight light, float3 worldPosition, float3 normal
     float3 toLight      = normalize( Light1.Position - worldPosition );
     float  lightAmount  = saturate( dot( normal, toLight ) );
     float3 reflection   = reflect( -toLight, normal );
-    float  specPower    = lerp( 0.0, SpecularPower, UseSpecularity );
-    specularity         = pow( max( dot( reflection, toCamera ), 0 ), specPower );
+    specularity         = lerp( 0.0,
+                                pow( max( dot( reflection, toCamera ), 0 ), SpecularPower ),
+                                UseSpecularity );
 
     // Now combine the light color + the specularity
     return light.DiffuseColor * lightAmount;

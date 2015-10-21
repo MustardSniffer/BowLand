@@ -12,7 +12,7 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
     , _samplerState( nullptr )
     , _ambientColor( 0.05f, 0.05f, 0.05f, 1.0f )
     , _useNormalMap( false )
-    , _useSpecularity( true )
+    , _useSpecularity( false )
     , _specularPower( 64.0f )
 {
     // Create our default sampler state
@@ -29,7 +29,6 @@ DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
     , _diffuseMap( nullptr )
     , _normalMap( nullptr )
     , _samplerState( nullptr )
-    , _useNormalMap( false )
 {
     CopyFrom( &other );
 }
@@ -40,6 +39,10 @@ DefaultMaterial::~DefaultMaterial()
     ReleaseMacro( _diffuseMap );
     ReleaseMacro( _normalMap );
     ReleaseMacro( _samplerState );
+    
+    _specularPower = 0.0f;
+    _useNormalMap = false;
+    _useSpecularity = false;
 }
 
 
@@ -54,9 +57,37 @@ void DefaultMaterial::CopyFrom( const Material* other )
     UpdateD3DResource( _diffuseMap, dm->_diffuseMap );
     UpdateD3DResource( _normalMap, dm->_normalMap );
     UpdateD3DResource( _samplerState, dm->_samplerState );
+
+    _ambientColor = dm->_ambientColor;
+    _specularPower = dm->_specularPower;
     _useNormalMap = dm->_useNormalMap;
+    _useSpecularity = dm->_useSpecularity;
 }
 
+
+// Get our ambient color
+DirectX::XMFLOAT4 DefaultMaterial::GetAmbientColor() const
+{
+    return _ambientColor;
+}
+
+// Get our specular power
+float DefaultMaterial::GetSpecularPower() const
+{
+    return _specularPower;
+}
+
+// Check if we use the normal map
+bool DefaultMaterial::UsesNormalMap() const
+{
+    return _useNormalMap;
+}
+
+// Check if we use specularity
+bool DefaultMaterial::UsesSpecularity() const
+{
+    return _useSpecularity;
+}
 
 // Load a diffuse map from a file
 bool DefaultMaterial::LoadDiffuseMap( const String& fname )
@@ -83,6 +114,12 @@ void DefaultMaterial::SetPointLight( const PointLight& light )
     assert( _pixelShader->SetData( "Light1", &light, sizeof( PointLight ) ) );
 }
 
+// Set the specular power
+void DefaultMaterial::SetSpecularPower( float value )
+{
+    _specularPower = value;
+}
+
 // Updates the default material
 void DefaultMaterial::Update( const GameTime& gameTime )
 {
@@ -107,6 +144,18 @@ void DefaultMaterial::UpdateShaderData()
 
     // Perform the base update
     Material::UpdateShaderData();
+}
+
+// Set whether or not to use the normal map
+void DefaultMaterial::UseNormalMap( bool value )
+{
+    _useNormalMap = value;
+}
+
+// Set whether or not to use specularity
+void DefaultMaterial::UseSpecularity( bool value )
+{
+    _useSpecularity = value;
 }
 
 // Copy values from another default material

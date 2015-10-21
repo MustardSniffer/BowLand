@@ -121,9 +121,10 @@ bool MyDemoGame::Init()
 
     // Add a default material to the game object
     DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
-    material->LoadDiffuseMap( L"Textures\\Rocks2.jpg" );
-    material->LoadNormalMap( L"Textures\\Rocks2Normals.jpg" );
-
+    material->LoadDiffuseMap( L"Textures\\DryDirt.jpg" );
+    material->LoadNormalMap( L"Textures\\DryDirtNormals.jpg" );
+    material->UseSpecularity( true );
+    material->SetSpecularPower( 128.0f );
 
     // Set the lights' information
     DirectionalLight dLight;
