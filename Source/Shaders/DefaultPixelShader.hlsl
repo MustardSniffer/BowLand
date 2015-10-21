@@ -80,7 +80,6 @@ float4 main( VertexToPixel input ) : SV_TARGET
     // Get the texture color
     float4 textureColor = DiffuseMap.Sample( TextureSampler, input.UV );
 
-
     // Return the final lighted and textured color
     return ( dirLightColor + pointLightColor + AmbientColor ) * textureColor + float4( specularity.xxx, 1.0 );
 }

@@ -29,7 +29,7 @@
 
 #include "Transform.hpp"
 #include "MeshRenderer.hpp"
-#include "Tweener.hpp"
+#include "TweenRotation.hpp"
 #include "DefaultMaterial.hpp"
 
 #include <sstream>
@@ -149,13 +149,13 @@ bool MyDemoGame::Init()
     mr->SetMesh( mesh );
 
     // Add a test tween component
-    Tweener* tweener = _testGameObject->AddComponent<Tweener>();
+    TweenRotation* tweener = _testGameObject->AddComponent<TweenRotation>();
     tweener->SetStartValue( XMFLOAT3( 0.0f, 0.0f, 0 ) );
     tweener->SetEndValue  ( XMFLOAT3( 0.0f, XM_2PI, 0 ) );
     tweener->SetDuration( 20.0f );
     tweener->SetTweenMethod( TweenMethod::Linear );
     tweener->SetPlayMode( TweenPlayMode::Loop );
-    tweener->Start( _gameTime, _testGameObject->GetTransform()->GetRotationPtr(), true );
+    tweener->Play();
 
     // Successfully initialized
     return true;

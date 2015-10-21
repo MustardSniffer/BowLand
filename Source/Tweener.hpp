@@ -85,22 +85,26 @@ class Tweener : public Component
     // All of the tween functions
     static std::vector<TweenFunction> _tweenFunctions;
 
-    // TODO - Create TweenTarget class to support float, float2, float3, etc.
-    TweenTarget _targetValue;
-    TweenMethod _tweenMethod;
     TweenFunction _tweenFunction;
+    TweenMethod   _tweenMethod;
+    TweenPlayMode _playMode;
+    float _startTime;
+    float _duration;
+
+protected:
+    TweenTarget _targetValue;
     TweenValue _startValue;
     TweenValue _endValue;
-    TweenPlayMode _playMode;
-    float _duration;
-    float _startTime;
-    bool _areValuesCompatible;
-    bool _isAffectingTransform;
 
     /// <summary>
     /// Creates all of the tween functions.
     /// </summary>
     static void CreateTweenFunctions();
+
+    /// <summary>
+    /// Checks to see if the target, start, and end values are compatible.
+    /// </summary>
+    bool AreValuesCompatible() const;
 
     /// <summary>
     /// Checks to see if the start, end, and target values are compatible.
@@ -110,8 +114,7 @@ class Tweener : public Component
     /// <summary>
     /// Handles when this tweener is done.
     /// </summary>
-    /// <param name="gameTime">The time when the end occurred.</param>
-    virtual void OnEnd( const GameTime& gameTime );
+    virtual void OnEnd();
 
 public:
     /// <summary>
@@ -126,41 +129,24 @@ public:
     virtual ~Tweener();
 
     /// <summary>
-    /// Gets this tween animation's starting value.
-    /// </summary>
-    inline TweenValue GetStartValue() const;
-
-    /// <summary>
-    /// Gets this tween animation's ending value.
-    /// </summary>
-    inline TweenValue GetEndValue() const;
-
-    /// <summary>
     /// Gets this tween animation's duration.
     /// </summary>
-    inline float GetDuration() const;
+    float GetDuration() const;
 
     /// <summary>
     /// Gets this tweener's tween method.
     /// </summary>
-    inline TweenMethod GetTweenMethod() const;
+    TweenMethod GetTweenMethod() const;
 
     /// <summary>
     /// Gets this tweener's play mode.
     /// </summary>
-    inline TweenPlayMode GetPlayMode() const;
+    TweenPlayMode GetPlayMode() const;
 
     /// <summary>
-    /// Sets this tweener's starting value.
+    /// Plays this tweener's animation.
     /// </summary>
-    /// <param name="value">The new start value.</param>
-    void SetStartValue( TweenValue value );
-
-    /// <summary>
-    /// Sets this tweener's ending value.
-    /// </summary>
-    /// <param name="value">The new end value.</param>
-    void SetEndValue( TweenValue value );
+    void Play();
 
     /// <summary>
     /// Sets this tweener's duration.
@@ -181,16 +167,8 @@ public:
     void SetTweenMethod( TweenMethod method );
 
     /// <summary>
-    /// Starts this tweener.
-    /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    /// <param name="target">The target value to modify.</param>
-    /// <param name="targetIsTransform">True if the target belongs to the transform of the owner game object, false if not.</param>
-    void Start( const GameTime& gameTime, TweenTarget target, bool targetIsTransform = false );
-
-    /// <summary>
     /// Updates this tweening component.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime ) override;
+    virtual void Update( const GameTime& gameTime ) override;
 };

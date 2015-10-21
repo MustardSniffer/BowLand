@@ -1,10 +1,7 @@
 #include "Tweener.hpp"
+#include "Time.hpp"
 #include "GameObject.hpp"
 #include <assert.h>
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define M_FPI M_PI##f
 
 using namespace DirectX;
 
@@ -18,8 +15,6 @@ Tweener::Tweener( GameObject* gameObject )
     , _tweenFunction( nullptr )
     , _duration( 1.0f )
     , _startTime( 0.0f )
-    , _areValuesCompatible( false )
-    , _isAffectingTransform( false )
 {
     _isDrawable = false;
     _isEnabled = false;
@@ -44,22 +39,22 @@ Tweener::~Tweener()
     _startTime     = 0.0f;
 }
 
-// Check if start, end, and target values are compatible.
-void Tweener::CheckForCompatibleValues()
+// Checks to see if the values are compatible.
+bool Tweener::AreValuesCompatible() const
 {
-    _areValuesCompatible =  _targetValue
-                         && ( _startValue.GetValueType() == _endValue.GetValueType() )
-                         && ( _startValue.GetValueType() == _targetValue.GetTargetType() );
+    return   _targetValue
+        && ( _startValue.GetValueType() == _endValue.GetValueType() )
+        && ( _startValue.GetValueType() == _targetValue.GetTargetType() );
 }
 
 // Handle when our animation ends
-void Tweener::OnEnd( const GameTime& gameTime )
+void Tweener::OnEnd()
 {
     switch ( _playMode )
     {
         case TweenPlayMode::Loop:
         {
-            this->Start( gameTime, _targetValue, _isAffectingTransform );
+            this->Play();
         }
         break;
 
@@ -71,7 +66,7 @@ void Tweener::OnEnd( const GameTime& gameTime )
             _startValue = end;
 
             // Begin again
-            this->Start( gameTime, _targetValue, _isAffectingTransform );
+            this->Play();
         }
         break;
 
@@ -83,18 +78,6 @@ void Tweener::OnEnd( const GameTime& gameTime )
         }
         break;
     }
-}
-
-// Get the start value
-TweenValue Tweener::GetStartValue() const
-{
-    return _startValue;
-}
-
-// Get the end value
-TweenValue Tweener::GetEndValue() const
-{
-    return _endValue;
 }
 
 // Get the tween duration
@@ -115,18 +98,13 @@ TweenPlayMode Tweener::GetPlayMode() const
     return _playMode;
 }
 
-// Set start value
-void Tweener::SetStartValue( TweenValue value )
+// Plays our tween animation
+void Tweener::Play()
 {
-    _startValue = value;
-    CheckForCompatibleValues();
-}
+    _startTime = Time::GetTotalTime();
 
-// Set ending value
-void Tweener::SetEndValue( TweenValue value )
-{
-    _endValue = value;
-    CheckForCompatibleValues();
+    // Ensure the values are compatible and only start if they are
+    SetEnabled( AreValuesCompatible() );
 }
 
 // Set duration
@@ -153,29 +131,17 @@ void Tweener::SetTweenMethod( TweenMethod method )
     _tweenFunction = _tweenFunctions[ static_cast<int>( method ) ];
 }
 
-// Starts the tweener
-void Tweener::Start( const GameTime& gameTime, TweenTarget target, bool targetIsTransform )
-{
-    _startTime = gameTime.GetTotalTime();
-    _targetValue = target;
-    _isAffectingTransform = targetIsTransform;
-
-    // Ensure the values are compatible and only start if they are
-    CheckForCompatibleValues();
-    SetEnabled( _areValuesCompatible );
-}
-
 // Update tween component
 void Tweener::Update( const GameTime& gameTime )
 {
-    assert( _areValuesCompatible && "Tweener values are not compatible!" );
+    assert( AreValuesCompatible() && "Tween values are incompatible!" );
 
     // Get the time, and make sure it doesn't go higher than the duration
     float time = gameTime.GetTotalTime() - _startTime;
     if ( time >= _duration )
     {
         time = _duration;
-        OnEnd( gameTime );
+        OnEnd();
     }
 
     // Modify the target value
@@ -232,12 +198,6 @@ void Tweener::Update( const GameTime& gameTime )
                 _targetValue.SetValue( value );
                 break;
             }
-        }
-
-        // If we're affecting the transform of our game object, we need to notify it that it has changed
-        if ( _isAffectingTransform )
-        {
-            _gameObject->SetWorldMatrixDirty();
         }
     }
 }

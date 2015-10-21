@@ -2,6 +2,8 @@
 
 #include "DirectX.hpp"
 
+// TODO - Remove this class
+
 /// <summary>
 /// Defines a way to keep track of time.
 /// </summary>
