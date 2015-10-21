@@ -1,0 +1,34 @@
+{
+	"_GAME_": {
+		"Camera": {
+			"Position": [5, 0, 0],
+			"Rotation": [0, -1.5707963267948966192313216916398, 0]
+		}
+	},
+	"Sphere": {
+		"DefaultMaterial": {
+			"DiffuseMap": "Textures/Rocks2.jpg",
+			"NormalMap": "Textures/Rocks2Normals.jpg",
+			"UseSpecularity": true,
+			"SpecularPower": 128,
+			"DirectionalLight": {
+				"DiffuseColor": [0.823529482, 0.411764741, 0.117647067],
+				"Direction": [1, 0, 0]
+			},
+			"PointLight": {
+				"DiffuseColor": [0.960784376, 0.870588303, 0.701960802],
+				"Position": [5, 0, 0]
+			}
+		},
+		"MeshRenderer": {
+			"Mesh": "Models/sphere.obj",
+			"Material": "this DefaultMaterial"
+		},
+		"TweenRotation": {
+			"Start": [0, 0, 0],
+			"End": [0, 6.283185307179586476925286766559, 0],
+			"PlayMode": "Loop",
+			"Duration": 20
+		}
+	}
+}
