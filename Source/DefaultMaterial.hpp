@@ -2,15 +2,20 @@
 
 #include "Material.hpp"
 #include "Shaders\DirectionalLight.hpp"
+#include "Shaders\PointLight.hpp"
 
 /// <summary>
 /// Defines the default material.
 /// </summary>
 class DefaultMaterial : public Material
 {
+    DirectX::XMFLOAT4 _ambientColor;
     ID3D11SamplerState* _samplerState;
     ID3D11ShaderResourceView* _diffuseMap;
     ID3D11ShaderResourceView* _normalMap;
+    float _specularPower;
+    bool _useNormalMap;
+    bool _useSpecularity;
 
 protected:
     /// <summary>
@@ -53,13 +58,13 @@ public:
     /// Sets the first directional light's value.
     /// </summary>
     /// <param name="light">The light value.</param>
-    void SetLight0( const DirectionalLight& light );
+    void SetDirectionalLight( const DirectionalLight& light );
 
     /// <summary>
     /// Sets the second directional light's value.
     /// </summary>
     /// <param name="light">The light value.</param>
-    void SetLight1( const DirectionalLight& light );
+    void SetPointLight( const PointLight& light );
 
     /// <summary>
     /// Updates this material.

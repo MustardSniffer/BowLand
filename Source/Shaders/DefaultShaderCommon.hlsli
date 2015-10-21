@@ -1,4 +1,5 @@
 #include "DirectionalLight.hpp"
+#include "PointLight.hpp"
 
 /// <summary>
 /// Our constant buffer for external data.
@@ -9,8 +10,12 @@ cbuffer __extern__ : register( b0 )
     matrix View;
     matrix Projection;
     DirectionalLight Light0;
-    DirectionalLight Light1;
-    float NormalMapWeight;
+    PointLight       Light1;
+    float4 AmbientColor;
+    float3 CameraPosition;
+    float  SpecularPower;
+    float  UseSpecularity; // Float, but treated as a bool
+    float  UseNormalMap;   // Float, but treated as a bool
 };
 
 /// <summary>

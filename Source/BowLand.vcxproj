@@ -148,6 +148,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClInclude Include="MyDemoGame.hpp" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DirectXGameCore.h" />
+    <ClInclude Include="Shaders\PointLight.hpp" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="Tweener.hpp" />

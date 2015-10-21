@@ -4,9 +4,16 @@
 
 class Camera
 {
+    static Camera* ActiveCamera;
+
 public:
     Camera(float x, float y, float z);
     ~Camera();
+
+    /// <summary>
+    /// Gets the currently active camera.
+    /// </summary>
+    static Camera* GetActiveCamera();
 
     // Transformations
     void MoveRelative(float x, float y, float z);

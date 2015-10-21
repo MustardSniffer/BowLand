@@ -96,6 +96,16 @@ bool Material::LoadVertexShader( const String& fname )
     return _vertexShader->LoadShaderFile( fname.c_str() );
 }
 
+// Attempt to load a texture
+bool Material::LoadTextureFromFile( const String& fname, ID3D11ShaderResourceView** texture )
+{
+    ReleaseMacro( ( *texture ) );
+
+    ID3D11Device* device = _gameObject->GetDevice();
+    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, texture ) );
+}
+
 
 // Checks to see if this is the active material
 bool Material::IsActive() const

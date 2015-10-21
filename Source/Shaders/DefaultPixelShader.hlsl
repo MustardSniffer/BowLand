@@ -10,9 +10,29 @@ SamplerState TextureSampler : register( s0 );
 /// <param name="light">The light.</param>
 float4 GetDirectionalLightColor( DirectionalLight light, float3 normal )
 {
-    float3 lDirection = normalize( -light.Direction );
-    float  lAmount = saturate( dot( normal, lDirection ) );
-    return ( lAmount * light.DiffuseColor ) + light.AmbientColor;
+    float3 lightDirection = normalize( -light.Direction );
+    float  lightAmount    = saturate( dot( normal, lightDirection ) );
+    return light.DiffuseColor * lightAmount;
+}
+
+/// <summary>
+/// Gets the color to be applied from a point light.
+/// </summary>
+/// <param name="light">The light.</param>
+/// <param name="worldPosition">The world position.</param>
+/// <param name="normal">The current normal.</param>
+float4 GetPointLightColor( PointLight light, float3 worldPosition, float3 normal, out float specularity )
+{
+    // Calculate the specularity from the light
+    float3 toCamera     = normalize( CameraPosition - worldPosition );
+    float3 toLight      = normalize( Light1.Position - worldPosition );
+    float  lightAmount  = saturate( dot( normal, toLight ) );
+    float3 reflection   = reflect( -toLight, normal );
+    float  specPower    = lerp( 0.0, SpecularPower, UseSpecularity );
+    specularity         = pow( max( dot( reflection, toCamera ), 0 ), specPower );
+
+    // Now combine the light color + the specularity
+    return light.DiffuseColor * lightAmount;
 }
 
 /// <summary>
@@ -47,17 +67,19 @@ float4 main( VertexToPixel input ) : SV_TARGET
     // Re-set the normal
     input.Normal = lerp( input.Normal,
                          GetNormalFromMap( input.UV, input.Normal, input.Tangent ),
-                         NormalMapWeight );
+                         UseNormalMap );
 
-    // Calculate the first light
-    float4 color0 = GetDirectionalLightColor( Light0, input.Normal );
+    // Calculate the color from the directional light
+    float4 dirLightColor = GetDirectionalLightColor( Light0, input.Normal );
 
-    // Calculate the second light
-    float4 color1 = GetDirectionalLightColor( Light1, input.Normal );
+    // Calculate the color from the point light
+    float specularity = 0.0;
+    float4 pointLightColor = GetPointLightColor( Light1, input.WorldPosition, input.Normal, specularity );
 
     // Get the texture color
     float4 textureColor = DiffuseMap.Sample( TextureSampler, input.UV );
 
+
     // Return the final lighted and textured color
-    return ( color0 + color1 ) * textureColor;
+    return ( dirLightColor + pointLightColor ) * textureColor + float4( specularity.xxx, 1.0 ) + AmbientColor;
 }

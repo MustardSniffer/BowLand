@@ -114,7 +114,7 @@ bool MyDemoGame::Init()
     {
         return false;
     }
-    _testGameObject->GetTransform()->SetScale( XMFLOAT3( 4, 4, 4 ) );
+    _testGameObject->GetTransform()->SetScale( XMFLOAT3( 3, 3, 3 ) );
 
     // Load helix model
     helix = MeshLoader::Load( "Models/sphere.obj", device, deviceContext );
@@ -126,16 +126,15 @@ bool MyDemoGame::Init()
 
 
     // Set the lights' information
-    DirectionalLight light;
-    light.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
-    light.DiffuseColor = XMFLOAT4( Colors::Chocolate );
-    light.Direction = XMFLOAT3( 1, 0, 0 );
-    material->SetLight0( light );
+    DirectionalLight dLight;
+    dLight.DiffuseColor = XMFLOAT4( Colors::Chocolate );
+    dLight.Direction = XMFLOAT3( 1, 0, 0 );
+    material->SetDirectionalLight( dLight );
 
-    light.AmbientColor = XMFLOAT4( 0.1f, 0.1f, 0.1f, 1.0f );
-    light.DiffuseColor = XMFLOAT4( Colors::Wheat );
-    light.Direction = XMFLOAT3( -1, 0, 0 );
-    material->SetLight1( light );
+    PointLight pLight;
+    pLight.DiffuseColor = XMFLOAT4( Colors::Wheat );
+    pLight.Position = XMFLOAT3( 5, 0, 0 );
+    material->SetPointLight( pLight );
 
 
 
@@ -234,13 +233,6 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     //  - At the beginning of DrawScene (before drawing *anything*)
     deviceContext->ClearRenderTargetView( renderTargetView, color );
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
-
-    // Get the material and apply the camera to it (won't be needed when the camera is a global component)
-    Material* material = _testGameObject->GetComponentOfType<Material>();
-    if ( material )
-    {
-        material->ApplyCamera( camera.get() );
-    }
 
     // Draw the game object
     _testGameObject->Draw( gameTime );

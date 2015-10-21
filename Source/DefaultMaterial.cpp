@@ -1,4 +1,5 @@
 #include "DefaultMaterial.hpp"
+#include "Camera.hpp"
 #include "GameObject.hpp"
 #include <DirectXTK/WICTextureLoader.h>
 #include <assert.h>
@@ -9,6 +10,10 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
     , _diffuseMap( nullptr )
     , _normalMap( nullptr )
     , _samplerState( nullptr )
+    , _ambientColor( 0.05f, 0.05f, 0.05f, 1.0f )
+    , _useNormalMap( false )
+    , _useSpecularity( true )
+    , _specularPower( 64.0f )
 {
     // Create our default sampler state
     CreateSamplerState( &_samplerState, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, 1, 0, D3D11_FLOAT32_MAX );
@@ -24,6 +29,7 @@ DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
     , _diffuseMap( nullptr )
     , _normalMap( nullptr )
     , _samplerState( nullptr )
+    , _useNormalMap( false )
 {
     CopyFrom( &other );
 }
@@ -48,39 +54,33 @@ void DefaultMaterial::CopyFrom( const Material* other )
     UpdateD3DResource( _diffuseMap, dm->_diffuseMap );
     UpdateD3DResource( _normalMap, dm->_normalMap );
     UpdateD3DResource( _samplerState, dm->_samplerState );
+    _useNormalMap = dm->_useNormalMap;
 }
 
 
 // Load a diffuse map from a file
 bool DefaultMaterial::LoadDiffuseMap( const String& fname )
 {
-    ReleaseMacro( _diffuseMap );
-
-    ID3D11Device* device = _gameObject->GetDevice();
-    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, &_diffuseMap ) );
+    return LoadTextureFromFile( fname, &_diffuseMap );
 }
 
 // Load a normal map from a file
 bool DefaultMaterial::LoadNormalMap( const String& fname )
 {
-    ReleaseMacro( _normalMap );
-
-    ID3D11Device* device = _gameObject->GetDevice();
-    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, &_normalMap ) );
+    _useNormalMap = LoadTextureFromFile( fname, &_normalMap );
+    return _useNormalMap;
 }
 
 // Set the first test light
-void DefaultMaterial::SetLight0( const DirectionalLight& light )
+void DefaultMaterial::SetDirectionalLight( const DirectionalLight& light )
 {
     assert( _pixelShader->SetData( "Light0", &light, sizeof( DirectionalLight ) ) );
 }
 
 // Set the second test light
-void DefaultMaterial::SetLight1( const DirectionalLight& light )
+void DefaultMaterial::SetPointLight( const PointLight& light )
 {
-    assert( _pixelShader->SetData( "Light1", &light, sizeof( DirectionalLight ) ) );
+    assert( _pixelShader->SetData( "Light1", &light, sizeof( PointLight ) ) );
 }
 
 // Updates the default material
@@ -91,11 +91,19 @@ void DefaultMaterial::Update( const GameTime& gameTime )
 // Send shader data
 void DefaultMaterial::UpdateShaderData()
 {
+    // Apply the camera
+    Camera* activeCamera = Camera::GetActiveCamera();
+    ApplyCamera( activeCamera );
+    assert( _pixelShader->SetFloat3( "CameraPosition", activeCamera->GetPosition() ) );
+
     // Send stuff
     assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap ) );
     assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap ) );
     assert( _pixelShader->SetSamplerState( "TextureSampler", _samplerState ) );
-    assert( _pixelShader->SetFloat( "NormalMapWeight", static_cast<float>( _normalMap != nullptr ) ) );
+    assert( _pixelShader->SetFloat4( "AmbientColor", _ambientColor ) );
+    assert( _pixelShader->SetFloat( "SpecularPower", _specularPower ) );
+    assert( _pixelShader->SetFloat( "UseNormalMap", static_cast<float>( _useNormalMap ) ) );
+    assert( _pixelShader->SetFloat( "UseSpecularity", static_cast<float>( _useSpecularity ) ) );
 
     // Perform the base update
     Material::UpdateShaderData();
