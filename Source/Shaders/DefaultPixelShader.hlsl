@@ -29,7 +29,7 @@ float4 GetPointLightColor( PointLight light, float3 worldPosition, float3 normal
     float  lightAmount  = saturate( dot( normal, toLight ) );
     float3 reflection   = reflect( -toLight, normal );
     specularity         = lerp( 0.0,
-                                pow( max( dot( reflection, toCamera ), 0 ), SpecularPower ),
+                                pow( max( dot( reflection, toCamera ), 0 ), SpecularPower ) * lightAmount,
                                 UseSpecularity );
 
     // Now combine the light color + the specularity
