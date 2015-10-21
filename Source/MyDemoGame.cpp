@@ -142,7 +142,6 @@ bool MyDemoGame::Init()
     MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
     mr->SetMaterial( material );
     mr->SetMesh( helix );
-    mr->SetDrawable( true );
 
     // Add a test tween component
     Tweener* tweener = _testGameObject->AddComponent<Tweener>();

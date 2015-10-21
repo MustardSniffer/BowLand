@@ -68,12 +68,6 @@ public:
     void SetEnabled( bool enabled );
 
     /// <summary>
-    /// Sets whether or not this component is drawable.
-    /// </summary>
-    /// <param name="enabled">True to draw the component, false to hide it.</param>
-    void SetDrawable( bool enabled );
-
-    /// <summary>
     /// Updates this component.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>

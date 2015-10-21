@@ -4,6 +4,8 @@
 MeshRenderer::MeshRenderer(GameObject* gameObj)
     : Component(gameObj)
 {
+    _isDrawable = true;
+
     _mesh = nullptr;
     _material = nullptr;
 }
