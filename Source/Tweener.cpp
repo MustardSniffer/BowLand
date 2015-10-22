@@ -136,6 +136,13 @@ void Tweener::Update( const GameTime& gameTime )
 {
     assert( AreValuesCompatible() && "Tween values are incompatible!" );
 
+    // If we have no play mode, then stop
+    if ( _playMode == TweenPlayMode::None )
+    {
+        OnEnd();
+        return;
+    }
+
     // Get the time, and make sure it doesn't go higher than the duration
     float time = gameTime.GetTotalTime() - _startTime;
     if ( time >= _duration )

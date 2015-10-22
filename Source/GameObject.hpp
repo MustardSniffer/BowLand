@@ -16,7 +16,9 @@ class Transform;
 class GameObject
 {
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
+    std::unordered_map< std::string, std::shared_ptr<GameObject>> _childrenCache;
     std::vector<std::shared_ptr<GameObject>> _children;
+    const std::string _name;
     GameObject* _parent;
     Transform* _transform;
     ID3D11Device* _device;
@@ -37,9 +39,10 @@ public:
     /// <summary>
     /// Creates a new game object.
     /// </summary>
+    /// <param name="name">The name of this game object.</param>
     /// <param name="device">The device this game object belongs to.</param>
     /// <param name="deviceContext">The device context this game object belongs to.</param>
-    GameObject( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
+    GameObject( const std::string& name, ID3D11Device* device, ID3D11DeviceContext* deviceContext );
 
     /// <summary>
     /// Destroys this game object.
@@ -49,7 +52,12 @@ public:
     /// <summary>
     /// Adds a child to this game object.
     /// </summary>
-    GameObject* AddChild();
+    /// <param name="name">The name of the child.</param>
+    GameObject* AddChild( const std::string& name );
+
+    // TODO - GetChildCount
+    // TODO - GetChild(index)
+    // TODO - GetChildByName
 
     /// <summary>
     /// Adds a component to this game object and then returns it.
@@ -107,6 +115,11 @@ public:
     /// Gets the D3D11 device context this game object is associated with.
     /// </summary>
     ID3D11DeviceContext* GetDeviceContext();
+
+    /// <summary>
+    /// Gets this game object's name.
+    /// </summary>
+    std::string GetName() const;
 
     /// <summary>
     /// Gets this game object's transform.

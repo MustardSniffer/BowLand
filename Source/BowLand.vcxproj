@@ -71,8 +71,10 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)Models"
+mkdir "$(OutDir)Scenes"
 mkdir "$(OutDir)Textures"
 xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
+xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d
 xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
 xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     </PostBuildEvent>
@@ -105,8 +107,10 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>mkdir "$(OutDir)Models"
+mkdir "$(OutDir)Scenes"
 mkdir "$(OutDir)Textures"
 xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
+xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d
 xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
 xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     </PostBuildEvent>
@@ -120,6 +124,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClCompile Include="DefaultMaterial.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="JSON.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
@@ -127,6 +132,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClCompile Include="MyDemoGame.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DirectXGameCore.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -150,6 +156,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClInclude Include="MyDemoGame.hpp" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DirectXGameCore.h" />
+    <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Shaders\PointLight.hpp" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="Time.hpp" />

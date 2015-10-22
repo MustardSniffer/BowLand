@@ -109,53 +109,11 @@ bool MyDemoGame::Init()
     // geometric primitives we'll be using and how to interpret them
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-    // Create the game object
-    _testGameObject = std::make_shared<GameObject>( device, deviceContext );
-    if ( !_testGameObject )
-    {
-        return false;
-    }
-    _testGameObject->GetTransform()->SetScale( XMFLOAT3( 3, 3, 3 ) );
 
-    // Load the object mesh model
-    std::shared_ptr<Mesh> mesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
+    // Create and load our test scene
+    _testScene = std::make_shared<Scene>( device, deviceContext );
+    _testScene->LoadFromFile( "Scenes\\Test.scene" );
 
-
-
-    // Add a default material to the game object
-    DefaultMaterial* material = _testGameObject->AddComponent<DefaultMaterial>();
-    material->LoadDiffuseMap( L"Textures\\Rocks2.jpg" );
-    material->LoadNormalMap( L"Textures\\Rocks2Normals.jpg" );
-    material->UseNormalMap( true );
-    material->UseSpecularity( true );
-    material->SetSpecularPower( 256 );
-
-    // Set the lights' information
-    DirectionalLight dLight;
-    dLight.DiffuseColor = XMFLOAT4( Colors::Chocolate );
-    dLight.Direction = XMFLOAT3( 1, 0, 0 );
-    material->SetDirectionalLight( dLight );
-
-    PointLight pLight;
-    pLight.DiffuseColor = XMFLOAT4( Colors::Wheat );
-    pLight.Position = XMFLOAT3( 5, 0, 0 );
-    material->SetPointLight( pLight );
-
-
-
-    // Add a mesh renderer to the test game object
-    MeshRenderer* mr = _testGameObject->AddComponent<MeshRenderer>();
-    mr->SetMaterial( material );
-    mr->SetMesh( mesh );
-
-    // Add a test tween component
-    TweenRotation* tweener = _testGameObject->AddComponent<TweenRotation>();
-    tweener->SetStartValue( XMFLOAT3( 0.0f, 0.0f, 0 ) );
-    tweener->SetEndValue  ( XMFLOAT3( 0.0f, XM_2PI, 0 ) );
-    tweener->SetDuration( 20.0f );
-    tweener->SetTweenMethod( TweenMethod::Linear );
-    tweener->SetPlayMode( TweenPlayMode::Loop );
-    tweener->Play();
 
     // Successfully initialized
     return true;
@@ -183,7 +141,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     }
     
 
-    _testGameObject->Update( gameTime );
+    _testScene->Update( gameTime );
     
 
     // Update the camera based on input
@@ -226,8 +184,12 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
     deviceContext->ClearRenderTargetView( renderTargetView, color );
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
+
+
     // Draw the game object
-    _testGameObject->Draw( gameTime );
+    _testScene->Draw( gameTime );
+
+
 
     // Present the buffer
     //  - Puts the image we're drawing into the window so the user can see it

@@ -11,6 +11,8 @@ TweenRotation::TweenRotation( GameObject* gameObject )
     _targetValue.SetTarget( _gameObject->GetTransform()->GetRotationPtr() );
     SetStartValue( XMFLOAT3( 0, 0, 0 ) );
     SetEndValue( XMFLOAT3( 0, 0, 0 ) );
+
+    _isEnabled = true;
 }
 
 // Gets the starting value

@@ -4,10 +4,8 @@
 #include "DirectXGameCore.h"
 #include "SimpleShader.h"
 #include "Camera.hpp"
-#include "Material.hpp"
-#include "Mesh.hpp"
-#include "Shaders/DirectionalLight.hpp"
 #include "GameObject.hpp"
+#include "Scene.hpp"
 #include <memory> // for std::shared_ptr
 #include <vector>
 
@@ -32,7 +30,7 @@ public:
     void OnMouseMove( WPARAM btnState, int x, int y );
 
 private:
-    std::shared_ptr<GameObject> _testGameObject;
+    std::shared_ptr<Scene> _testScene;
 
     // The matrices to go from model space to screen space
     std::shared_ptr<Camera> camera;

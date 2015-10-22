@@ -5,8 +5,9 @@
 using namespace DirectX;
 
 // Create a new game object
-GameObject::GameObject( ID3D11Device* device, ID3D11DeviceContext* deviceContext )
-    : _parent( nullptr )
+GameObject::GameObject( const std::string& name, ID3D11Device* device, ID3D11DeviceContext* deviceContext )
+    : _name( name )
+    , _parent( nullptr )
     , _device( nullptr )
     , _deviceContext( nullptr )
     , _transform( nullptr )
@@ -26,11 +27,17 @@ GameObject::~GameObject()
 }
 
 // Add  a child to this game object
-GameObject* GameObject::AddChild()
+GameObject* GameObject::AddChild( const std::string& name )
 {
-    auto child = std::make_shared<GameObject>( _device, _deviceContext );
-    _children.push_back( child );
+    // Create the child
+    auto child = std::make_shared<GameObject>( name, _device, _deviceContext );
     child->_parent = this;
+
+    // Record the child
+    _children.push_back( child );
+    _childrenCache[ name ] = child;
+
+    // Return the child
     return child.get();
 }
 
@@ -56,6 +63,12 @@ const ID3D11DeviceContext* GameObject::GetDeviceContext() const
 ID3D11DeviceContext* GameObject::GetDeviceContext()
 {
     return _deviceContext;
+}
+
+// Get our name
+std::string GameObject::GetName() const
+{
+    return _name;
 }
 
 // Get the transform

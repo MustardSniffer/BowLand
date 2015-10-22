@@ -6,18 +6,21 @@
 		}
 	},
 	"Sphere": {
+		"Transform": {
+			"Scale": [3, 3, 3]
+		},
 		"DefaultMaterial": {
 			"DiffuseMap": "Textures/Rocks2.jpg",
 			"NormalMap": "Textures/Rocks2Normals.jpg",
 			"UseSpecularity": true,
-			"SpecularPower": 128,
+			"SpecularPower": 256,
 			"DirectionalLight": {
-				"DiffuseColor": [0.823529482, 0.411764741, 0.117647067],
+				"DiffuseColor": [0.823529482, 0.411764741, 0.117647067, 1.0],
 				"Direction": [1, 0, 0]
 			},
 			"PointLight": {
-				"DiffuseColor": [0.960784376, 0.870588303, 0.701960802],
-				"Position": [5, 0, 0]
+				"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
+				"Position": [6, 0, 0]
 			}
 		},
 		"MeshRenderer": {
@@ -28,6 +31,7 @@
 			"Start": [0, 0, 0],
 			"End": [0, 6.283185307179586476925286766559, 0],
 			"PlayMode": "Loop",
+			"Method": "Linear",
 			"Duration": 20
 		}
 	}
