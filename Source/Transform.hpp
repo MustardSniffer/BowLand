@@ -5,8 +5,11 @@
 
 class Transform : public Component
 {
-protected:
+    friend class TweenRotation;
+    friend class TweenPosition;
+    friend class TweenScale;
 
+protected:
     DirectX::XMFLOAT3 _position;
     DirectX::XMFLOAT3 _scale;
     DirectX::XMFLOAT3 _rotation;
@@ -67,21 +70,6 @@ public:
     /// Returns the rotation of this transform in Euler angles.
     /// </summary>
     DirectX::XMFLOAT3 GetRotation() const;
-
-    /// <summary>
-    /// Returns the pointer to the position of this transform.
-    /// </summary>
-    DirectX::XMFLOAT3* GetPositionPtr();
-
-    /// <summary>
-    /// Returns the pointer to the scale of this transform.
-    /// </summary>
-    DirectX::XMFLOAT3* GetScalePtr();
-
-    /// <summary>
-    /// Returns the pointer to the rotation of this transform in Euler angles.
-    /// </summary>
-    DirectX::XMFLOAT3* GetRotationPtr();
 
     /// <summary>
     /// Updates this component.

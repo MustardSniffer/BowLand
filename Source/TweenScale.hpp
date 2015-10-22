@@ -3,40 +3,40 @@
 #include "Tweener.hpp"
 
 /// <summary>
-/// Defines a tween component that only affects a GameObject's rotation.
+/// Defines a tween component that only affects a GameObject's scale.
 /// </summary>
-class TweenRotation : public Tweener
+class TweenScale : public Tweener
 {
 public:
     /// <summary>
-    /// Creates a new tween rotation component.
+    /// Creates a new tween scale component.
     /// </summary>
-    TweenRotation( GameObject* gameObject );
+    TweenScale( GameObject* gameObject );
 
     /// <summary>
-    /// Gets the starting rotation value.
+    /// Gets the starting scale value.
     /// </summary>
     DirectX::XMFLOAT3 GetStartValue() const;
 
     /// <summary>
-    /// Gets the ending rotation value.
+    /// Gets the ending scale value.
     /// </summary>
     DirectX::XMFLOAT3 GetEndValue() const;
 
     /// <summary>
-    /// Sets the starting rotation value.
+    /// Sets the starting scale value.
     /// </summary>
     /// <param name="value">The new starting value.</param>
     void SetStartValue( const DirectX::XMFLOAT3& value );
 
     /// <summary>
-    /// Sets the ending rotation value.
+    /// Sets the ending scale value.
     /// </summary>
     /// <param name="value">The new ending value.</param>
     void SetEndValue( const DirectX::XMFLOAT3& value );
 
     /// <summary>
-    /// Updates this tween rotation component.
+    /// Updates this tween scale component.
     /// </summary>
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     void Update( const GameTime& gameTime ) override;

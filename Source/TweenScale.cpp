@@ -1,47 +1,47 @@
-#include "TweenRotation.hpp"
+#include "TweenScale.hpp"
 #include "GameObject.hpp"
 #include "Transform.hpp"
 
 using namespace DirectX;
 
 // Creates a new tween rotation component
-TweenRotation::TweenRotation( GameObject* gameObject )
+TweenScale::TweenScale( GameObject* gameObject )
     : Tweener( gameObject )
 {
-    _targetValue.SetTarget( &_gameObject->GetTransform()->_rotation );
+    _targetValue.SetTarget( &_gameObject->GetTransform()->_scale );
 
-    SetStartValue( XMFLOAT3( 0, 0, 0 ) );
-    SetEndValue( XMFLOAT3( 0, 0, 0 ) );
+    SetStartValue( XMFLOAT3( 1, 1, 1 ) );
+    SetEndValue( XMFLOAT3( 1, 1, 1 ) );
 
     _isEnabled = true;
 }
 
 // Gets the starting value
-XMFLOAT3 TweenRotation::GetStartValue() const
+XMFLOAT3 TweenScale::GetStartValue() const
 {
     return _startValue.GetFloat3();
 }
 
 // Gets the ending value
-XMFLOAT3 TweenRotation::GetEndValue() const
+XMFLOAT3 TweenScale::GetEndValue() const
 {
     return _endValue.GetFloat3();
 }
 
 // Sets the starting value
-void TweenRotation::SetStartValue( const XMFLOAT3& value )
+void TweenScale::SetStartValue( const XMFLOAT3& value )
 {
     _startValue.SetValue( value );
 }
 
 // Sets the ending value
-void TweenRotation::SetEndValue( const XMFLOAT3& value )
+void TweenScale::SetEndValue( const XMFLOAT3& value )
 {
     _endValue.SetValue( value );
 }
 
 // Updates this component
-void TweenRotation::Update( const GameTime& gameTime )
+void TweenScale::Update( const GameTime& gameTime )
 {
     Tweener::Update( gameTime );
     _gameObject->SetWorldMatrixDirty();

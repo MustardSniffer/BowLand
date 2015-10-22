@@ -62,21 +62,21 @@
       <AdditionalDependencies>assimp.lib;d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>mkdir "$(OutDir)Models"
+mkdir "$(OutDir)Scenes"
+mkdir "$(OutDir)Textures"
+xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d /q
+xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d /q
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d /q
+xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)Models"
-mkdir "$(OutDir)Scenes"
-mkdir "$(OutDir)Textures"
-xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
-xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
-xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>
@@ -98,21 +98,21 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
       <AdditionalDependencies>assimp.lib;d3d11.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>mkdir "$(OutDir)Models"
+mkdir "$(OutDir)Scenes"
+mkdir "$(OutDir)Textures"
+xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d /q
+xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d /q
+xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d /q
+xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>mkdir "$(OutDir)Models"
-mkdir "$(OutDir)Scenes"
-mkdir "$(OutDir)Textures"
-xcopy "$(ProjectDir)Models" "$(OutDir)Models\" /y /d
-xcopy "$(ProjectDir)Scenes" "$(OutDir)Scenes\" /y /d
-xcopy "$(ProjectDir)Textures" "$(OutDir)Textures\" /y /d
-xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying assets...</Message>
@@ -135,10 +135,13 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
     <ClCompile Include="Time.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Tweener.cpp" />
     <ClCompile Include="TweenFunctions.cpp" />
+    <ClCompile Include="TweenPosition.cpp" />
     <ClCompile Include="TweenRotation.cpp" />
+    <ClCompile Include="TweenScale.cpp" />
     <ClCompile Include="TweenTarget.cpp" />
     <ClCompile Include="TweenValue.cpp" />
   </ItemGroup>
@@ -160,9 +163,12 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d</Command>
     <ClInclude Include="Shaders\PointLight.hpp" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="Time.hpp" />
+    <ClInclude Include="Timer.hpp" />
     <ClInclude Include="Transform.hpp" />
     <ClInclude Include="Tweener.hpp" />
+    <ClInclude Include="TweenPosition.hpp" />
     <ClInclude Include="TweenRotation.hpp" />
+    <ClInclude Include="TweenScale.hpp" />
     <ClInclude Include="TweenTarget.hpp" />
     <ClInclude Include="TweenType.hpp" />
     <ClInclude Include="TweenValue.hpp" />

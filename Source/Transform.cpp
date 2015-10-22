@@ -62,24 +62,6 @@ XMFLOAT3 Transform::GetRotation() const{
     return _rotation;
 }
 
-// Get the position pointer
-XMFLOAT3* Transform::GetPositionPtr()
-{
-    return &_position;
-}
-
-// Get the scale pointer
-XMFLOAT3* Transform::GetScalePtr()
-{
-    return &_scale;
-}
-
-// Get the rotation pointer
-XMFLOAT3* Transform::GetRotationPtr()
-{
-    return &_rotation;
-}
-
 void Transform::Update(const GameTime& gameTime){
     
 }

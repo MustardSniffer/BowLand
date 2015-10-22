@@ -4,8 +4,11 @@
 #include "MeshRenderer.hpp"
 #include "Shaders\DirectionalLight.hpp"
 #include "Shaders\PointLight.hpp"
+#include "Timer.hpp"
 #include "Transform.hpp"
 #include "TweenRotation.hpp"
+#include "TweenPosition.hpp"
+#include "TweenScale.hpp"
 #include <assert.h>
 #include <codecvt>
 #include <iostream>
@@ -275,7 +278,7 @@ static TweenMethod ToTweenMethod( const std::string& str )
 }
 
 // Parses a JSON object into tween rotation
-static void ParseTweenRotation( TweenRotation* value, json::Object& object )
+template<class T> static void ParserTweener( T* value, json::Object& object )
 {
     for ( auto iter = object.begin(); iter != object.end(); ++iter )
     {
@@ -337,26 +340,12 @@ void Scene::Dispose()
 // Parse a component from a JSON object
 bool Scene::ParseComponent( std::shared_ptr<GameObject>& go, const std::string& name, json::Object& object )
 {
-    if ( "Transform" == name )
-    {
-        Transform* transform = go->GetTransform();
-        ParseTransform( transform, object );
-    }
-    else if ( "DefaultMaterial" == name )
-    {
-        DefaultMaterial* material = go->AddComponent<DefaultMaterial>();
-        ParseDefaultMaterial( material, object );
-    }
-    else if ( "MeshRenderer" == name )
-    {
-        MeshRenderer* renderer = go->AddComponent<MeshRenderer>();
-        ParseMeshRenderer( renderer, object );
-    }
-    else if ( "TweenRotation" == name )
-    {
-        TweenRotation* tween = go->AddComponent<TweenRotation>();
-        ParseTweenRotation( tween, object );
-    }
+    if      ( "Transform"       == name ) ParseTransform( go->GetTransform(), object );
+    else if ( "DefaultMaterial" == name ) ParseDefaultMaterial( go->AddComponent<DefaultMaterial>(), object );
+    else if ( "MeshRenderer"    == name ) ParseMeshRenderer( go->AddComponent<MeshRenderer>(), object );
+    else if ( "TweenRotation"   == name ) ParserTweener( go->AddComponent<TweenRotation>(), object );
+    else if ( "TweenPosition"   == name ) ParserTweener( go->AddComponent<TweenPosition>(), object );
+    else if ( "TweenScale"      == name ) ParserTweener( go->AddComponent<TweenScale>(), object );
     else
     {
         std::cout << "Unknown component '" << name << "' in '" << go->GetName() << "'." << std::endl;
@@ -402,6 +391,10 @@ std::shared_ptr<GameObject> Scene::ParseGameObject( const std::string& name, jso
 // Parse a scene root
 bool Scene::ParseSceneRoot( json::Object& root )
 {
+    // Start timing
+    Timer timer;
+    timer.Start();
+
     // Basically we just parse all of the objects in the root as game objects
     for ( auto iter = root.begin(); iter != root.end(); ++iter )
     {
@@ -426,6 +419,10 @@ bool Scene::ParseSceneRoot( json::Object& root )
             //return false; // TODO - Do we want to recover from parsing a bad object?
         }
     }
+
+    // Finish up timing
+    timer.Stop();
+    std::cout << "Parsed scene root in " << timer.GetElapsedTime() << " seconds." << std::endl;
 
     return true;
 }
@@ -473,8 +470,22 @@ bool Scene::LoadFromMemory( const std::string& name, const std::string& contents
     // Clear out our original values
     Dispose();
 
+#if defined( DEBUG ) || defined( _DEBUG )
+    std::string message = "===  Parsing scene  '" + name + "'  ===";
+    std::cout << message << std::endl;
+#endif
+
     // Parse the scene root
-    return ParseSceneRoot( parsed.ToObject() );
+    bool success = ParseSceneRoot( parsed.ToObject() );
+
+#if defined( DEBUG ) || defined( _DEBUG )
+    std::string endMessage;
+    endMessage.resize( message.length() );
+    std::fill( endMessage.begin(), endMessage.end(), '=' );
+    std::cout << endMessage << std::endl;
+#endif
+
+    return success;
 }
 
 // Updates all objects in this scene
