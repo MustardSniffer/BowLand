@@ -7,6 +7,8 @@
 /// </summary>
 class Time
 {
+    friend class DirectXGameCore;
+
     static double  _perfCounterSeconds;
     static __int64 _startTime;
     static __int64 _currTime;
@@ -23,9 +25,6 @@ class Time
     /// Updates timing values.
     /// </summary>
     static void Update();
-
-    friend class DirectXGameCore;
-    friend class MyDemoGame;
 
     // Hide instance constructors + destructor
     Time() = delete;
