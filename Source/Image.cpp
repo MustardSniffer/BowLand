@@ -1,5 +1,10 @@
 #include "Image.hpp"
+#include "Texture2D.hpp"
+#include "DirectX.hpp"
 #include <FreeImage.h>
+#if defined( _DEBUG ) || defined( DEBUG )
+#   include <iostream>
+#endif
 
 using namespace DirectX;
 
@@ -31,20 +36,40 @@ unsigned int Image::GetWidth() const
     return _height;
 }
 
-// Get image pixel
-XMFLOAT4 Image::GetPixel( unsigned int x, unsigned int y ) const
+// Attempt to save the image
+bool Image::Save( const std::string& fname ) const
 {
-    unsigned int index = x + ( y * 4 );
-    if ( index >= _pixels.size() )
+    // Attempt to allocate the image
+    FIBITMAP* image = FreeImage_Allocate( static_cast<int>( _width ), static_cast<int>( _height ), 32 );
+    if ( !image )
     {
-        return XMFLOAT4( 0, 0, 0, 0 );
+#if defined( _DEBUG ) || defined( DEBUG )
+        std::cout << "Failed to allocate memory when saving to '" << fname << "'." << std::endl;
+#endif
+        return false;
     }
 
-    // Return the pixel as a float4 with normalized values ([0, 1])
-    return XMFLOAT4( _pixels[ index + 0 ] * ByteToNormalizedFloat,
-                     _pixels[ index + 1 ] * ByteToNormalizedFloat,
-                     _pixels[ index + 2 ] * ByteToNormalizedFloat,
-                     _pixels[ index + 3 ] * ByteToNormalizedFloat );
+    // Get the image format
+    FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType( fname.c_str() );
+
+    // Set the image's pixel data
+    unsigned char* imagePixels = FreeImage_GetBits( image );
+    memcpy( imagePixels, &_pixels[ 0 ], _pixels.size() );
+
+    // Flip the image vertically because with FreeImage, (0,0) is the lower left corner
+    if ( !FreeImage_FlipVertical( image ) )
+    {
+#if defined( _DEBUG ) || defined( DEBUG )
+        std::cout << "Failed to flip '" << fname << "' vertically before saving" << std::endl;
+#endif
+        FreeImage_Unload( image );
+        return false;
+    }
+
+    // Now save the image
+    bool success = FreeImage_Save( imageFormat, image, fname.c_str() );
+    FreeImage_Unload( image );
+    return success;
 }
 
 // Disposes of this image
@@ -84,8 +109,15 @@ bool Image::LoadFromFile( const std::string& fname )
         image = temp;
     }
 
-    // Flip the image vertically because of the way UV coordinates work
-    FreeImage_FlipVertical( image );
+    // Flip the image vertically because with FreeImage, (0,0) is the lower left corner
+    if ( !FreeImage_FlipVertical( image ) )
+    {
+#if defined( _DEBUG ) || defined( DEBUG )
+        std::cout << "Failed to flip '" << fname << "' vertically" << std::endl;
+#endif
+        FreeImage_Unload( image );
+        return false;
+    }
 
     // Get the image's dimensions
     _width  = FreeImage_GetWidth( image );
@@ -107,6 +139,26 @@ bool Image::LoadFromFile( const std::string& fname )
         std::swap( _pixels[ i + 0 ], _pixels[ i + 2 ] );
     }
 
+
+    return true;
+}
+
+// Attempt to load a texture
+bool Image::LoadFromTexture( const Texture2D& texture )
+{
+    // Get the device context
+    ID3D11DeviceContext* dc = texture._deviceContext;
+
+    // Prepare for copying
+    _width = texture._width;
+    _height = texture._height;
+    _pixels.resize( _width * _height * 4 );
+
+    // Map the image resource
+    D3D11_MAPPED_SUBRESOURCE resource;
+    HR( dc->Map( texture._texture, 0, D3D11_MAP_READ, 0, &resource ) );
+    memcpy( &_pixels[ 0 ], resource.pData, _pixels.size() );
+    dc->Unmap( texture._texture, 0 );
 
     return true;
 }

@@ -42,15 +42,20 @@ public:
     unsigned int GetWidth() const;
 
     /// <summary>
-    /// Gets the pixel at the given coordinates.
+    /// Attempts to save this image's data to the given file.
     /// </summary>
-    /// <param name="x">The X coordinate to retrieve the pixel at.</param>
-    /// <param name="y">The Y coordinate to retrieve the pixel at.</param>
-    DirectX::XMFLOAT4 GetPixel( unsigned int x, unsigned int y ) const;
+    /// <param name="fname">The file name.</param>
+    bool Save( const std::string& fname ) const;
 
     /// <summary>
     /// Attempts to load image data from the given file.
     /// </summary>
     /// <param name="fname">The file name.</param>
     bool LoadFromFile( const std::string& fname );
+
+    /// <summary>
+    /// Attempts to load image data from the given texture.
+    /// </summary>
+    /// <param name="texture">The texture.</param>
+    bool LoadFromTexture( const Texture2D& texture );
 };
