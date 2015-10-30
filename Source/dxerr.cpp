@@ -3228,13 +3228,13 @@ const WCHAR* WINAPI DXGetErrorStringW( _In_ HRESULT hr )
         //CHK_ERRA(D3DERR_WASSTILLDRAWING)
         CHK_ERRA(D3DOK_NOAUTOGEN)
 
-	    // Extended for Windows Vista
-	    CHK_ERRA(D3DERR_DEVICEREMOVED)
-	    CHK_ERRA(S_NOT_RESIDENT)
-	    CHK_ERRA(S_RESIDENT_IN_SHARED_MEMORY)
-	    CHK_ERRA(S_PRESENT_MODE_CHANGED)
-	    CHK_ERRA(S_PRESENT_OCCLUDED)
-	    CHK_ERRA(D3DERR_DEVICEHUNG)
+        // Extended for Windows Vista
+        CHK_ERRA(D3DERR_DEVICEREMOVED)
+        CHK_ERRA(S_NOT_RESIDENT)
+        CHK_ERRA(S_RESIDENT_IN_SHARED_MEMORY)
+        CHK_ERRA(S_PRESENT_MODE_CHANGED)
+        CHK_ERRA(S_PRESENT_OCCLUDED)
+        CHK_ERRA(D3DERR_DEVICEHUNG)
 
         // Extended for Windows 7
         CHK_ERRA(D3DERR_UNSUPPORTEDOVERLAY)
@@ -3271,7 +3271,7 @@ const WCHAR* WINAPI DXGetErrorStringW( _In_ HRESULT hr )
         CHK_ERRA(DSERR_BADSENDBUFFERGUID)
         CHK_ERRA(DSERR_OBJECTNOTFOUND)
 
-    	CHK_ERRA(DSERR_FXUNAVAILABLE)
+        CHK_ERRA(DSERR_FXUNAVAILABLE)
 
 #endif // !WINAPI_FAMILY || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP
 
@@ -3696,13 +3696,13 @@ void WINAPI DXGetErrorDescriptionW( _In_ HRESULT hr, _Out_cap_(count) WCHAR* des
         //CHK_ERR(D3DERR_WASSTILLDRAWING, "Was Still Drawing")
         CHK_ERR(D3DOK_NOAUTOGEN, "The call succeeded but there won't be any mipmaps generated")
 
-	    // Extended for Windows Vista
-	    CHK_ERR(D3DERR_DEVICEREMOVED, "Hardware device was removed")
-	    CHK_ERR(S_NOT_RESIDENT, "Resource not resident in memory")
-	    CHK_ERR(S_RESIDENT_IN_SHARED_MEMORY, "Resource resident in shared memory")
-	    CHK_ERR(S_PRESENT_MODE_CHANGED, "Desktop display mode has changed")
-	    CHK_ERR(S_PRESENT_OCCLUDED, "Client window is occluded (minimized or other fullscreen)")
-	    CHK_ERR(D3DERR_DEVICEHUNG, "Hardware adapter reset by OS")
+        // Extended for Windows Vista
+        CHK_ERR(D3DERR_DEVICEREMOVED, "Hardware device was removed")
+        CHK_ERR(S_NOT_RESIDENT, "Resource not resident in memory")
+        CHK_ERR(S_RESIDENT_IN_SHARED_MEMORY, "Resource resident in shared memory")
+        CHK_ERR(S_PRESENT_MODE_CHANGED, "Desktop display mode has changed")
+        CHK_ERR(S_PRESENT_OCCLUDED, "Client window is occluded (minimized or other fullscreen)")
+        CHK_ERR(D3DERR_DEVICEHUNG, "Hardware adapter reset by OS")
 
         // Extended for Windows 7
         CHK_ERR(D3DERR_UNSUPPORTEDOVERLAY, "Overlay is not supported" )
@@ -3952,8 +3952,8 @@ HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HR
                     strBufferFile, strBufferLine, strBufferError, strBufferMsg );
 
         int nResult = MessageBoxW( GetForegroundWindow(), strBuffer, L"Unexpected error encountered", MB_YESNO | MB_ICONERROR );
-        if( nResult == IDYES )
-            DebugBreak();
+        if ( nResult == IDYES )
+            __debugbreak();
     }
 #else
     UNREFERENCED_PARAMETER(bPopMsgBox);
