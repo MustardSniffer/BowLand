@@ -44,20 +44,15 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     desc.Height = height;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    desc.MipLevels = 1;
+    desc.MipLevels = 0;
     desc.ArraySize = 1;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
     desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-    D3D11_SUBRESOURCE_DATA resource;
-    resource.pSysMem = data;
-    resource.SysMemPitch = width * 4;
-
     // Now create the texture
-    HR( device->CreateTexture2D( &desc, &resource, &_texture ) );
+    HR( device->CreateTexture2D( &desc, nullptr, &_texture ) );
 
 
 
@@ -72,6 +67,9 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     if ( FAILED( result ) ) { ReleaseMacro( _texture ); HR( result ); }
 
 
+
+    // Set the subresource data
+    deviceContext->UpdateSubresource( _texture, 0, nullptr, data, width * 4, width * height * 4 );
 
     // Now generate the mip maps
     deviceContext->GenerateMips( _shaderResource );
