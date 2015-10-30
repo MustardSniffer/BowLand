@@ -382,9 +382,11 @@ std::shared_ptr<GameObject> Scene::ParseGameObject( const std::string& name, jso
 // Parse a scene root
 bool Scene::ParseSceneRoot( json::Object& root )
 {
+#if defined( _DEBUG ) || defined( DEBUG )
     // Start timing
     Timer timer;
     timer.Start();
+#endif
 
     // Basically we just parse all of the objects in the root as game objects
     for ( auto iter = root.begin(); iter != root.end(); ++iter )
@@ -411,9 +413,11 @@ bool Scene::ParseSceneRoot( json::Object& root )
         }
     }
 
+#if defined( _DEBUG ) || defined( DEBUG )
     // Finish up timing
     timer.Stop();
     std::cout << "Parsed scene root in " << timer.GetElapsedTime() << " seconds." << std::endl;
+#endif
 
     return true;
 }
@@ -467,16 +471,7 @@ bool Scene::LoadFromMemory( const std::string& name, const std::string& contents
 #endif
 
     // Parse the scene root
-    bool success = ParseSceneRoot( parsed.ToObject() );
-
-#if defined( DEBUG ) || defined( _DEBUG )
-    std::string endMessage;
-    endMessage.resize( message.length() );
-    std::fill( endMessage.begin(), endMessage.end(), '=' );
-    std::cout << endMessage << std::endl;
-#endif
-
-    return success;
+    return ParseSceneRoot( parsed.ToObject() );
 }
 
 // Updates all objects in this scene
