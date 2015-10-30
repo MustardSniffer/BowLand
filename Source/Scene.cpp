@@ -10,9 +10,7 @@
 #include "TweenPosition.hpp"
 #include "TweenScale.hpp"
 #include <assert.h>
-#include <codecvt>
 #include <iostream>
-#include <locale>
 #include <fstream>
 #include <sstream>
 
@@ -80,13 +78,6 @@ static void ParseTransform( Transform* value, json::Object& object )
     }
 }
 
-// Converts an std::string to an std::wstring
-static std::wstring ToWString( const std::string& str )
-{
-    std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>> converter;
-    return converter.from_bytes( str );
-}
-
 // Parses a directional light from an object
 static DirectionalLight ParseDirectionalLight( json::Object& object )
 {
@@ -130,11 +121,11 @@ static void ParseDefaultMaterial( DefaultMaterial* value, json::Object& object )
     {
         if ( "DiffuseMap" == iter->first )
         {
-            value->LoadDiffuseMap( ToWString( iter->second ) );
+            value->LoadDiffuseMap( iter->second );
         }
         else if ( "NormalMap" == iter->first )
         {
-            value->LoadNormalMap( ToWString( iter->second ) );
+            value->LoadNormalMap( iter->second );
         }
         else if ( "UseNormalMap" == iter->first )
         {

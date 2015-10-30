@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Material.hpp"
+#include "Texture2D.hpp"
 #include "Shaders\DirectionalLight.hpp"
 #include "Shaders\PointLight.hpp"
 
@@ -11,8 +12,8 @@ class DefaultMaterial : public Material
 {
     DirectX::XMFLOAT4 _ambientColor;
     ID3D11SamplerState* _samplerState;
-    ID3D11ShaderResourceView* _diffuseMap;
-    ID3D11ShaderResourceView* _normalMap;
+    std::shared_ptr<Texture2D> _diffuseMap;
+    std::shared_ptr<Texture2D> _normalMap;
     float _specularPower;
     bool _useNormalMap;
     bool _useSpecularity;
@@ -66,13 +67,13 @@ public:
     /// Loads the diffuse map for this material from a file.
     /// </summary>
     /// <param name="fname">The name of the file to load.</param>
-    bool LoadDiffuseMap( const String& fname );
+    bool LoadDiffuseMap( const std::string& fname );
 
     /// <summary>
     /// Loads the normal map for this material from a file.
     /// </summary>
     /// <param name="fname">The name of the file to load.</param>
-    bool LoadNormalMap( const String& fname );
+    bool LoadNormalMap( const std::string& fname );
 
     /// <summary>
     /// Sets the first directional light's value.

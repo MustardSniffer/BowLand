@@ -36,8 +36,6 @@ DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
 // Destroy this default material
 DefaultMaterial::~DefaultMaterial()
 {
-    ReleaseMacro( _diffuseMap );
-    ReleaseMacro( _normalMap );
     ReleaseMacro( _samplerState );
     
     _specularPower = 0.0f;
@@ -54,14 +52,16 @@ void DefaultMaterial::CopyFrom( const Material* other )
 
     // Now copy from the given default material
     const DefaultMaterial* dm = reinterpret_cast<const DefaultMaterial*>( other );
-    UpdateD3DResource( _diffuseMap, dm->_diffuseMap );
-    UpdateD3DResource( _normalMap, dm->_normalMap );
     UpdateD3DResource( _samplerState, dm->_samplerState );
 
-    _ambientColor = dm->_ambientColor;
-    _specularPower = dm->_specularPower;
-    _useNormalMap = dm->_useNormalMap;
+    _ambientColor   = dm->_ambientColor;
+    _specularPower  = dm->_specularPower;
+    _useNormalMap   = dm->_useNormalMap;
     _useSpecularity = dm->_useSpecularity;
+
+    // Because of a bug with shared pointers, we only need to update the textures if they're different
+    UpdateSharedPtr( _diffuseMap, dm->_diffuseMap );
+    UpdateSharedPtr( _normalMap,  dm->_normalMap );
 }
 
 
@@ -90,15 +90,25 @@ bool DefaultMaterial::UsesSpecularity() const
 }
 
 // Load a diffuse map from a file
-bool DefaultMaterial::LoadDiffuseMap( const String& fname )
+bool DefaultMaterial::LoadDiffuseMap( const std::string& fname )
 {
-    return LoadTextureFromFile( fname, &_diffuseMap );
+    ID3D11Device* device = _gameObject->GetDevice();
+    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+
+    _diffuseMap = Texture2D::FromFile( device, deviceContext, fname );
+
+    return static_cast<bool>( _diffuseMap );
 }
 
 // Load a normal map from a file
-bool DefaultMaterial::LoadNormalMap( const String& fname )
+bool DefaultMaterial::LoadNormalMap( const std::string& fname )
 {
-    _useNormalMap = LoadTextureFromFile( fname, &_normalMap );
+    ID3D11Device* device = _gameObject->GetDevice();
+    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+
+    _normalMap = Texture2D::FromFile( device, deviceContext, fname );
+    _useNormalMap = static_cast<bool>( _diffuseMap );
+
     return _useNormalMap;
 }
 
@@ -134,8 +144,8 @@ void DefaultMaterial::UpdateShaderData()
     assert( _pixelShader->SetFloat3( "CameraPosition", activeCamera->GetPosition() ) );
 
     // Send stuff
-    assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap ) );
-    assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap ) );
+    assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap->GetShaderResourceView() ) );
+    assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap->GetShaderResourceView() ) );
     assert( _pixelShader->SetSamplerState( "TextureSampler", _samplerState ) );
     assert( _pixelShader->SetFloat4( "AmbientColor", _ambientColor ) );
     assert( _pixelShader->SetFloat( "SpecularPower", _specularPower ) );

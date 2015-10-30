@@ -85,27 +85,16 @@ void Material::CreateSamplerState( ID3D11SamplerState** samplerState, D3D11_FILT
 }
 
 // Attempt to load the pixel shader
-bool Material::LoadPixelShader( const String& fname )
+bool Material::LoadPixelShader( const wchar_t* fname )
 {
-    return _pixelShader->LoadShaderFile( fname.c_str() );
+    return _pixelShader->LoadShaderFile( fname );
 }
 
 // Attempt to load the vertex shader
-bool Material::LoadVertexShader( const String& fname )
+bool Material::LoadVertexShader( const wchar_t* fname )
 {
-    return _vertexShader->LoadShaderFile( fname.c_str() );
+    return _vertexShader->LoadShaderFile( fname );
 }
-
-// Attempt to load a texture
-bool Material::LoadTextureFromFile( const String& fname, ID3D11ShaderResourceView** texture )
-{
-    ReleaseMacro( ( *texture ) );
-
-    ID3D11Device* device = _gameObject->GetDevice();
-    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-    return SUCCEEDED( DirectX::CreateWICTextureFromFile( device, deviceContext, fname.c_str(), nullptr, texture ) );
-}
-
 
 // Checks to see if this is the active material
 bool Material::IsActive() const

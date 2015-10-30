@@ -10,11 +10,6 @@
 #include <string>
 
 /// <summary>
-/// The string type used by DirectX.
-/// </summary>
-typedef std::wstring String;
-
-/// <summary>
 /// Safely releases the given COM pointer.
 /// </summary>
 /// <param name="x">The COM pointer.</param>
@@ -35,6 +30,13 @@ typedef std::wstring String;
     ReleaseMacro( resource ); \
     resource = value; \
     AddRefMacro( resource )
+
+/// <summary>
+/// Updates a shared pointer with the given value.
+/// </summary>
+/// <param name="ptr">The shared pointer.</param>
+/// <param name="value">The new shared pointer value.</param>
+#define UpdateSharedPtr(ptr, value) if ( ptr.get() != value.get() ) ptr = value
 
 // --------------------------------------------------------
 // Macro for checking the result of a DirectX function call.  This will

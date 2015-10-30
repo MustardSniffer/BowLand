@@ -3,6 +3,7 @@
 #include "DirectX.hpp"
 #include "SimpleShader.h"
 #include "Component.hpp"
+#include "Texture2D.hpp"
 #include <memory> // for std::shared_ptr
 
 class Camera; // forward declaration
@@ -42,23 +43,16 @@ protected:
     void CreateSamplerState( ID3D11SamplerState** samplerState, D3D11_FILTER filter, D3D11_TEXTURE_ADDRESS_MODE addressMode, UINT anisotropy, float minLod, float maxLod );
 
     /// <summary>
-    /// Attempts to load the given file as a texture.
-    /// </summary>
-    /// <param name="fname">The file name to load.</param>
-    /// <param name="texture">The texture to load into.</param>
-    bool LoadTextureFromFile( const String& fname, ID3D11ShaderResourceView** texture );
-
-    /// <summary>
     /// Attempts to load the given pixel shader.
     /// </summary>
     /// <param name="fname">The file name to load.</param>
-    bool LoadPixelShader( const String& fname );
+    bool LoadPixelShader( const wchar_t* fname );
 
     /// <summary>
     /// Attempts to load the given vertex shader.
     /// </summary>
     /// <param name="fname">The file name to load.</param>
-    bool LoadVertexShader( const String& fname );
+    bool LoadVertexShader( const wchar_t* fname );
 
 public:
     /// <summary>
