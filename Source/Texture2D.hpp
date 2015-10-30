@@ -25,7 +25,8 @@ class Texture2D : public Texture
     /// <param name="width">The width of the texture.</param>
     /// <param name="height">The height of the texture.</param>
     /// <param name="data">The texture's initial data. (NOTE: Assumed to be RGBA.)</param>
-    Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height, const void* data, bool mipMaps );
+    /// <param name="genMipMaps">True to generate mip maps, false to not.</param>
+    Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height, const void* data, bool genMipMaps );
 
     /// <summary>
     /// Creates a new 2D texture.
@@ -45,7 +46,7 @@ public:
     /// <param name="deviceContext">The device context to use.</param>
     /// <param name="width">The width of the texture.</param>
     /// <param name="height">The height of the texture.</param>
-    static std::shared_ptr<Texture2D> Create( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height, bool mipMaps );
+    static std::shared_ptr<Texture2D> Create( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height );
 
     /// <summary>
     /// Loads a 2D texture from a file.
@@ -53,7 +54,7 @@ public:
     /// <param name="device">The device to use.</param>
     /// <param name="deviceContext">The device context to use.</param>
     /// <param name="fname">The file to load.</param>
-    static std::shared_ptr<Texture2D> FromFile( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std::string& fname, bool mipMaps );
+    static std::shared_ptr<Texture2D> FromFile( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std::string& fname );
 
     /// <summary>
     /// Loads a 2D texture from an image.
@@ -61,7 +62,7 @@ public:
     /// <param name="device">The device to use.</param>
     /// <param name="deviceContext">The device context to use.</param>
     /// <param name="image">The image to load.</param>
-    static std::shared_ptr<Texture2D> FromImage( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const Image& image, bool mipMaps );
+    static std::shared_ptr<Texture2D> FromImage( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const Image& image );
 
     /// <summary>
     /// Destroys this 2D texture.

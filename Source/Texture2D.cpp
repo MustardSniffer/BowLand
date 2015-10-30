@@ -3,7 +3,7 @@
 // Create an empty texture
 std::shared_ptr<Texture2D> Texture2D::Create( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height )
 {
-    return std::shared_ptr<Texture2D>( new (std::nothrow) Texture2D( device, deviceContext, width, height, nullptr ) );
+    return std::shared_ptr<Texture2D>( new (std::nothrow) Texture2D( device, deviceContext, width, height, nullptr, false ) );
 }
 
 // Load a texture from a file
@@ -27,16 +27,21 @@ std::shared_ptr<Texture2D> Texture2D::FromImage( ID3D11Device* device, ID3D11Dev
     unsigned int width  = image.GetWidth();
     unsigned int height = image.GetHeight();
     const void*  pixels = &image._pixels[ 0 ];
-    return std::shared_ptr<Texture2D>( new ( std::nothrow ) Texture2D( device, deviceContext, width, height, pixels ) );
+    return std::shared_ptr<Texture2D>( new (std::nothrow) Texture2D( device, deviceContext, width, height, pixels, true ) );
 }
 
 // Create an empty 2D texture
-Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height, const void* data )
+Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height, const void* data, bool genMipMaps )
     : Texture( device, deviceContext )
     , _texture( nullptr )
     , _width( width )
     , _height( height )
 {
+    // Create some flags based on whether or not to generate mip maps
+    UINT bindFlags   = D3D11_BIND_SHADER_RESOURCE | ( genMipMaps ? D3D11_BIND_RENDER_TARGET : 0 );
+    UINT miscFlags   = ( genMipMaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0 );
+    UINT mipLevels   = ( genMipMaps ? 0 : 1 );
+
     // Create the texture description
     D3D11_TEXTURE2D_DESC desc;
     ZeroMemory( &desc, sizeof( D3D11_TEXTURE2D_DESC ) );
@@ -44,13 +49,12 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     desc.Height = height;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-    desc.MipLevels = 0;
+    desc.MiscFlags = miscFlags;
+    desc.MipLevels = mipLevels;
     desc.ArraySize = 1;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-    desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    desc.BindFlags = bindFlags;
 
     // Now create the texture
     HR( device->CreateTexture2D( &desc, nullptr, &_texture ) );
@@ -73,7 +77,10 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     UpdateArea( 0, 0, width, height, data );
 
     // Now generate the mip maps
-    deviceContext->GenerateMips( _shaderResource );
+    if ( genMipMaps )
+    {
+        deviceContext->GenerateMips( _shaderResource );
+    }
 }
 
 // Destroy this 2D texture

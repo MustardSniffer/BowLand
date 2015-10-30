@@ -1,14 +1,38 @@
+#pragma warning( disable : 4800 ) // int->bool warning
+
 #include "Image.hpp"
 #include "Texture2D.hpp"
 #include "DirectX.hpp"
 #include <FreeImage.h>
+#include <locale>
 #if defined( _DEBUG ) || defined( DEBUG )
 #   include <iostream>
 #endif
 
 using namespace DirectX;
 
-static const float ByteToNormalizedFloat = 1.0f / 255.0f;
+// Gets an image format based on a file name
+static FREE_IMAGE_FORMAT GetImageFormatFromFileName( const std::string& fname )
+{
+    static std::locale locale;
+
+    // Get the extension in uppercase
+    std::string ext = fname.substr( fname.find_last_of( '.' ) );
+    for ( unsigned int i = 0; i < ext.length(); ++i )
+    {
+        ext[ i ] = std::toupper( ext[ i ], locale );
+    }
+    
+    // Now check the extension!
+         if ( "PNG"  == ext ) return FIF_PNG;
+    else if ( "BMP"  == ext ) return FIF_BMP;
+    else if ( "TIFF" == ext ) return FIF_TIFF;
+    else if ( "JPG"  == ext ) return FIF_JPEG;
+    else if ( "JPEG" == ext ) return FIF_JPEG;
+    else if ( "DDS"  == ext ) return FIF_DDS;
+
+    return FIF_UNKNOWN;
+}
 
 // Create a new image
 Image::Image()
@@ -50,11 +74,17 @@ bool Image::Save( const std::string& fname ) const
     }
 
     // Get the image format
-    FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType( fname.c_str() );
+    FREE_IMAGE_FORMAT imageFormat = GetImageFormatFromFileName( fname.c_str() );
 
     // Set the image's pixel data
     unsigned char* imagePixels = FreeImage_GetBits( image );
     memcpy( imagePixels, &_pixels[ 0 ], _pixels.size() );
+
+    // Convert the image from RGBA to BGRA
+    for ( unsigned int i = 0; i < _pixels.size(); i += 4 )
+    {
+        std::swap( imagePixels[ i + 0 ], imagePixels[ i + 2 ] );
+    }
 
     // Flip the image vertically because with FreeImage, (0,0) is the lower left corner
     if ( !FreeImage_FlipVertical( image ) )
@@ -67,9 +97,36 @@ bool Image::Save( const std::string& fname ) const
     }
 
     // Now save the image
-    bool success = FreeImage_Save( imageFormat, image, fname.c_str() );
+    bool success = static_cast<bool>( FreeImage_Save( imageFormat, image, fname.c_str() ) );
     FreeImage_Unload( image );
     return success;
+}
+
+// Create a staging texture
+ID3D11Texture2D* Image::CreateStagingTexture( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const Texture2D& source )
+{
+    // Create the texture description
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory( &desc, sizeof( D3D11_TEXTURE2D_DESC ) );
+    desc.Width = source.GetWidth();
+    desc.Height = source.GetHeight();
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.Usage = D3D11_USAGE_STAGING;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+
+    // Create the staging texture
+    ID3D11Texture2D* stagingTexture = nullptr;
+    HR( device->CreateTexture2D( &desc, nullptr, &stagingTexture ) );
+
+    // Copy the original texture into the staging texture
+    //deviceContext->CopyResource( stagingTexture, source._texture );
+    deviceContext->CopySubresourceRegion( stagingTexture, 0, 0, 0, 0, source._texture, 0, nullptr );
+
+    return stagingTexture;
 }
 
 // Disposes of this image
@@ -128,6 +185,7 @@ bool Image::LoadFromFile( const std::string& fname )
     unsigned char* imageBits = FreeImage_GetBits( image );
     memcpy( &_pixels[ 0 ], imageBits, _pixels.size() );
 
+
     // Release the image
     FreeImage_Unload( image );
 
@@ -154,11 +212,26 @@ bool Image::LoadFromTexture( const Texture2D& texture )
     _height = texture._height;
     _pixels.resize( _width * _height * 4 );
 
-    // Map the image resource
-    D3D11_MAPPED_SUBRESOURCE resource;
-    HR( dc->Map( texture._texture, 0, D3D11_MAP_READ, 0, &resource ) );
-    memcpy( &_pixels[ 0 ], resource.pData, _pixels.size() );
-    dc->Unmap( texture._texture, 0 );
+    // Get the staging texture to read from
+    ID3D11Texture2D* stagingTexture = CreateStagingTexture( texture._device, texture._deviceContext, texture );
+
+    // Now map the staging texture
+    D3D11_MAPPED_SUBRESOURCE subresource;
+    ZeroMemory( &subresource, sizeof( D3D11_MAPPED_SUBRESOURCE ) );
+    HRESULT result = dc->Map( stagingTexture, 0, D3D11_MAP_READ, 0, &subresource );
+    if ( FAILED( result ) )
+    {
+        ReleaseMacro( stagingTexture );
+        HR( result );
+        return false;
+    }
+
+    // Read from the staging texture
+    memcpy( &_pixels[ 0 ], subresource.pData, _pixels.size() );
+
+    // Clean up
+    dc->Unmap( stagingTexture, 0 );
+    ReleaseMacro( stagingTexture );
 
     return true;
 }
