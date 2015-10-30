@@ -16,6 +16,8 @@ class Texture
     Texture& operator=( Texture&& ) = delete;
 
 protected:
+    ID3D11Device* _device;
+    ID3D11DeviceContext* _deviceContext;
     ID3D11ShaderResourceView* _shaderResource;
 
     /// <summary>

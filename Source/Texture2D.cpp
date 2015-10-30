@@ -44,6 +44,7 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     desc.Height = height;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     desc.MipLevels = 0;
     desc.ArraySize = 1;
     desc.SampleDesc.Count = 1;
@@ -69,7 +70,7 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
 
 
     // Set the subresource data
-    deviceContext->UpdateSubresource( _texture, 0, nullptr, data, width * 4, width * height * 4 );
+    UpdateArea( 0, 0, width, height, data );
 
     // Now generate the mip maps
     deviceContext->GenerateMips( _shaderResource );
@@ -91,4 +92,20 @@ unsigned int Texture2D::GetHeight() const
 unsigned int Texture2D::GetWidth() const
 {
     return _height;
+}
+
+// Updates the given area of the texture
+void Texture2D::UpdateArea( unsigned int x, unsigned int y, unsigned int width, unsigned int height, const void* data )
+{
+    // Create the subresource box
+    D3D11_BOX box;
+    box.left    = x;
+    box.right   = x + width;
+    box.top     = y;
+    box.bottom  = y + height;
+    box.front   = 0;
+    box.back    = 1;
+
+    // Update the subresource
+    _deviceContext->UpdateSubresource( _texture, 0, &box, data, width * 4, width * height * 4 );
 }
