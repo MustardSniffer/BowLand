@@ -9,6 +9,7 @@
 /// </summary>
 class Image
 {
+    friend class Font;
     friend class Texture2D;
 
     std::vector<unsigned char> _pixels;

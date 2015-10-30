@@ -159,8 +159,8 @@ bool DirectXGameCore::InitMainWindow()
         return false;
     }
 
-    // Finally show the window to the user
-    ShowWindow(hMainWnd, SW_SHOW);
+    // Hide the window until all loading is done
+    ShowWindow(hMainWnd, SW_HIDE);
     return true;
 }
 
@@ -295,6 +295,9 @@ void DirectXGameCore::OnResize()
 // --------------------------------------------------------
 int DirectXGameCore::Run()
 {
+    // Show the window
+    ShowWindow( hMainWnd, SW_SHOW );
+
     // Create a variable to hold the current message
     MSG msg = {0};
 

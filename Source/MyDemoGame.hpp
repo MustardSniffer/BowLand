@@ -6,6 +6,7 @@
 #include "Camera.hpp"
 #include "GameObject.hpp"
 #include "Scene.hpp"
+#include "Font.hpp"
 #include <memory> // for std::shared_ptr
 #include <vector>
 
@@ -31,6 +32,7 @@ public:
 
 private:
     std::shared_ptr<Scene> _testScene;
+    std::shared_ptr<Font> _testFont;
 
     // The matrices to go from model space to screen space
     std::shared_ptr<Camera> camera;

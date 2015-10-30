@@ -114,6 +114,9 @@ bool MyDemoGame::Init()
     _testScene = std::make_shared<Scene>( device, deviceContext );
     _testScene->LoadFromFile( "Scenes\\Test.scene" );
 
+    // Create and load our test font
+    _testFont = std::make_shared<Font>( device, deviceContext );
+    _testFont->LoadFromFile( "Fonts\\PressStart2P-Regular.ttf" );
 
     // Successfully initialized
     return true;
@@ -146,7 +149,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
 
     // Update the camera based on input
     float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
-    float rotSpeed  = gameTime.GetElapsedTime() * 8.0f;
+    float rotSpeed  = gameTime.GetElapsedTime() * 3.0f;
 
     // Speed up when shift is pressed
     if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }

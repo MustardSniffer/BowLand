@@ -38,6 +38,11 @@ template<typename T> struct Rect
 typedef Rect<int> IntRect;
 
 /// <summary>
+/// A rectangle with unsigned integer components.
+/// </summary>
+typedef Rect<unsigned int> UintRect;
+
+/// <summary>
 /// A rectangle with float components.
 /// </summary>
 typedef Rect<float> FloatRect;

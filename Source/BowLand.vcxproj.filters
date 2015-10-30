@@ -11,6 +11,7 @@
     </Filter>
     <Filter Include="Shader Files">
       <UniqueIdentifier>{e11479ef-8a44-4ba5-9d5a-c14237485115}</UniqueIdentifier>
+      <Extensions>hlsl;hlsli</Extensions>
     </Filter>
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{e5584c61-a90c-459b-a378-3e4e5771f12a}</UniqueIdentifier>
@@ -113,6 +114,18 @@
     <ClCompile Include="TweenScale.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
@@ -175,9 +188,6 @@
     <ClInclude Include="Material.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Shaders\PointLight.hpp">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Time.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -196,6 +206,41 @@
     <ClInclude Include="TweenScale.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Font.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\DirectionalLight.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\PointLight.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\SharedTypes.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameObject.inl">
+      <Filter>Header Files\Utility</Filter>
+    </None>
+    <None Include="Rect.inl">
+      <Filter>Header Files\Graphics</Filter>
+    </None>
+    <None Include="Shaders\DefaultShaderCommon.hlsli">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\DefaultPixelShader.hlsl">
@@ -204,19 +249,5 @@
     <FxCompile Include="Shaders\DefaultVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\DirectionalLight.hpp">
-      <Filter>Header Files\Graphics</Filter>
-    </None>
-    <None Include="Shaders\SharedTypes.hpp">
-      <Filter>Header Files\Graphics</Filter>
-    </None>
-    <None Include="GameObject.inl">
-      <Filter>Header Files\Utility</Filter>
-    </None>
-    <None Include="Shaders\DefaultShaderCommon.hlsli">
-      <Filter>Shader Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
