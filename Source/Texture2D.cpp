@@ -49,19 +49,15 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
     desc.ArraySize = 1;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
-    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-    // Create the subresource data
-    D3D11_SUBRESOURCE_DATA subresource;
-    ZeroMemory( &subresource, sizeof( D3D11_SUBRESOURCE_DATA ) );
-    if ( data )
-    {
-        subresource.pSysMem = data;
-        subresource.SysMemPitch = width * 4;
-    }
+    D3D11_SUBRESOURCE_DATA resource;
+    resource.pSysMem = data;
+    resource.SysMemPitch = width * 4;
 
     // Now create the texture
-    HR( device->CreateTexture2D( &desc, &subresource, &_texture ) );
+    HR( device->CreateTexture2D( &desc, &resource, &_texture ) );
 
 
 
