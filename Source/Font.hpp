@@ -19,7 +19,7 @@
 /// </summary>
 class Font
 {
-    // TODO - Friend class for whatever holds a string
+    friend class TextRenderer;
 
     #pragma region Structures
 
@@ -30,7 +30,7 @@ class Font
     {
         float Advance;
         FloatRect Bounds;
-        FloatRect TextureBounds;
+        UintRect TextureBounds;
 
         /// <summary>
         /// Creates an empty glyph.
@@ -129,12 +129,6 @@ class Font
     UintRect FindGlyphRect( GlyphPage& page, unsigned int width, unsigned int height ) const;
 
     /// <summary>
-    /// Gets the texture used for the given font size.
-    /// </summary>
-    /// <param name="size">The character size.</param>
-    std::shared_ptr<Texture2D> GetTexture( unsigned int size ) const;
-
-    /// <summary>
     /// Disposes of this font.
     /// </summary>
     void Dispose();
@@ -159,6 +153,12 @@ class Font
     /// </summary>
     /// <param name="size">The character size.</param>
     float GetLineSpacing( unsigned int size );
+
+    /// <summary>
+    /// Gets the texture used for the given font size.
+    /// </summary>
+    /// <param name="size">The character size.</param>
+    std::shared_ptr<Texture2D> GetTexture( unsigned int size );
 
     /// <summary>
     /// Loads the glyph for the given character at the given size.

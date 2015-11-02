@@ -17,7 +17,7 @@ static FREE_IMAGE_FORMAT GetImageFormatFromFileName( const std::string& fname )
     static std::locale locale;
 
     // Get the extension in uppercase
-    std::string ext = fname.substr( fname.find_last_of( '.' ) );
+    std::string ext = fname.substr( fname.find_last_of( '.' ) + 1 );
     for ( unsigned int i = 0; i < ext.length(); ++i )
     {
         ext[ i ] = std::toupper( ext[ i ], locale );

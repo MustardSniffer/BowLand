@@ -13,7 +13,6 @@
 #include FT_OUTLINE_H
 #include FT_BITMAP_H
 #if defined( _DEBUG ) || defined( DEBUG )
-#   include "Timer.hpp"
 #   include <iostream>
 #endif
 
@@ -208,20 +207,6 @@ unsigned int Font::GetCurrentSize() const
     return 0;
 }
 
-// Get the texture for the given size
-std::shared_ptr<Texture2D> Font::GetTexture( unsigned int size ) const
-{
-    std::shared_ptr<Texture2D> texture;
-
-    auto search = _pages.find( size );
-    if ( search != _pages.end() )
-    {
-        texture = search->second.Texture;
-    }
-
-    return texture;
-}
-
 // Disposes of this font
 void Font::Dispose()
 {
@@ -298,6 +283,29 @@ float Font::GetLineSpacing( unsigned int size )
     return 0.0f;
 }
 
+// Get the texture for the given size
+std::shared_ptr<Texture2D> Font::GetTexture( unsigned int size )
+{
+    std::shared_ptr<Texture2D> texture;
+
+    // Find the texture in the glyph page for the given font size
+    auto search = _pages.find( size );
+    if ( search != _pages.end() )
+    {
+        GlyphPage& page = search->second;
+        texture = page.Texture;
+
+        // If the texture doesn't exist, create it
+        if ( !texture )
+        {
+            texture = Texture2D::Create( _device, _deviceContext, 256, 256 );
+            page.Texture = texture;
+        }
+    }
+
+    return texture;
+}
+
 // Load a character glyph
 Font::Glyph Font::LoadGlyph( char ch, unsigned int size )
 {
@@ -311,7 +319,9 @@ Font::Glyph Font::LoadGlyph( char ch, unsigned int size )
 
     // Attempt to load the font's glyph for the given character
     if ( 0 != FT_Load_Char( _myFontFace, ch, FT_LOAD_TARGET_NORMAL | FT_LOAD_FORCE_AUTOHINT ) )
+    {
         return glyph;
+    }
 
     // Get the glyph's description
     FT_Glyph ftGlyph;
@@ -347,9 +357,7 @@ Font::Glyph Font::LoadGlyph( char ch, unsigned int size )
         emptyArea.Y += padding;
         emptyArea.Width -= 2 * padding;
         emptyArea.Height -= 2 * padding;
-
-        // Get the normalized texture rectangle
-        glyph.TextureBounds = page.GetNormalizedRect( emptyArea );
+        glyph.TextureBounds = emptyArea;
 
         // Set the glyph's bounding box
         glyph.Bounds.X      =  ( _myFontFace->glyph->metrics.horiBearingX ) * KerningScale;
@@ -402,14 +410,6 @@ Font::Glyph Font::LoadGlyph( char ch, unsigned int size )
 // Attempts to load font information from a file
 bool Font::LoadFromFile( const std::string& fname )
 {
-#if defined( _DEBUG ) || defined( DEBUG )
-    std::string initMessage = "===  Loading font  '" + fname + "'  ===";
-    std::cout << initMessage << std::endl;
-
-    Timer timer;
-    timer.Start();
-#endif
-
     // Remove any loaded information
     Dispose();
 
@@ -451,10 +451,6 @@ bool Font::LoadFromFile( const std::string& fname )
     // Set our default font size to be 12
     SetCurrentSize( 12U );
 
-#if defined( _DEBUG ) || defined( DEBUG )
-    timer.Stop();
-    std::cout << "Loaded font in " << timer.GetElapsedTime() << " seconds." << std::endl;
-#endif
     return true;
 }
 

@@ -3,6 +3,9 @@
         "Camera": {
             "Position": [5, 0, 0],
             "Rotation": [0, -1.5707963267948966192313216916398, 0]
+        },
+        "Camera2D": {
+            "Viewport": [-640, 640, 360, -360, -0.1, 0.1]
         }
     },
     "Sphere": {
@@ -10,8 +13,8 @@
             "Scale": [3, 3, 3]
         },
         "DefaultMaterial": {
-            "DiffuseMap": "Textures/Rocks2.jpg",
-            "NormalMap": "Textures/Rocks2Normals.jpg",
+            "DiffuseMap": "Textures\\Rocks2.jpg",
+            "NormalMap": "Textures\\Rocks2Normals.jpg",
             "UseSpecularity": true,
             "SpecularPower": 256,
             "DirectionalLight": {
@@ -24,7 +27,7 @@
             }
         },
         "MeshRenderer": {
-            "Mesh": "Models/sphere.obj",
+            "Mesh": "Models\\sphere.obj",
             "Material": "this DefaultMaterial"
         },
         "TweenRotation": {
@@ -40,8 +43,8 @@
             "Position": [2, 2, 2]
         },
         "DefaultMaterial": {
-            "DiffuseMap": "Textures/DryDirt.jpg",
-            "NormalMap": "Textures/DryDirtNormals.jpg",
+            "DiffuseMap": "Textures\\DryDirt.jpg",
+            "NormalMap": "Textures\\DryDirtNormals.jpg",
             "DirectionalLight": {
                 "DiffuseColor": [0.823529482, 0.411764741, 0.117647067, 1.0],
                 "Direction": [1, 0, 0]
@@ -52,7 +55,7 @@
             }
         },
         "MeshRenderer": {
-            "Mesh": "Models/cube.obj",
+            "Mesh": "Models\\cube.obj",
             "Material": "this DefaultMaterial"
         },
         "TweenPosition": {
@@ -68,6 +71,16 @@
             "PlayMode": "PingPong",
             "Method": "ExponentialEaseInOut",
             "Duration": 2
+        }
+    },
+    "TestText": {
+        "Transform": {
+            "Position": [0, 0]
+        },
+        "TextRenderer": {
+            "Font": "Fonts\\PressStart2P-Regular.ttf",
+            "FontSize": 36,
+            "Text": "Hello, world!"
         }
     }
 }

@@ -114,9 +114,6 @@ bool MyDemoGame::Init()
     _testScene = std::make_shared<Scene>( device, deviceContext );
     _testScene->LoadFromFile( "Scenes\\Test.scene" );
 
-    // Create and load our test font
-    _testFont = std::make_shared<Font>( device, deviceContext );
-    _testFont->LoadFromFile( "Fonts\\PressStart2P-Regular.ttf" );
 
     // Successfully initialized
     return true;

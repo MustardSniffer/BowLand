@@ -32,7 +32,6 @@ public:
 
 private:
     std::shared_ptr<Scene> _testScene;
-    std::shared_ptr<Font> _testFont;
 
     // The matrices to go from model space to screen space
     std::shared_ptr<Camera> camera;

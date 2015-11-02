@@ -126,6 +126,12 @@
     <ClCompile Include="Texture2D.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="TextRenderer.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceState.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
@@ -230,6 +236,12 @@
     <ClInclude Include="Shaders\SharedTypes.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="TextRenderer.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="DeviceState.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject.inl">
@@ -241,12 +253,21 @@
     <None Include="Shaders\DefaultShaderCommon.hlsli">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="TextShaderCommon.hlsli">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\DefaultPixelShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\DefaultVertexShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="TextVertexShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="TextPixelShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

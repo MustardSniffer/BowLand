@@ -5,7 +5,7 @@ std::shared_ptr<Texture2D> Texture2D::Create( ID3D11Device* device, ID3D11Device
 {
     // Create some empty data for the texture
     std::vector<unsigned char> pixels( width * height * 4 );
-    for ( unsigned int i = 0; i < pixels.size(); ++i )
+    for ( unsigned int i = 0; i < pixels.size(); i += 4 )
     {
         pixels[ i + 0 ] = 255;
         pixels[ i + 1 ] = 255;

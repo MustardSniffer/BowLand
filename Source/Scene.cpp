@@ -4,6 +4,7 @@
 #include "MeshRenderer.hpp"
 #include "Shaders\DirectionalLight.hpp"
 #include "Shaders\PointLight.hpp"
+#include "TextRenderer.hpp"
 #include "Timer.hpp"
 #include "Transform.hpp"
 #include "TweenRotation.hpp"
@@ -22,7 +23,7 @@ using namespace DirectX;
 // Parses a float3 from the given value
 static XMFLOAT3 ParseFloat3( const json::Value& value )
 {
-    XMFLOAT3 float3;
+    XMFLOAT3 float3( 0.0f, 0.0f, 0.0f );
 
     if ( value.GetType() == json::ValueType::ArrayVal )
     {
@@ -38,7 +39,7 @@ static XMFLOAT3 ParseFloat3( const json::Value& value )
 // Parses a float3 from the given value
 static XMFLOAT4 ParseFloat4( const json::Value& value )
 {
-    XMFLOAT4 float4;
+    XMFLOAT4 float4( 0.0f, 0.0f, 0.0f, 0.0f );
 
     if ( value.GetType() == json::ValueType::ArrayVal )
     {
@@ -216,6 +217,51 @@ static void ParseMeshRenderer( MeshRenderer* value, json::Object& object )
     }
 }
 
+// Parses a JSON object into a text renderer
+static void ParseTextRenderer( TextRenderer* value, json::Object& object )
+{
+    for ( auto iter = object.begin(); iter != object.end(); ++iter )
+    {
+        if ( "Font" == iter->first )
+        {
+            // Load the font
+            ID3D11Device* device = value->GetGameObject()->GetDevice();
+            ID3D11DeviceContext* deviceContext = value->GetGameObject()->GetDeviceContext();
+            std::shared_ptr<Font> font = std::make_shared<Font>( device, deviceContext );
+
+            // If we created the font and the specified if a string
+            if ( font && iter->second.GetType() == json::StringVal )
+            {
+                // Only set the font if we can load the file
+                if ( font->LoadFromFile( iter->second.ToString() ) )
+                {
+                    std::cout << "Loaded font " << font->GetFontName() << " at " << font->GetCurrentSize() << "px" << std::endl;
+                    value->SetFont( font );
+                }
+            }
+        }
+        else if ( "FontSize" == iter->first )
+        {
+            // Set the font size to be a minimum of 6px
+            int size = iter->second.ToInt();
+            if ( size <= 6 )
+            {
+                size = 6;
+            }
+            value->SetFontSize( static_cast<unsigned int>( size ) );
+        }
+        else if ( "Text" == iter->first )
+        {
+            value->SetText( iter->second.ToString() );
+        }
+        else
+        {
+            std::cout << "Unknown value '" << iter->first << "' in "
+                << value->GetGameObject()->GetName() << "'s TextRenderer." << std::endl;
+        }
+    }
+}
+
 // Converts a string to a tween play mode
 static TweenPlayMode ToTweenPlayMode( const std::string& str )
 {
@@ -334,6 +380,7 @@ bool Scene::ParseComponent( std::shared_ptr<GameObject>& go, const std::string& 
     if      ( "Transform"       == name ) ParseTransform( go->GetTransform(), object );
     else if ( "DefaultMaterial" == name ) ParseDefaultMaterial( go->AddComponent<DefaultMaterial>(), object );
     else if ( "MeshRenderer"    == name ) ParseMeshRenderer( go->AddComponent<MeshRenderer>(), object );
+    else if ( "TextRenderer"    == name ) ParseTextRenderer( go->AddComponent<TextRenderer>(), object );
     else if ( "TweenRotation"   == name ) ParserTweener( go->AddComponent<TweenRotation>(), object );
     else if ( "TweenPosition"   == name ) ParserTweener( go->AddComponent<TweenPosition>(), object );
     else if ( "TweenScale"      == name ) ParserTweener( go->AddComponent<TweenScale>(), object );

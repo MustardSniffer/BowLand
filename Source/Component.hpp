@@ -10,6 +10,7 @@ class GameObject;
 class Component
 {
 protected:
+    // TODO - Use enum flags instead of bools?
     GameObject* const _gameObject;
     bool _isEnabled;
     bool _usesLateUpdate;
