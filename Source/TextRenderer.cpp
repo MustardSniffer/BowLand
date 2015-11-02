@@ -232,10 +232,10 @@ void TextRenderer::RebuildMesh()
         float right  = left + glyph.Bounds.Width;
         float bottom = top + glyph.Bounds.Height;
 
-        float u1 = uScale * ( static_cast<float>( glyph.TextureBounds.X ) );
-        float v1 = vScale * ( static_cast<float>( glyph.TextureBounds.Y ) );
-        float u2 = uScale * ( u1 + glyph.TextureBounds.Width );
-        float v2 = vScale * ( v1 + glyph.TextureBounds.Height );
+        float u1 = uScale * ( glyph.TextureBounds.X );
+        float v1 = vScale * ( glyph.TextureBounds.Y );
+        float u2 = uScale * ( glyph.TextureBounds.X + glyph.TextureBounds.Width );
+        float v2 = vScale * ( glyph.TextureBounds.Y + glyph.TextureBounds.Height );
 
         // Now add the quad
         vertices.push_back( TextVertex( x + left,  y + top,     u1, v1 ) );
@@ -303,26 +303,6 @@ void TextRenderer::Update( const GameTime& gameTime )
         RebuildMesh();
         _isMeshDirty = false;
     }
-
-    // Get our world matrix
-    XMFLOAT3 position = _gameObject->GetTransform()->GetPosition();
-    XMMATRIX worldMatrix = XMMatrixTranslation( position.x, position.y, 0.0f );
-    XMFLOAT4X4 worldFloat4x4;
-    XMStoreFloat4x4( &worldFloat4x4, worldMatrix );
-
-    // Get our projection matrix
-    XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f );
-    XMFLOAT4X4 projectionFloat4x4;
-    XMStoreFloat4x4( &projectionFloat4x4, projectionMatrix );
-
-    // Set our shader variables
-    Camera* camera = Camera::GetActiveCamera();
-    Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
-    _vertexShader->SetMatrix4x4        ( "World",       worldFloat4x4 );
-    _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
-    _pixelShader->SetFloat4            ( "TextColor",   Colors::Wheat );
-    _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
-    _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
 }
 
 // Draws this text renderer
@@ -346,14 +326,28 @@ void TextRenderer::Draw( const GameTime& gameTime )
     deviceContext->RSSetState( _rasterizerState );
 
 
+    // Get our projection matrix
+    XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f );
+    XMFLOAT4X4 projectionFloat4x4;
+    XMStoreFloat4x4( &projectionFloat4x4, projectionMatrix );
+
+    // Set our shader variables
+    Camera* camera = Camera::GetActiveCamera();
+    Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
+    _vertexShader->SetMatrix4x4        ( "World", _gameObject->GetWorldMatrix() );
+    _vertexShader->SetMatrix4x4        ( "Projection", projectionFloat4x4 );
+    _pixelShader->SetFloat4            ( "TextColor", Colors::Black );
+    _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
+    _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
+
     // Set our shaders
-    _pixelShader->SetShaderResourceView( "TextTexture", _font->GetTexture( GetFontSize() )->GetShaderResourceView() );
     _vertexShader->SetShader( true );
     _pixelShader->SetShader( true );
     
+
     // Draw the buffer
-    UINT stride = sizeof( TextVertex );
-    UINT offset = 0;
+    const UINT stride = sizeof( TextVertex );
+    const UINT offset = 0;
 
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     deviceContext->IASetIndexBuffer( nullptr, DXGI_FORMAT_UNKNOWN, 0 );

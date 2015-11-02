@@ -3,17 +3,7 @@
 // Create an empty texture
 std::shared_ptr<Texture2D> Texture2D::Create( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height )
 {
-    // Create some empty data for the texture
-    std::vector<unsigned char> pixels( width * height * 4 );
-    for ( unsigned int i = 0; i < pixels.size(); i += 4 )
-    {
-        pixels[ i + 0 ] = 255;
-        pixels[ i + 1 ] = 255;
-        pixels[ i + 2 ] = 255;
-        pixels[ i + 3 ] = 0;
-    }
-
-    return std::shared_ptr<Texture2D>( new (std::nothrow) Texture2D( device, deviceContext, width, height, &pixels[ 0 ], false ) );
+    return std::shared_ptr<Texture2D>( new (std::nothrow) Texture2D( device, deviceContext, width, height, nullptr, false ) );
 }
 
 // Load a texture from a file
@@ -84,7 +74,10 @@ Texture2D::Texture2D( ID3D11Device* device, ID3D11DeviceContext* deviceContext, 
 
 
     // Set the subresource data
-    UpdateArea( 0, 0, width, height, data );
+    if ( data )
+    {
+        UpdateArea( 0, 0, width, height, data );
+    }
 
     // Now generate the mip maps
     if ( genMipMaps )

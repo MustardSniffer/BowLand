@@ -365,6 +365,7 @@ Font::Glyph Font::LoadGlyph( char ch, unsigned int size )
         glyph.Bounds.Width  =  ( _myFontFace->glyph->metrics.width        ) * KerningScale;
         glyph.Bounds.Height =  ( _myFontFace->glyph->metrics.height       ) * KerningScale;
 
+
         // Extract the glyph's pixels from the bitmap
         _pixelBuffer.resize( width * height * 4, 255 );
         const unsigned char* pixels = bitmap.buffer;

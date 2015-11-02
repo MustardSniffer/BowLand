@@ -79,7 +79,7 @@
         },
         "TextRenderer": {
             "Font": "Fonts\\PressStart2P-Regular.ttf",
-            "FontSize": 36,
+            "FontSize": 32,
             "Text": "Hello, world!"
         }
     }
