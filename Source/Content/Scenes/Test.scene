@@ -78,7 +78,7 @@
             "Position": [0, 0]
         },
         "TextRenderer": {
-            "Font": "Fonts\\PressStart2P-Regular.ttf",
+            "Font": "Fonts\\OpenSans-Regular.ttf",
             "FontSize": 32,
             "Text": "Hello, world!"
         }

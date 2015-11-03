@@ -8,6 +8,7 @@
 #include <iostream>
 
 // TODO - We need some kind of way to guarantee that text is drawn on top of everything else
+// TODO - Add TextMaterial
 
 using namespace DirectX;
 
@@ -116,8 +117,8 @@ void TextRenderer::CreateDeviceStates()
     blendDesc.RenderTarget[ 0 ].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
     blendDesc.RenderTarget[ 0 ].DestBlendAlpha        = D3D11_BLEND_INV_SRC_ALPHA;
     blendDesc.RenderTarget[ 0 ].RenderTargetWriteMask = 0x0F;
-    blendDesc.RenderTarget[ 0 ].SrcBlend              = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[ 0 ].SrcBlendAlpha         = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[ 0 ].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
+    blendDesc.RenderTarget[ 0 ].SrcBlendAlpha         = D3D11_BLEND_SRC_ALPHA;
 
     HR( device->CreateBlendState( &blendDesc, &_blendState ) );
 
@@ -128,7 +129,7 @@ void TextRenderer::CreateDeviceStates()
     samplerDesc.AddressU        = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDesc.AddressV        = D3D11_TEXTURE_ADDRESS_CLAMP;
     samplerDesc.AddressW        = D3D11_TEXTURE_ADDRESS_CLAMP;
-    samplerDesc.Filter          = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+    samplerDesc.Filter          = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     samplerDesc.ComparisonFunc  = D3D11_COMPARISON_ALWAYS;
     samplerDesc.MaxAnisotropy   = 4;
 
@@ -313,7 +314,7 @@ void TextRenderer::Draw( const GameTime& gameTime )
     {
         return;
     }
-
+    
 
     ID3D11Device* device = _gameObject->GetDevice();
     ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
@@ -334,11 +335,24 @@ void TextRenderer::Draw( const GameTime& gameTime )
     // Set our shader variables
     Camera* camera = Camera::GetActiveCamera();
     Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
-    _vertexShader->SetMatrix4x4        ( "World", _gameObject->GetWorldMatrix() );
-    _vertexShader->SetMatrix4x4        ( "Projection", projectionFloat4x4 );
-    _pixelShader->SetFloat4            ( "TextColor", Colors::Black );
+    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetWorldMatrix() );
+    _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
+    _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
     _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
     _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
+
+
+
+
+    /*static bool flag = false;
+    if ( !flag )
+    {
+        Image image;
+        flag = image.LoadFromTexture( *texture ) && image.Save( "Font.png" );
+    }*/
+
+
+
 
     // Set our shaders
     _vertexShader->SetShader( true );
