@@ -253,7 +253,7 @@
     <None Include="Shaders\DefaultShaderCommon.hlsli">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="TextShaderCommon.hlsli">
+    <None Include="Shaders\TextShaderCommon.hlsli">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
@@ -264,10 +264,10 @@
     <FxCompile Include="Shaders\DefaultVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="TextVertexShader.hlsl">
+    <FxCompile Include="Shaders\TextPixelShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
-    <FxCompile Include="TextPixelShader.hlsl">
+    <FxCompile Include="Shaders\TextVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>
