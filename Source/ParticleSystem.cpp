@@ -5,6 +5,22 @@ ParticleSystem::ParticleSystem()
 {
 }
 
+ParticleSystem::ParticleSystem(XMFLOAT3 startPos, XMFLOAT3 startVel, XMFLOAT4 startColor, XMFLOAT4 midColor, XMFLOAT4 endColor,
+								float startSize, float midSize, float endSize, float ageToSpawn, float maxLifetime, XMFLOAT3 accel, Texture2D* texture){
+	ParticleSystem::startPos = startPos;
+	ParticleSystem::startVel = startVel;
+	ParticleSystem::startColor = startColor;
+	ParticleSystem::midColor = midColor;
+	ParticleSystem::endColor = endColor;
+	ParticleSystem::startSize = startSize;
+	ParticleSystem::midSize = midSize;
+	ParticleSystem::endSize = endSize;
+	ParticleSystem::ageToSpawn = ageToSpawn;
+	ParticleSystem::maxLifetime = maxLifetime;
+	ParticleSystem::accel = accel;
+	ParticleSystem::texture = texture->GetShaderResourceView();
+}
+
 
 ParticleSystem::~ParticleSystem()
 {
@@ -75,4 +91,145 @@ void ParticleSystem::CreateGeometry(ID3D11Device* device){
 
 void ParticleSystem::LoadShaders(ID3D11Device* device, ID3D11DeviceContext* deviceContext){
 	particleVertShader = new SimpleVertexShader(device, deviceContext);
+	particleVertShader->LoadShaderFile(L"Shaders/ParticleVS.cso");
+
+	particlePixShader = new SimplePixelShader(device, deviceContext);
+	particlePixShader->LoadShaderFile(L"Shaders/ParticlePS.cso");
+
+	particleGeoShader = new SimpleGeometryShader(device, deviceContext);
+	particleGeoShader->LoadShaderFile(L"Shaders/ParticleGS.cso");
+
+	spawnGeoShader = new SimpleGeometryShader(device, deviceContext);
+	spawnGeoShader->LoadShaderFile(L"Shaders/SpawnGS.cso");
+
+	spawnVertShader = new SimpleVertexShader(device, deviceContext);
+	spawnVertShader->LoadShaderFile(L"Shaders/SpawnVS.cso");
+
+	//Create SO buffers
+	spawnGeoShader->CreateCompatibleStreamOutBuffer(&soBufferRead, 1000000);
+	spawnGeoShader->CreateCompatibleStreamOutBuffer(&soBufferWrite, 1000000);
+	spawnFlip = false;
+	frameCount = 0;
+
+	
+	//Create sampler
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&samplerDesc, &sampler);
+
+	//STATES
+
+	//Blend state
+	D3D11_BLEND_DESC blendDesc;
+	ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+	blendDesc.AlphaToCoverageEnable = false;
+	blendDesc.IndependentBlendEnable = false;
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blendDesc, &particleBlendState);
+
+	//Depth state
+	D3D11_DEPTH_STENCIL_DESC depthDesc;
+	ZeroMemory(&depthDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+	depthDesc.DepthEnable = true;
+	depthDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	device->CreateDepthStencilState(&depthDesc, &particleDepthState);
+}
+
+void ParticleSystem::DrawSpawn(float dt, float totalTime, ID3D11Device* device, ID3D11DeviceContext* deviceContext){
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	UINT stride = sizeof(ParticleVertex);
+	UINT offset = 0;
+
+	//Set/unset correct shaders
+	//Set the delta time for spawning
+	spawnGeoShader->SetFloat("dt", dt);
+	spawnGeoShader->SetFloat("ageToSpawn", ageToSpawn);
+	spawnGeoShader->SetFloat("maxLifetime", maxLifetime);
+	spawnGeoShader->SetFloat("totalTime", totalTime);
+	spawnGeoShader->SetSamplerState("randomSampler", sampler);
+	spawnGeoShader->SetShaderResourceView("randomTexture", randomSRV);
+
+	spawnVertShader->SetShader();
+	spawnGeoShader->SetShader();
+	deviceContext->PSSetShader(0, 0, 0);
+
+	//Unbind vertex buffers
+	ID3D11Buffer* unset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &unset, &stride, &offset);
+
+	//First frame
+	if (frameCount == 0){
+		//Draw using seed vertex
+		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		deviceContext->SOSetTargets(1, &soBufferWrite, &offset);
+		deviceContext->Draw(1, 0);
+		frameCount++;
+	}
+	else{
+		//Draw using the buffers
+		deviceContext->IASetVertexBuffers(0, 1, &soBufferRead, &stride, &offset);
+		deviceContext->SOSetTargets(1, &soBufferWrite, &offset);
+		deviceContext->DrawAuto();
+	}
+
+	//Unbind SO targets and shader
+	SimpleGeometryShader::UnbindStreamOutStage(deviceContext);
+	deviceContext->GSSetShader(0, 0, 0);
+
+	//Swap buffers
+	SwapSOBuffers();
+}
+
+void ParticleSystem::SwapSOBuffers(){
+	ID3D11Buffer* temp = soBufferRead;
+	soBufferRead = soBufferWrite;
+	soBufferWrite = temp;
+}
+
+void ParticleSystem::DrawParticles(Camera* camera, ID3D11Device* device, ID3D11DeviceContext* deviceContext){
+	particleGeoShader->SetMatrix4x4("world", XMFLOAT4X4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+	particleGeoShader->SetMatrix4x4("view", camera->GetView());
+	particleGeoShader->SetMatrix4x4("projection", camera->GetProjection());
+
+	particleVertShader->SetFloat3("acceleration", accel);
+	particleVertShader->SetFloat("maxLifetime", maxLifetime);
+
+	particlePixShader->SetSamplerState("trilinear", sampler);
+	particlePixShader->SetShaderResourceView("particleTexture", texture);
+
+	particleVertShader->SetShader(true);
+	particlePixShader->SetShader(true);
+	particleGeoShader->SetShader(true);
+
+	//Set up states
+	float factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	deviceContext->OMSetBlendState(particleBlendState, factor, 0xffffffff);
+	deviceContext->OMSetDepthStencilState(particleDepthState, 0);
+
+	//Set buffers
+	UINT paticleStride = sizeof(ParticleVertex);
+	UINT particleOffset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &soBufferRead, &paticleStride, &particleOffset);
+
+	//Draw auto - draws based on current stream out buffer
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	deviceContext->DrawAuto();
+
+	//unset Geometry Shader and reset states
+	deviceContext->GSSetShader(0, 0, 0);
+	deviceContext->OMSetBlendState(0, factor, 0xffffffff);
+	deviceContext->OMSetDepthStencilState(0, 0);
 }

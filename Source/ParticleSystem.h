@@ -1,9 +1,12 @@
 #pragma once
 #include <DirectXMath.h>
 #include "DirectXGameCore.h"
+#include <d3d11.h>
 #include "SimpleShader.h"
 #include "Vertex.hpp"
 #include <time.h>
+#include "Camera.hpp"
+#include "Texture2D.hpp"
 
 using namespace DirectX;
 
@@ -11,15 +14,18 @@ class ParticleSystem
 {
 public:
 	ParticleSystem();
+	ParticleSystem(XMFLOAT3, XMFLOAT3, XMFLOAT4, XMFLOAT4, XMFLOAT4, float, float, float, float, float, XMFLOAT3, Texture2D*);
 	~ParticleSystem();
 
-	void DrawSpawn(float dt, float totalTime);
+	void DrawSpawn(float dt, float totalTime, ID3D11Device*, ID3D11DeviceContext*);
+	void DrawParticles(Camera*, ID3D11Device*, ID3D11DeviceContext*);
 	void SwapSOBuffers();
 	void CreateGeometry(ID3D11Device*);
 	void LoadShaders(ID3D11Device*, ID3D11DeviceContext*);
 	
 private:
 	ID3D11ShaderResourceView* texture;
+	ID3D11SamplerState* sampler;
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* soBufferRead;
 	ID3D11Buffer* soBufferWrite;

@@ -1,6 +1,6 @@
 cbuffer externalDate : register(b0)
 {
-	marix world;
+	matrix world;
 	matrix view;
 	matrix projection;
 };
@@ -15,13 +15,13 @@ struct VStoGS
 
 struct GStoPS
 {
-	float4 position	: SV_POSITOIN;
+	float4 position	: SV_POSITION;
 	float4 color	: COLOR;
 	float2 uv		: TEXCOORD0;
 };
 
 [maxvertexcount(4)]
-void main(point VStoGS input[i], inout TriangleStream<GStoPS> outStream)
+void main(point VStoGS input[1], inout TriangleStream<GStoPS> outStream)
 {
 	//Don't draw the root particle
 	if (input[0].type == 0)
@@ -32,13 +32,13 @@ void main(point VStoGS input[i], inout TriangleStream<GStoPS> outStream)
 	//Create offsets for quads
 	float2 offsets[4];
 	//Bottom left
-	offsets[0] = float(-0.1f, -0.1f);
+	offsets[0] = float2(-0.1f, -0.1f);
 	//Top left
-	offsets[1] = float(-0.1f, +0.1f);
+	offsets[1] = float2(-0.1f, +0.1f);
 	//Bottom right
-	offsets[2] = float(+0.1f, -0.1f);
+	offsets[2] = float2(+0.1f, -0.1f);
 	//Top right
-	offsets[3] = float(+0.1f, +0.1f);
+	offsets[3] = float2(+0.1f, +0.1f);
 
 	//calculate world view projection matrix
 	matrix wvp = mul(mul(world, view), projection);

@@ -132,6 +132,9 @@
     <ClCompile Include="DeviceState.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
@@ -242,6 +245,9 @@
     <ClInclude Include="DeviceState.hpp">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject.inl">
@@ -268,6 +274,15 @@
       <Filter>Shader Files</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\TextVertexShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleGeometryShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticlePixelShader.hlsl">
+      <Filter>Shader Files</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleVertexShader.hlsl">
       <Filter>Shader Files</Filter>
     </FxCompile>
   </ItemGroup>

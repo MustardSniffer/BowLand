@@ -131,6 +131,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClCompile Include="MyDemoGame.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DirectXGameCore.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
@@ -164,6 +165,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClInclude Include="MyDemoGame.hpp" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DirectXGameCore.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Rect.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Shaders\DirectionalLight.hpp" />
@@ -192,6 +194,20 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <None Include="Shaders\TextShaderCommon.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="ParticleGeometryShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="ParticlePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="ParticleVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="Shaders\DefaultPixelShader.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)Shaders\%(Filename).cso</ObjectFileOutput>

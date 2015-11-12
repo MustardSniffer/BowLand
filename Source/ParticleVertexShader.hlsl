@@ -18,7 +18,7 @@ struct VStoGS
 	float size			: TEXCOORD1;
 };
 
-cbuffer externalData : register(b0);
+cbuffer externalData : register(b0)
 {
 	float3 acceleration;
 	float maxLifetime;
@@ -28,10 +28,10 @@ cbuffer externalData : register(b0);
 float BezierCurve(float p0, float p1, float p2, float t)
 {
 	float oneMinusT = 1 - t;
-	return oneMinusT * oneMinusT p0 + 2 * oneMinusT * t * p1 + t * p2;
+	return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * p2;
 }
 
-float2 BezierCurve(float2 p0, float2 p1, float2 p2, float2 t)
+float2 BezierCurve(float2 p0, float2 p1, float2 p2, float t)
 {
 	return float2(
 		BezierCurve(p0.x, p1.x, p2.x, t),
@@ -51,7 +51,7 @@ float4 BezierCurve(float4 p0, float4 p1, float4 p2, float t)
 	return float4(
 		BezierCurve(p0.x, p1.x, p2.x, t),
 		BezierCurve(p0.y, p1.y, p2.y, t),
-		BezierCurve(p0.z, p1.z, p2.z, t)
+		BezierCurve(p0.z, p1.z, p2.z, t),
 		BezierCurve(p0.w, p1.w, p2.w, t));
 }
 
@@ -70,4 +70,5 @@ VStoGS main(VSInput input)
 	output.color = BezierCurve(input.startColor, input.midColor, input.endColor, agePercent);
 	output.size = BezierCurve(input.sizes.x, input.sizes.y, input.sizes.z, agePercent);
 
+	return output;
 }
