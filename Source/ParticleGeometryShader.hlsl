@@ -8,7 +8,7 @@ cbuffer externalDate : register(b0)
 struct VStoGS
 {
 	int type				: TEXCOORD0;
-	float3 position			: POSITION;
+	float4 position			: SV_POSITION;
 	float4 color			: COLOR;
 	float size				: TEXCOORD1;
 };
@@ -46,7 +46,7 @@ void main(point VStoGS input[1], inout TriangleStream<GStoPS> outStream)
 	//Create triangles for each vert
 	[unroll]
 	for (int i = 0; i < 4; i++){
-		//Cretae a single vertex and add it to the stream
+		//Create a single vertex and add it to the stream
 		output.position = mul(float4(input[0].position, 1.0f), wvp);
 
 		float depthChange = output.position.z / output.position.w;

@@ -2,7 +2,7 @@ struct VSInput
 {
 	int type			: TEXCOORD0;
 	float age			: TEXCOORD1;
-	float3 startPos		: POSITION;
+	float3 startPos		: SV_POSITION;
 	float3 startVel		: TEXCOORD2;
 	float4 startColor	: COLOR0;
 	float4 midColor		: COLOR1;
@@ -13,7 +13,7 @@ struct VSInput
 struct VStoGS
 {
 	int type			: TEXCOORD0;
-	float3 position		: POSITION;
+	float4 position		: SV_POSITION;
 	float4 color		: COLOR;
 	float size			: TEXCOORD1;
 };
