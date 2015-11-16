@@ -9,24 +9,7 @@
 class TweenValue
 {
     // Union to cut back on used memory
-    union
-    {
-        struct
-        {
-            DirectX::XMFLOAT4 Float4;
-        };
-        struct
-        {
-            DirectX::XMFLOAT3 Float3;
-            float __Unused0;
-        };
-        struct
-        {
-            DirectX::XMFLOAT2 Float2;
-            float Float;
-            float __Unused1;
-        };
-    } _value;
+    DirectX::XMFLOAT4 _values;
     TweenType _valueType;
 
 public:
