@@ -52,7 +52,7 @@ public:
     /// </summary>
     inline float GetFloat() const
     {
-        return _value.Float;
+        return _values.x;
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public:
     /// </summary>
     inline DirectX::XMFLOAT2 GetFloat2() const
     {
-        return _value.Float2;
+        return DirectX::XMFLOAT2(_values.x, _values.y);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public:
     /// </summary>
     inline DirectX::XMFLOAT3 GetFloat3() const
     {
-        return _value.Float3;
+        return DirectX::XMFLOAT3(_values.x, _values.y, _values.z);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public:
     /// </summary>
     inline DirectX::XMFLOAT4 GetFloat4() const
     {
-        return _value.Float4;
+        return _values;
     }
 
     /// <summary>

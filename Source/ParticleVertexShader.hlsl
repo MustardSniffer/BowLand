@@ -63,7 +63,7 @@ VStoGS main(VSInput input)
 
 	//Handle position
 	float t = input.age;
-	output.position = 0.5f * t * t * acceleration + t * input.startVel + input.startPos;
+	output.position = float4(0.5f * t * t * acceleration + t * input.startVel + input.startPos, 1.0f);
 	
 	//Interpolate the color and size
 	float agePercent = t / maxLifetime;

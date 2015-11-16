@@ -47,7 +47,7 @@ void main(point VStoGS input[1], inout TriangleStream<GStoPS> outStream)
 	[unroll]
 	for (int i = 0; i < 4; i++){
 		//Create a single vertex and add it to the stream
-		output.position = mul(float4(input[0].position, 1.0f), wvp);
+		output.position = mul(input[0].position, wvp);
 
 		float depthChange = output.position.z / output.position.w;
 

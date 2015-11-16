@@ -5,7 +5,7 @@ struct VStoGS
 {
 	int type			: TEXCOORD0;
 	float age			: TEXCOORD1;
-	float3 startPos		: POSITION;
+	float4 startPos		: SV_POSITION;
 	float3 startVel		: TEXCOORD2;
 	float4 startColor	: COLOR0;
 	float4 midColor		: COLOR1;
@@ -21,7 +21,7 @@ cbuffer externalData : register(b0)
 	float totalTime;
 }
 
-texture1D randomTExsture : register(t0);
+texture1D randomTexture : register(t0);
 sampler randomSampler : register(s0);
 
 [maxvertexcount(2)]
@@ -52,7 +52,7 @@ void main(point VStoGS input[1], inout PointStream<VStoGS> outStream)
 
 			//Create some randomness
 			float4 random = randomTexture.SampleLevel(randomSampler, totalTime * 10, 0);
-			emit.startPos += random.xyz * 0.5f;
+			emit.startPos.xyz += random.xyz * 0.5f;
 			emit.startVel.x = random.w * 0.3f;
 			emit.startVel.z = random.x * 0.3f;
 
@@ -60,7 +60,7 @@ void main(point VStoGS input[1], inout PointStream<VStoGS> outStream)
 		}
 
 		//Keep root
-		outStream.Appent(input[0]);
+		outStream.Append(input[0]);
 	}
 
 	else if (input[0].age < maxLifetime)

@@ -2,7 +2,7 @@ struct VStoGS
 {
 	int type			: TEXCOORD0;
 	float age			: TEXCOORD1;
-	float3 startPos		: POSITION;
+	float4 startPos		: SV_POSITION;
 	float3 startVel		: TEXCOORD2;
 	float4 startColor	: COLOR0;
 	float4 midColor		: COLOR1;
