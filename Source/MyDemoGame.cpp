@@ -86,9 +86,7 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     windowHeight = 720;
 
     // Re-create the camera's projection matrix
-    camera = std::make_shared<Camera>( 5.0f, 0.0f, 0.0f );
-    camera->Rotate( 0, -XM_PIDIV2 );
-    camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
+    
 }
 
 // Cleans up the game
@@ -109,11 +107,12 @@ bool MyDemoGame::Init()
     // geometric primitives we'll be using and how to interpret them
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-
+	std::cout << "Test1" << std::endl;
     // Create and load our test scene
     _testScene = std::make_shared<Scene>( device, deviceContext );
     _testScene->LoadFromFile( "Scenes\\Test.scene" );
 
+	Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 
     // Successfully initialized
     return true;
@@ -125,8 +124,15 @@ void MyDemoGame::OnResize()
     // Handle base-level DX resize stuff
     DirectXGameCore::OnResize();
     
+	std::cout << "test2" << std::endl;
     // Update the camera's projection
-    camera->UpdateProjectionMatrix( static_cast<float>( windowWidth ) / windowHeight );
+	// firstRun is to prevent the ProjectionMatrix attempting to update before the cameras are created from the scene
+	if (firstRun){
+		firstRun = false;
+	} else {
+		Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
+	}
+    
 }
 
 #define IsKeyDown(key) (GetAsyncKeyState(key) & 0x8000)
@@ -152,20 +158,20 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }
 
     // Movement
-    if ( IsKeyDown( 'W' ) ) { camera->MoveRelative(0, 0, moveSpeed); }
-    if ( IsKeyDown( 'S' ) ) { camera->MoveRelative(0, 0, -moveSpeed); }
-    if ( IsKeyDown( 'A' ) ) { camera->MoveRelative(-moveSpeed, 0, 0); }
-    if ( IsKeyDown( 'D' ) ) { camera->MoveRelative(moveSpeed, 0, 0); }
-    if ( IsKeyDown( 'Q' ) ) { camera->MoveAbsolute(0, -moveSpeed, 0); }
-    if ( IsKeyDown( 'E' ) ) { camera->MoveAbsolute(0, moveSpeed, 0); }
+	if (IsKeyDown('W')) { Camera::GetActiveCamera()->MoveRelative(0, 0, moveSpeed); }
+	if (IsKeyDown('S')) { Camera::GetActiveCamera()->MoveRelative(0, 0, -moveSpeed); }
+	if (IsKeyDown('A')) { Camera::GetActiveCamera()->MoveRelative(-moveSpeed, 0, 0); }
+	if (IsKeyDown('D')) { Camera::GetActiveCamera()->MoveRelative(moveSpeed, 0, 0); }
+	if (IsKeyDown('Q')) { Camera::GetActiveCamera()->MoveAbsolute(0, -moveSpeed, 0); }
+	if (IsKeyDown('E')) { Camera::GetActiveCamera()->MoveAbsolute(0, moveSpeed, 0); }
     
     if ( hasMouseFocus )
     {
         // Rotate the camera
-        camera->Rotate( rotSpeed * ( currMousePos.y - prevMousePos.y ),
+		Camera::GetActiveCamera()->Rotate(rotSpeed * (currMousePos.y - prevMousePos.y),
                         rotSpeed * ( currMousePos.x - prevMousePos.x ) );
     }
-    camera->UpdateViewMatrix();
+    Camera::GetActiveCamera()->UpdateViewMatrix();
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;

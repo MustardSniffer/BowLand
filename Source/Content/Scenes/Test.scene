@@ -1,12 +1,9 @@
 {
-    "_GAME_": {
-        "Camera": {
+	"CameraObject": {
+        "Transform": {
             "Position": [5, 0, 0],
-            "Rotation": [0, -1.5707963267948966192313216916398, 0]
+			"Rotation": [0, 1.5, 0]
         },
-        "Camera2D": {
-            "Viewport": [-640, 640, 360, -360, -0.1, 0.1]
-        }
     },
     "Sphere": {
         "Transform": {
@@ -36,6 +33,10 @@
             "PlayMode": "Loop",
             "Method": "Linear",
             "Duration": 20
+        },
+		"Camera": {
+            "NearClip": 0.1,
+            "FarClip": 100.0
         }
     },
     "Cube": {

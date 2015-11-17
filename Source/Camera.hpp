@@ -1,13 +1,16 @@
 #pragma once
 #include <DirectXMath.h>
+#include <vector>
+#include "Component.hpp"
 
 
-class Camera
+class Camera : public Component
 {
     static Camera* ActiveCamera;
+	static std::vector<Camera*> Cameras;
 
 public:
-    Camera(float x, float y, float z);
+	Camera(GameObject* gameObj);
     ~Camera();
 
     /// <summary>
@@ -15,15 +18,26 @@ public:
     /// </summary>
     static Camera* GetActiveCamera();
 
+	/// <summary>
+	/// Returns a list of all cameras in scene
+	/// </summary>
+	static std::vector<Camera*> GetCurrentCameras();
+	static void AddCamera(Camera* cam);
+
     // Transformations
     void MoveRelative(float x, float y, float z);
     void MoveAbsolute(float x, float y, float z);
     void Rotate(float x, float y);
 
     // Updating
-    void Update(float dt);
+	void Update(const GameTime& gameTime) override;
     void UpdateViewMatrix();
     void UpdateProjectionMatrix(float aspectRatio);
+
+	// Mutators
+	void SetNearClip(const float nClip) { nearClip = nClip; }
+	void SetFarClip(const float fClip){ farClip = fClip; }
+	void SetActive();
 
     // Getters
     DirectX::XMFLOAT3 GetPosition() const { return position; }
@@ -34,6 +48,9 @@ private:
     // Camera matrices
     DirectX::XMFLOAT4X4 viewMatrix;
     DirectX::XMFLOAT4X4 projMatrix;
+
+	float nearClip;
+	float farClip;
 
     // Transformations
     DirectX::XMFLOAT3 startPosition;

@@ -33,8 +33,7 @@ public:
 private:
     std::shared_ptr<Scene> _testScene;
 
-    // The matrices to go from model space to screen space
-    std::shared_ptr<Camera> camera;
+	bool firstRun = true;
 
     // Keeps track of the old mouse position.  Useful for 
     // determining how far the mouse moved in a single frame.

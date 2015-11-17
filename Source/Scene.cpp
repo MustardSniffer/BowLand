@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include "DefaultMaterial.hpp"
+#include "Camera.hpp"
 #include "MeshLoader.hpp"
 #include "MeshRenderer.hpp"
 #include "Shaders\DirectionalLight.hpp"
@@ -77,6 +78,32 @@ static void ParseTransform( Transform* value, json::Object& object )
                       << value->GetGameObject()->GetName() << "'s Transform." << std::endl;
         }
     }
+}
+
+static void ParseCamera( Camera* value, json::Object& object ){
+
+	// Go through all of the sub-properties
+	for (auto iter = object.begin(); iter != object.end(); ++iter){
+		if ("NearClip" == iter->first)
+		{
+			value->SetNearClip(iter->second);
+		}
+		else if ("FarClip" == iter->first)
+		{
+			value->SetFarClip(iter->second);
+		}
+		else
+		{
+			std::cout << "Unknown value '" << iter->first << "' in "
+				<< value->GetGameObject()->GetName() << "'s Camera." << std::endl;
+		}
+
+		if (Camera::GetActiveCamera == NULL){
+			value->SetActive();
+		}
+
+		Camera::AddCamera(value);
+	}
 }
 
 // Parses a directional light from an object
@@ -384,6 +411,7 @@ bool Scene::ParseComponent( std::shared_ptr<GameObject>& go, const std::string& 
     else if ( "TweenRotation"   == name ) ParserTweener( go->AddComponent<TweenRotation>(), object );
     else if ( "TweenPosition"   == name ) ParserTweener( go->AddComponent<TweenPosition>(), object );
     else if ( "TweenScale"      == name ) ParserTweener( go->AddComponent<TweenScale>(), object );
+	else if ( "Camera"			== name ) ParseCamera(go->AddComponent<Camera>(), object);
     else
     {
         std::cout << "Unknown component '" << name << "' in '" << go->GetName() << "'." << std::endl;
