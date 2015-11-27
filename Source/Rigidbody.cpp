@@ -11,6 +11,7 @@ using namespace DirectX;
 #define DefaultMass btScalar( 1.0f )
 #define _myRigidbody static_cast<btRigidBody*>( _rigidbody.get() )
 #define _myMotionState static_cast<btMotionState*>( _motionState.get() )
+static const btVector3 ZeroVector( 0, 0, 0 );
 
 // Converts an XMFLOAT3 to a btVector3
 static inline btVector3 XMtoBT( const XMFLOAT3& xm )
@@ -29,6 +30,9 @@ Rigidbody::Rigidbody( GameObject* gameObject )
     : Component( gameObject )
     , _collider( gameObject->GetComponentOfType<Collider>() )
 {
+    _isEnabled = true;
+
+
     // Create our motion state
     _motionState.reset( new btDefaultMotionState(), btAlignedFreeInternal );
 
@@ -45,7 +49,6 @@ Rigidbody::Rigidbody( GameObject* gameObject )
     CopyTransformToBullet();
 
 
-
     // Add ourself to the physics system
     Physics::AddRigidbody( this );
 }
@@ -55,6 +58,30 @@ Rigidbody::~Rigidbody()
 {
     Physics::RemoveRigidbody( this );
     _collider = nullptr;
+}
+
+// Apply a force
+void Rigidbody::ApplyForce( const DirectX::XMFLOAT3& force )
+{
+    _myRigidbody->applyForce( XMtoBT( force ), ZeroVector );
+}
+
+// Apply a force
+void Rigidbody::ApplyForce( float x, float y, float z )
+{
+    _myRigidbody->applyForce( btVector3( x, y, z ), ZeroVector );
+}
+
+// Apply an impulse
+void Rigidbody::ApplyImpulse( const DirectX::XMFLOAT3& impulse )
+{
+    _myRigidbody->applyImpulse( XMtoBT( impulse ), ZeroVector );
+}
+
+// Apply an impulse
+void Rigidbody::ApplyImpulse( float x, float y, float z )
+{
+    _myRigidbody->applyImpulse( btVector3( x, y, z ), ZeroVector );
 }
 
 // Get our collider
@@ -98,6 +125,12 @@ float Rigidbody::GetMass() const
     return 0.0f;
 }
 
+// Get our velocity
+XMFLOAT3 Rigidbody::GetVelocity() const
+{
+    return BTtoXM( _myRigidbody->getLinearVelocity() );
+}
+
 // Copies Bullet's transform to our transform
 void Rigidbody::CopyTransformFromBullet()
 {
@@ -106,21 +139,15 @@ void Rigidbody::CopyTransformFromBullet()
     _myMotionState->getWorldTransform( btTrans );
     Transform&   myTrans = *( _gameObject->GetTransform() );
 
+    
     // Copy the position
     XMFLOAT3 position = BTtoXM( btTrans.getOrigin() );
     myTrans.SetPosition( position );
-
-    // Copy the rotation (http://answers.unity3d.com/questions/416169/finding-pitchrollyaw-from-quaternions.html)
-    btQuaternion rot = btTrans.getRotation();
-    float rx = rot.getX(),
-          ry = rot.getY(),
-          rz = rot.getZ(),
-          rw = rot.getW();
-    myTrans.SetRotation( DirectX::XMFLOAT3(
-        atan2( 2.0f * rx * rw - 2.0f * ry * rz, 1.0f - 2.0f * rx * rx - 2.0f * rz * rz ),
-        asin ( 2.0f * rx * ry + 2.0f * rz * rw ),
-        atan2( 2.0f * ry * rw - 2.0f * rx * rz, 1.0f - 2.0f * ry * ry - 2.0f * rz * rz )
-    ) );
+    
+    //// Copy the rotation
+    //btQuaternion btRot = btTrans.getRotation();
+    //XMFLOAT4 xmRot( btRot.getX(), btRot.getY(), btRot.getZ(), btRot.getW() );
+    //myTrans.SetRotation( xmRot );
 }
 
 // Copies our transform to Bullet's transform
@@ -135,10 +162,9 @@ void Rigidbody::CopyTransformToBullet()
     btTrans.setOrigin( XMtoBT( myTrans.GetPosition() ) );
 
     // Copy the rotation
-    DirectX::XMFLOAT3 rot = myTrans.GetRotation();
-    btQuaternion quat;
-    quat.setEuler( rot.y, rot.x, rot.z );
-    btTrans.setRotation( quat );
+    XMFLOAT4 xmRot = myTrans.GetRotation();
+    btQuaternion btRot( xmRot.x, xmRot.y, xmRot.z, xmRot.w );
+    btTrans.setRotation( btRot );
 
     // Now set the transform
     _myMotionState->setWorldTransform( btTrans );
@@ -155,14 +181,8 @@ void Rigidbody::SetMass( float mass )
 // Updates this rigid body
 void Rigidbody::Update( const GameTime& gameTime )
 {
-    static bool first = true;
-    if ( first )
+    if ( fabsf( GetVelocity().y ) <= 0.01f )
     {
-        //CopyTransformToBullet();
-
-        btVector3 vel( 0, 12.0f, 0 );
-        btVector3 zero( 0, 0, 0 );
-        _myRigidbody->applyForce( vel, zero );
-        first = false;
+        ApplyImpulse( XMFLOAT3( 0, 10, 0 ) );
     }
 }

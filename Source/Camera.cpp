@@ -9,30 +9,60 @@ using namespace DirectX;
 Camera* Camera::ActiveCamera = nullptr;
 std::vector<Camera*> Camera::Cameras;
 
+// Gets the yaw, pitch, and roll from a quaternion
+static void GetYawPitchRollFromQuaternion( XMFLOAT4 quat, float* yaw, float* pitch, float* roll )
+{
+    // TODO - This is broken
+
+    // Normalize the quaternion
+    XMStoreFloat4( &quat, XMQuaternionNormalize( XMLoadFloat4( &quat ) ) );
+    const float& qx = quat.x;
+    const float& qy = quat.y;
+    const float& qz = quat.z;
+    const float& qw = quat.w;
+
+    // From http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+    
+    *pitch = asinf( 2 * ( qx * qy + qz * qw ) );
+
+    // Test if we're rotated towards the north pole
+    if ( qx *  qy + qz * qw == 0.5f )
+    {
+        *yaw  = 2 * atan2f( qx, qw );
+        *roll = 0.0f;
+
+        return;
+    }
+    // Test if we're rotated towards the south pole
+    else if ( qx *  qy + qz * qw == -0.5f )
+    {
+        *yaw  = -2 * atan2f( qx, qw );
+        *roll = 0.0f;
+
+        return;
+    }
+
+    *yaw  = atan2f( 2 * ( qy * qw - qx * qz ), 1 - 2 * ( qy * qy - qz * qz ) );
+    *roll = atan2f( 2 * ( qx * qw - qy * qz ), 1 - 2 * ( qx * qx - qz * qz ) );
+}
+
 // Creates a camera at the specified position
-Camera::Camera(GameObject* gameObj)
-    : Component(gameObj)
+Camera::Camera( GameObject* gameObj )
+    : Component( gameObj )
+    , position( gameObj->GetTransform()->_position )
+    , rotation( gameObj->GetTransform()->_rotation )
 {
     _isDrawable = false;
 
-    Transform* tra = _gameObject->GetComponent<Transform>();
-    position = tra->GetPosition();
-    startPosition = tra->GetPosition();
-
-    XMFLOAT3 rot = tra->GetRotation();
-    XMStoreFloat4(&rotation, XMQuaternionRotationRollPitchYaw(
-        rot.x,
-        rot.y,
-        rot.z
-    ));
-    xRotation = rot.x;
-    yRotation = rot.y;
+    // Get the yaw, pitch, and roll from the transform
+    float roll = 0.0f;
+    GetYawPitchRollFromQuaternion( rotation, &yRotation, &xRotation, &roll );
 
     nearClip = 0.1f;
     farClip = 100.0f;
 
-    XMStoreFloat4x4(&viewMatrix, XMMatrixIdentity());
-    XMStoreFloat4x4(&projMatrix, XMMatrixIdentity());
+    XMStoreFloat4x4( &viewMatrix, XMMatrixIdentity() );
+    XMStoreFloat4x4( &projMatrix, XMMatrixIdentity() );
 
     ActiveCamera = this;
 }
@@ -98,16 +128,6 @@ void Camera::SetActive(){
 // Camera's update, which looks for key presses
 void Camera::Update(const GameTime& gameTime)
 {
-    // Check for reset
-    if (GetAsyncKeyState('R') & 0x8000)
-    {
-        position = startPosition;
-        xRotation = 0;
-        xRotation = 0;
-        XMStoreFloat4(&rotation, XMQuaternionIdentity());
-    }
-
-    // Update the view every frame - could be optimized
     UpdateViewMatrix();
 }
 
@@ -124,11 +144,6 @@ void Camera::UpdateViewMatrix()
         XMVectorSet(0, 1, 0, 0));
 
     XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(view));
-
-    // Update the transform
-    Transform* transform = _gameObject->GetTransform();
-    transform->SetPosition( position );
-    transform->SetRotation( XMFLOAT3( xRotation, yRotation, 0.0f ) );
 }
 
 // Updates the projection matrix

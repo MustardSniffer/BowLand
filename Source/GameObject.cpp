@@ -90,25 +90,19 @@ XMFLOAT4X4 GameObject::GetWorldMatrix() const
 }
 
 // Update world matrix
-void GameObject::UpdateWorldMatrix(){
-
-    XMFLOAT3 pos = _transform->GetPosition();
-    XMFLOAT3 rot = _transform->GetRotation();
-    XMFLOAT3 sca = _transform->GetScale();
-
-    XMMATRIX POS = XMMatrixTranslation(pos.x, pos.y, pos.z);
-    XMMATRIX SCALE = XMMatrixScaling(sca.x, sca.y, sca.z);
-    XMMATRIX ROT = XMMatrixRotationX(rot.x) * XMMatrixRotationY(rot.y) * XMMatrixRotationZ(rot.z);
-    XMMATRIX WORLD = SCALE * ROT * POS;
+void GameObject::UpdateWorldMatrix()
+{
+    XMFLOAT4X4 world4x4 = _transform->GetWorldMatrix();
+    XMMATRIX world = XMLoadFloat4x4( &world4x4 );
     
     // Check if we have a parent, then combine the matrices if necessary
     if (_parent)
     {
         XMFLOAT4X4 parentWorld = _parent->GetWorldMatrix();
-        WORLD = XMLoadFloat4x4(&parentWorld) * WORLD;
+        world = XMLoadFloat4x4( &parentWorld ) * world;
     }
 
-    XMStoreFloat4x4(&worldMat, XMMatrixTranspose(WORLD));
+    XMStoreFloat4x4( &worldMat, world );
     dirtyWorldMatrix = false;
 }
 

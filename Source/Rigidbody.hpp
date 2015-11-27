@@ -38,6 +38,34 @@ public:
     ~Rigidbody();
 
     /// <summary>
+    /// Applies a force to this rigidbody.
+    /// </summary>
+    /// <param name="force">The force.</param>
+    void ApplyForce( const DirectX::XMFLOAT3& force );
+
+    /// <summary>
+    /// Applies a force to this rigidbody.
+    /// </summary>
+    /// <param name="x">The force in the X direction.</param>
+    /// <param name="y">The force in the Y direction.</param>
+    /// <param name="z">The force in the Z direction.</param>
+    void ApplyForce( float x, float y, float z );
+
+    /// <summary>
+    /// Applies an impulse to this rigidbody.
+    /// </summary>
+    /// <param name="impulse">The impulse.</param>
+    void ApplyImpulse( const DirectX::XMFLOAT3& impulse );
+
+    /// <summary>
+    /// Applies an impulse to this rigidbody.
+    /// </summary>
+    /// <param name="x">The impulse in the X direction.</param>
+    /// <param name="y">The impulse in the Y direction.</param>
+    /// <param name="z">The impulse in the Z direction.</param>
+    void ApplyImpulse( float x, float y, float z );
+
+    /// <summary>
     /// Gets this rigidbody's collider.
     /// </summary>
     const Collider* GetCollider() const;
@@ -56,6 +84,11 @@ public:
     /// Gets this rigidbody's mass.
     /// </summary>
     float GetMass() const;
+
+    /// <summary>
+    /// Gets this rigidbody's velocity.
+    /// </summary>
+    DirectX::XMFLOAT3 GetVelocity() const;
 
     /// <summary>
     /// Sets this rigidbody's mass.

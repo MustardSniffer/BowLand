@@ -1,7 +1,7 @@
 {
 	"CameraObject": {
         "Transform": {
-            "Position": [5, 15, 0],
+            "Position": [10, 10, 0],
 			"Rotation": [0.9, -1.5, 0]
         },
         "Camera": {
@@ -11,7 +11,7 @@
     },
     "Sphere": {
         "Transform": {
-            "Position": [0, 10, 0]
+            "Position": [0, 1, 0]
         },
         "SphereCollider": {
             "Radius": 0.5
@@ -36,25 +36,7 @@
             "Material": "this DefaultMaterial"
         }
     },
-    "Sphere2": {
-        "Transform": { "Position": [0.5, 12, 0] },
-        "SphereCollider": {},
-        "Rigidbody": { "Mass": 1 },
-        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
-    },
-    "Sphere3": {
-        "Transform": { "Position": [0.5, 14, 0.5] },
-        "SphereCollider": {},
-        "Rigidbody": { "Mass": 1 },
-        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
-    },
-    "Sphere4": {
-        "Transform": { "Position": [0, 16, 0.5] },
-        "SphereCollider": {},
-        "Rigidbody": { "Mass": 1 },
-        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
-    },
-    "Cube": {
+    "Floor": {
         "Transform": {
             "Position": [0, 0, 0],
             "Scale": [20, 1, 20]

@@ -7,10 +7,10 @@
 class Camera : public Component
 {
     static Camera* ActiveCamera;
-	static std::vector<Camera*> Cameras;
+    static std::vector<Camera*> Cameras;
 
 public:
-	Camera(GameObject* gameObj);
+    Camera(GameObject* gameObj);
     ~Camera();
 
     /// <summary>
@@ -18,11 +18,11 @@ public:
     /// </summary>
     static Camera* GetActiveCamera();
 
-	/// <summary>
-	/// Returns a list of all cameras in scene
-	/// </summary>
-	static std::vector<Camera*> GetCurrentCameras();
-	static void AddCamera(Camera* cam);
+    /// <summary>
+    /// Returns a list of all cameras in scene
+    /// </summary>
+    static std::vector<Camera*> GetCurrentCameras();
+    static void AddCamera(Camera* cam);
 
     // Transformations
     void MoveRelative(float x, float y, float z);
@@ -30,14 +30,14 @@ public:
     void Rotate(float x, float y);
 
     // Updating
-	void Update(const GameTime& gameTime) override;
+    void Update(const GameTime& gameTime) override;
     void UpdateViewMatrix();
     void UpdateProjectionMatrix(float aspectRatio);
 
-	// Mutators
-	void SetNearClip(const float nClip) { nearClip = nClip; }
-	void SetFarClip(const float fClip){ farClip = fClip; }
-	void SetActive();
+    // Mutators
+    void SetNearClip(const float nClip) { nearClip = nClip; }
+    void SetFarClip(const float fClip){ farClip = fClip; }
+    void SetActive();
 
     // Getters
     DirectX::XMFLOAT3 GetPosition() const { return position; }
@@ -49,13 +49,12 @@ private:
     DirectX::XMFLOAT4X4 viewMatrix;
     DirectX::XMFLOAT4X4 projMatrix;
 
-	float nearClip;
-	float farClip;
+    float nearClip;
+    float farClip;
 
     // Transformations
-    DirectX::XMFLOAT3 startPosition;
-    DirectX::XMFLOAT3 position;
-    DirectX::XMFLOAT4 rotation;
+    DirectX::XMFLOAT3& position;
+    DirectX::XMFLOAT4& rotation;
     float xRotation;
     float yRotation;
 };

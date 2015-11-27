@@ -1,8 +1,11 @@
 #include "Collider.hpp"
 #include "GameObject.hpp"
+#include "Rigidbody.hpp"
 #include "Transform.hpp"
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
+
+using namespace DirectX;
 
 #define _myShape static_cast<btCollisionShape*>( _collisionShape.get() )
 
@@ -28,11 +31,12 @@ ColliderType Collider::GetType() const
 void Collider::Update( const GameTime& gameTime )
 {
     Transform* transform = _gameObject->GetTransform();
+    XMFLOAT3 s = transform->GetScale();
 
     btVector3 scale;
-    scale.setX( transform->GetScale().x );
-    scale.setY( transform->GetScale().y );
-    scale.setZ( transform->GetScale().z );
+    scale.setX( s.x );
+    scale.setY( s.y );
+    scale.setZ( s.z );
 
     _myShape->setLocalScaling( scale );
 }
