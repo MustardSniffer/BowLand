@@ -23,16 +23,6 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
     assert( _pixelShader->LoadShaderFile( L"Shaders\\DefaultPixelShader.cso" ) );
 }
 
-// Copy another default material
-DefaultMaterial::DefaultMaterial( const DefaultMaterial& other )
-    : Material( other._gameObject )
-    , _diffuseMap( nullptr )
-    , _normalMap( nullptr )
-    , _samplerState( nullptr )
-{
-    CopyFrom( &other );
-}
-
 // Destroy this default material
 DefaultMaterial::~DefaultMaterial()
 {
@@ -42,28 +32,6 @@ DefaultMaterial::~DefaultMaterial()
     _useNormalMap = false;
     _useSpecularity = false;
 }
-
-
-// Copy values from the given material
-void DefaultMaterial::CopyFrom( const Material* other )
-{
-    // Allow the base material to copy
-    Material::CopyFrom( other );
-
-    // Now copy from the given default material
-    const DefaultMaterial* dm = reinterpret_cast<const DefaultMaterial*>( other );
-    UpdateD3DResource( _samplerState, dm->_samplerState );
-
-    _ambientColor   = dm->_ambientColor;
-    _specularPower  = dm->_specularPower;
-    _useNormalMap   = dm->_useNormalMap;
-    _useSpecularity = dm->_useSpecularity;
-
-    // Because of a bug with shared pointers, we only need to update the textures if they're different
-    UpdateSharedPtr( _diffuseMap, dm->_diffuseMap );
-    UpdateSharedPtr( _normalMap,  dm->_normalMap );
-}
-
 
 // Get our ambient color
 DirectX::XMFLOAT4 DefaultMaterial::GetAmbientColor() const
@@ -166,11 +134,4 @@ void DefaultMaterial::UseNormalMap( bool value )
 void DefaultMaterial::UseSpecularity( bool value )
 {
     _useSpecularity = value;
-}
-
-// Copy values from another default material
-DefaultMaterial& DefaultMaterial::operator=( const DefaultMaterial& other )
-{
-    CopyFrom( &other );
-    return *this;
 }

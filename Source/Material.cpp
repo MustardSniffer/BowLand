@@ -25,42 +25,11 @@ Material::Material( GameObject* gameObject )
     assert( _device != nullptr && _deviceContext != nullptr && "Materials must have a valid device and device context!" );
 }
 
-// Copy another material
-Material::Material( const Material& other )
-    : Component( other._gameObject )
-    , _device( nullptr )
-    , _deviceContext( nullptr )
-    , _vertexShader( nullptr )
-    , _pixelShader( nullptr )
-{
-    CopyFrom( &other );
-}
-
 // Destroy this material
 Material::~Material()
 {
     ReleaseMacro( _deviceContext );
     ReleaseMacro( _device );
-}
-
-
-// Copy data from another material
-void Material::CopyFrom( const Material* other )
-{
-    // Update the pixel and vertex shaders
-    // (We need to check for equality because of a bug with shared_ptr)
-    if ( _vertexShader.get() != other->_vertexShader.get() )
-    {
-        _vertexShader = other->_vertexShader;
-    }
-    if ( _pixelShader.get() != other->_pixelShader.get() )
-    {
-        _pixelShader = other->_pixelShader;
-    }
-
-    // Update our resources
-    UpdateD3DResource( _deviceContext, other->_deviceContext );
-    UpdateD3DResource( _device, other->_device );
 }
 
 // Create the sampler state
@@ -140,11 +109,4 @@ void Material::UpdateShaderData()
 {
     _vertexShader->CopyAllBufferData();
     _pixelShader->CopyAllBufferData();
-}
-
-// Copy another material
-Material& Material::operator=( const Material& other )
-{
-    CopyFrom( &other );
-    return *this;
 }

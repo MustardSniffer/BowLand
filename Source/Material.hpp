@@ -13,10 +13,6 @@ class Camera; // forward declaration
 /// </summary>
 class Material : public Component
 {
-    // Disallow the move constructor and assignment operator
-    Material( Material&& ) = delete;
-    Material& operator=( Material&& ) = delete;
-
 protected:
     static Material* ActiveMaterial;
 
@@ -24,12 +20,6 @@ protected:
     std::shared_ptr<SimplePixelShader> _pixelShader;
     ID3D11Device* _device;
     ID3D11DeviceContext* _deviceContext;
-
-    /// <summary>
-    /// Copies values from the given material.
-    /// </summary>
-    /// <param name="other">The other material.</param>
-    virtual void CopyFrom( const Material* other );
 
     /// <summary>
     /// Creates a sampler state.
@@ -60,12 +50,6 @@ public:
     /// </summary>
     /// <param name="gameObject">The game object we are being added to.</param>
     Material( GameObject* gameObject );
-
-    /// <summary>
-    /// Copies an existing material.
-    /// </summary>
-    /// <param name="other">The material to copy.</param>
-    Material( const Material& other );
 
     /// <summary>
     /// Destroys this material.
@@ -108,10 +92,4 @@ public:
     /// Sends this material's information to the shaders.
     /// </summary>
     virtual void UpdateShaderData();
-
-    /// <summary>
-    /// Copies another material's data into this material.
-    /// </summary>
-    /// <param name="other">The material to copy.</param>
-    Material& operator=( const Material& other );
 };

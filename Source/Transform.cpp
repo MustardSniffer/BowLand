@@ -21,14 +21,6 @@ void Transform::InitializeTransform(XMFLOAT3 nPos){
     _rotation = DirectX::XMFLOAT3(+0.0f, +0.0f, +0.0f);
 }
 
-// Copy another transform into this one
-void Transform::CopyTransform(Transform* nTra){
-    _position = nTra->GetPosition();
-    _scale = nTra->GetScale();
-    _rotation = nTra->GetRotation();
-    _gameObject->SetWorldMatrixDirty();
-}
-
 // Set the position
 void Transform::SetPosition(XMFLOAT3 nPos){
     _position = nPos;

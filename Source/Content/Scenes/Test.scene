@@ -1,77 +1,85 @@
 {
 	"CameraObject": {
         "Transform": {
-            "Position": [5, 0, 0],
-			"Rotation": [0, 1.5, 0]
+            "Position": [5, 15, 0],
+			"Rotation": [0.9, -1.5, 0]
         },
+        "Camera": {
+            "NearClip": 0.01,
+            "FarClip": 1024.0
+        }
     },
     "Sphere": {
         "Transform": {
-            "Scale": [3, 3, 3]
+            "Position": [0, 10, 0]
+        },
+        "SphereCollider": {
+            "Radius": 0.5
+        },
+        "Rigidbody": {
+            "Mass": 1
         },
         "DefaultMaterial": {
             "DiffuseMap": "Textures\\Rocks2.jpg",
             "NormalMap": "Textures\\Rocks2Normals.jpg",
-            "UseSpecularity": true,
-            "SpecularPower": 256,
             "DirectionalLight": {
-                "DiffuseColor": [0.823529482, 0.411764741, 0.117647067, 1.0],
-                "Direction": [1, 0, 0]
+                "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
+                "Direction": [0, -1, 0]
             },
             "PointLight": {
                 "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
-                "Position": [6, 0, 0]
+                "Position": [0, -100, 0]
             }
         },
         "MeshRenderer": {
             "Mesh": "Models\\sphere.obj",
             "Material": "this DefaultMaterial"
-        },
-        "TweenRotation": {
-            "Start": [0, 0, 0],
-            "End": [0, 6.283185307179586476925286766559, 0],
-            "PlayMode": "Loop",
-            "Method": "Linear",
-            "Duration": 20
-        },
-		"Camera": {
-            "NearClip": 0.1,
-            "FarClip": 100.0
         }
+    },
+    "Sphere2": {
+        "Transform": { "Position": [0.5, 12, 0] },
+        "SphereCollider": {},
+        "Rigidbody": { "Mass": 1 },
+        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
+    },
+    "Sphere3": {
+        "Transform": { "Position": [0.5, 14, 0.5] },
+        "SphereCollider": {},
+        "Rigidbody": { "Mass": 1 },
+        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
+    },
+    "Sphere4": {
+        "Transform": { "Position": [0, 16, 0.5] },
+        "SphereCollider": {},
+        "Rigidbody": { "Mass": 1 },
+        "DefaultMaterial": {"DiffuseMap": "Textures\\Rocks2.jpg","NormalMap": "Textures\\Rocks2Normals.jpg","DirectionalLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Direction": [0, -1, 0]},"PointLight": {"DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],"Position": [0, -100, 0]}},"MeshRenderer":{"Mesh": "Models\\sphere.obj","Material": "this DefaultMaterial"}
     },
     "Cube": {
         "Transform": {
-            "Position": [2, 2, 2]
+            "Position": [0, 0, 0],
+            "Scale": [20, 1, 20]
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
         },
         "DefaultMaterial": {
             "DiffuseMap": "Textures\\DryDirt.jpg",
             "NormalMap": "Textures\\DryDirtNormals.jpg",
             "DirectionalLight": {
-                "DiffuseColor": [0.823529482, 0.411764741, 0.117647067, 1.0],
-                "Direction": [1, 0, 0]
+                "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
+                "Direction": [0, -1, 0]
             },
             "PointLight": {
                 "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
-                "Position": [6, 6, 0]
+                "Position": [0, -100, 0]
             }
         },
         "MeshRenderer": {
             "Mesh": "Models\\cube.obj",
             "Material": "this DefaultMaterial"
-        },
-        "TweenPosition": {
-            "Start": [ 2, 0, 3],
-            "End":   [-2, 0, 3],
-            "PlayMode": "PingPong",
-            "Method": "ExponentialEaseInOut",
-            "Duration": 2
-        },
-        "TweenScale": {
-            "Start": [1, 1, 1],
-            "End": [2, 2, 2],
-            "PlayMode": "PingPong",
-            "Method": "ExponentialEaseInOut",
-            "Duration": 2
         }
     },
     "TestText": {

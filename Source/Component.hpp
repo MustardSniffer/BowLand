@@ -9,6 +9,11 @@ class GameObject;
 /// </summary>
 class Component
 {
+    Component( const Component& ) = delete;
+    Component( Component&& ) = delete;
+    Component& operator=( const Component& ) = delete;
+    Component& operator=( Component&& ) = delete;
+
 protected:
     // TODO - Use enum flags instead of bools?
     GameObject* const _gameObject;

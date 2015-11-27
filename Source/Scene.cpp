@@ -1,10 +1,13 @@
 #include "Scene.hpp"
+#include "BoxCollider.hpp"
 #include "DefaultMaterial.hpp"
 #include "Camera.hpp"
 #include "MeshLoader.hpp"
 #include "MeshRenderer.hpp"
 #include "Shaders\DirectionalLight.hpp"
 #include "Shaders\PointLight.hpp"
+#include "Rigidbody.hpp"
+#include "SphereCollider.hpp"
 #include "TextRenderer.hpp"
 #include "Timer.hpp"
 #include "Transform.hpp"
@@ -80,30 +83,34 @@ static void ParseTransform( Transform* value, json::Object& object )
     }
 }
 
-static void ParseCamera( Camera* value, json::Object& object ){
+// Parses a JSON object into a camera
+static void ParseCamera( Camera* value, json::Object& object )
+{
 
-	// Go through all of the sub-properties
-	for (auto iter = object.begin(); iter != object.end(); ++iter){
-		if ("NearClip" == iter->first)
-		{
-			value->SetNearClip(iter->second);
-		}
-		else if ("FarClip" == iter->first)
-		{
-			value->SetFarClip(iter->second);
-		}
-		else
-		{
-			std::cout << "Unknown value '" << iter->first << "' in "
-				<< value->GetGameObject()->GetName() << "'s Camera." << std::endl;
-		}
+    // Go through all of the sub-properties
+    for ( auto iter = object.begin(); iter != object.end(); ++iter )
+    {
+        if ( "NearClip" == iter->first )
+        {
+            value->SetNearClip( iter->second );
+        }
+        else if ( "FarClip" == iter->first )
+        {
+            value->SetFarClip( iter->second );
+        }
+        else
+        {
+            std::cout << "Unknown value '" << iter->first << "' in "
+                      << value->GetGameObject()->GetName() << "'s Camera." << std::endl;
+        }
+    }
 
-		if (Camera::GetActiveCamera == NULL){
-			value->SetActive();
-		}
+    if ( Camera::GetActiveCamera == nullptr )
+    {
+        value->SetActive();
+    }
 
-		Camera::AddCamera(value);
-	}
+    Camera::AddCamera( value );
 }
 
 // Parses a directional light from an object
@@ -374,6 +381,67 @@ template<class T> static void ParserTweener( T* value, json::Object& object )
     }
 }
 
+// Parses a JSON object into a box collider
+static void ParseBoxCollider( BoxCollider* value, json::Object& object )
+{
+    if ( !value )
+    {
+        return;
+    }
+    for ( auto iter = object.begin(); iter != object.end(); ++iter )
+    {
+        if ( "Size" == iter->first )
+        {
+            XMFLOAT3 size = ParseFloat3( iter->second.ToArray() );
+            value->SetSize( size );
+        }
+        else
+        {
+            std::cout << "Unknown value '" << iter->first << "' in "
+                      << value->GetGameObject()->GetName() << "'s BoxCollider." << std::endl;
+        }
+    }
+}
+
+// Parses a JSON object into a sphere collider
+static void ParseSphereCollider( SphereCollider* value, json::Object& object )
+{
+    if ( !value )
+    {
+        return;
+    }
+    for ( auto iter = object.begin(); iter != object.end(); ++iter )
+    {
+        if ( "Radius" == iter->first )
+        {
+            value->SetRadius( iter->second.ToFloat() );
+        }
+        else
+        {
+            std::cout << "Unknown value '" << iter->first << "' in "
+                      << value->GetGameObject()->GetName() << "'s SphereCollider." << std::endl;
+        }
+    }
+}
+
+// Parses a JSON object into a rigidbody
+static void ParseRigidbody( Rigidbody* value, json::Object& object )
+{
+    for ( auto iter = object.begin(); iter != object.end(); ++iter )
+    {
+        if ( "Mass" == iter->first )
+        {
+            float mass = iter->second.ToFloat();
+            value->SetMass( mass );
+        }
+        else
+        {
+            std::cout << "Unknown value '" << iter->first << "' in "
+                      << value->GetGameObject()->GetName() << "'s Rigidbody." << std::endl;
+        }
+    }
+}
+
 
 
 // Creates a new scene
@@ -407,11 +475,14 @@ bool Scene::ParseComponent( std::shared_ptr<GameObject>& go, const std::string& 
     if      ( "Transform"       == name ) ParseTransform( go->GetTransform(), object );
     else if ( "DefaultMaterial" == name ) ParseDefaultMaterial( go->AddComponent<DefaultMaterial>(), object );
     else if ( "MeshRenderer"    == name ) ParseMeshRenderer( go->AddComponent<MeshRenderer>(), object );
+    else if ( "Rigidbody"       == name ) ParseRigidbody( go->AddComponent<Rigidbody>(), object );
+    else if ( "BoxCollider"     == name ) ParseBoxCollider( go->AddComponent<BoxCollider>(), object );
+    else if ( "SphereCollider"  == name ) ParseSphereCollider( go->AddComponent<SphereCollider>(), object );
     else if ( "TextRenderer"    == name ) ParseTextRenderer( go->AddComponent<TextRenderer>(), object );
     else if ( "TweenRotation"   == name ) ParserTweener( go->AddComponent<TweenRotation>(), object );
     else if ( "TweenPosition"   == name ) ParserTweener( go->AddComponent<TweenPosition>(), object );
     else if ( "TweenScale"      == name ) ParserTweener( go->AddComponent<TweenScale>(), object );
-	else if ( "Camera"			== name ) ParseCamera(go->AddComponent<Camera>(), object);
+    else if ( "Camera"			== name ) ParseCamera(go->AddComponent<Camera>(), object);
     else
     {
         std::cout << "Unknown component '" << name << "' in '" << go->GetName() << "'." << std::endl;

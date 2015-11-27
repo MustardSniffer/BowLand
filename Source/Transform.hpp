@@ -33,12 +33,6 @@ public:
     ~Transform();
 
     /// <summary>
-    /// Sets this transform's values to those of another transform.
-    /// </summary>
-    /// <param name="nTra">The transform to be copied into this one.</param>
-    void CopyTransform(Transform* nTra);
-
-    /// <summary>
     /// Sets this transform to the given position.
     /// </summary>
     /// <param name="nPos">The position to move this transform to.</param>

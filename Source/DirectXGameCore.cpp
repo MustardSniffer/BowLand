@@ -10,6 +10,7 @@
 // -------------------------------------------------------------
 
 #include "DirectXGameCore.h"
+#include "Physics.hpp"
 #include "Time.hpp"
 #include <WindowsX.h>
 #include <sstream>
@@ -95,6 +96,12 @@ bool DirectXGameCore::Init()
     // DirectX (specifically Direct3D)
     if(!InitDirect3D())
         return false;
+
+    // Attempt to initialize the physics system
+    if ( !Physics::Initialize() )
+    {
+        return false;
+    }
 
     // Everything was set up properly
     return true;
@@ -317,9 +324,12 @@ int DirectXGameCore::Run()
         {
             // Standard game loop type stuff
             _gameTime.Update();
+            
             Time::Update();
             CalculateFrameStats();
+            
             UpdateScene(_gameTime);
+            Physics::Update();
             DrawScene(_gameTime);
         }
     }

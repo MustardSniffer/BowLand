@@ -11,25 +11,30 @@ std::vector<Camera*> Camera::Cameras;
 
 // Creates a camera at the specified position
 Camera::Camera(GameObject* gameObj)
-	: Component(gameObj)
+    : Component(gameObj)
 {
-	_isDrawable = false;
+    _isDrawable = false;
 
-	Transform* tra = _gameObject->GetComponent<Transform>();
-	position = tra->GetPosition();
+    Transform* tra = _gameObject->GetComponent<Transform>();
+    position = tra->GetPosition();
     startPosition = tra->GetPosition();
-    XMStoreFloat4(&rotation, XMQuaternionIdentity());
-    xRotation = 0;
-    yRotation = 0;
 
-	nearClip = 0.1f;
-	farClip = 100.0f;
+    XMFLOAT3 rot = tra->GetRotation();
+    XMStoreFloat4(&rotation, XMQuaternionRotationRollPitchYaw(
+        rot.x,
+        rot.y,
+        rot.z
+    ));
+    xRotation = rot.x;
+    yRotation = rot.y;
+
+    nearClip = 0.1f;
+    farClip = 100.0f;
 
     XMStoreFloat4x4(&viewMatrix, XMMatrixIdentity());
     XMStoreFloat4x4(&projMatrix, XMMatrixIdentity());
 
-	ActiveCamera = this;
-    
+    ActiveCamera = this;
 }
 
 // Does nothing
@@ -45,14 +50,13 @@ Camera* Camera::GetActiveCamera()
 
 // Gets a vector of all cameras currently in the scene
 std::vector<Camera*> Camera::GetCurrentCameras(){
-	return Cameras;
+    return Cameras;
 }
 
 // Adds a camera to the current scene
 void Camera::AddCamera(Camera* cam){
-	Cameras.push_back(cam);
+    Cameras.push_back(cam);
 }
-
 
 // Moves the camera relative to its orientation
 void Camera::MoveRelative(float x, float y, float z)
@@ -67,9 +71,9 @@ void Camera::MoveRelative(float x, float y, float z)
 // Moves the camera in world space (not local space)
 void Camera::MoveAbsolute(float x, float y, float z)
 {
-	Transform* tra = _gameObject->GetComponent<Transform>();
-    // Simple add, no need to load/store
-	tra->SetPosition(DirectX::XMFLOAT3(x, y, z));
+    position.x += x;
+    position.y += y;
+    position.z += z;
 }
 
 // Rotate on the X and/or Y axis
@@ -88,7 +92,7 @@ void Camera::Rotate(float x, float y)
 
 // Sets this to be the active camera
 void Camera::SetActive(){
-	ActiveCamera = this;
+    ActiveCamera = this;
 }
 
 // Camera's update, which looks for key presses
@@ -120,6 +124,11 @@ void Camera::UpdateViewMatrix()
         XMVectorSet(0, 1, 0, 0));
 
     XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(view));
+
+    // Update the transform
+    Transform* transform = _gameObject->GetTransform();
+    transform->SetPosition( position );
+    transform->SetRotation( XMFLOAT3( xRotation, yRotation, 0.0f ) );
 }
 
 // Updates the projection matrix

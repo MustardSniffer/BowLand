@@ -18,25 +18,12 @@ class DefaultMaterial : public Material
     bool _useNormalMap;
     bool _useSpecularity;
 
-protected:
-    /// <summary>
-    /// Copies values from the given default material.
-    /// </summary>
-    /// <param name="other">The other default material.</param>
-    void CopyFrom( const Material* other ) override;
-
 public:
     /// <summary>
     /// Creates a new default material.
     /// </summary>
     /// <param name="gameObject">The game object we are attached to.</param>
     DefaultMaterial( GameObject* gameObject );
-
-    /// <summary>
-    /// Copies an existing default material.
-    /// </summary>
-    /// <param name="other">The default material to copy.</param>
-    DefaultMaterial( const DefaultMaterial& other );
 
     /// <summary>
     /// Destroys this default material.
@@ -115,10 +102,4 @@ public:
     /// </summary>
     /// <param name="value">True to use the specularity, false to not.</param>
     void UseSpecularity( bool value );
-
-    /// <summary>
-    /// Copies another default material's data into this material.
-    /// </summary>
-    /// <param name="other">The default material to copy.</param>
-    DefaultMaterial& operator=( const DefaultMaterial& other );
 };
