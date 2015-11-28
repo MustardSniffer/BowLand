@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include "Component.hpp"
 #include "GameObject.hpp"
+#include "Time.hpp"
 #include "Transform.hpp"
 #include <Windows.h>
 
@@ -126,7 +127,7 @@ void Camera::SetActive(){
 }
 
 // Camera's update, which looks for key presses
-void Camera::Update(const GameTime& gameTime)
+void Camera::Update()
 {
     UpdateViewMatrix();
 }

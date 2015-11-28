@@ -99,7 +99,7 @@ void DefaultMaterial::SetSpecularPower( float value )
 }
 
 // Updates the default material
-void DefaultMaterial::Update( const GameTime& gameTime )
+void DefaultMaterial::Update()
 {
 }
 

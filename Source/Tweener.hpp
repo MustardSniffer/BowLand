@@ -169,6 +169,5 @@ public:
     /// <summary>
     /// Updates this tweening component.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    virtual void Update( const GameTime& gameTime ) override;
+    virtual void Update() override;
 };

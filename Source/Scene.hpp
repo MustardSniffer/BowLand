@@ -78,12 +78,10 @@ public:
     /// <summary>
     /// Updates all game objects within this scene.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime );
+    void Update();
 
     /// <summary>
     /// Draws all game objects within this scene.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Draw( const GameTime& gameTime );
+    void Draw();
 };

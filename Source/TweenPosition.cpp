@@ -41,8 +41,8 @@ void TweenPosition::SetEndValue( const XMFLOAT3& value )
 }
 
 // Updates this component
-void TweenPosition::Update( const GameTime& gameTime )
+void TweenPosition::Update()
 {
-    Tweener::Update( gameTime );
+    Tweener::Update();
     _gameObject->SetWorldMatrixDirty();
 }

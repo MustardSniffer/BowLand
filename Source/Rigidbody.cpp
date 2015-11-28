@@ -61,7 +61,7 @@ Rigidbody::~Rigidbody()
 }
 
 // Apply a force
-void Rigidbody::ApplyForce( const DirectX::XMFLOAT3& force )
+void Rigidbody::ApplyForce( const XMFLOAT3& force )
 {
     _myRigidbody->applyForce( XMtoBT( force ), ZeroVector );
 }
@@ -73,7 +73,7 @@ void Rigidbody::ApplyForce( float x, float y, float z )
 }
 
 // Apply an impulse
-void Rigidbody::ApplyImpulse( const DirectX::XMFLOAT3& impulse )
+void Rigidbody::ApplyImpulse( const XMFLOAT3& impulse )
 {
     _myRigidbody->applyImpulse( XMtoBT( impulse ), ZeroVector );
 }
@@ -179,7 +179,7 @@ void Rigidbody::SetMass( float mass )
 }
 
 // Updates this rigid body
-void Rigidbody::Update( const GameTime& gameTime )
+void Rigidbody::Update()
 {
     if ( fabsf( GetVelocity().y ) <= 0.01f )
     {

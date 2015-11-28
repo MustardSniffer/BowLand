@@ -43,12 +43,12 @@ Material* MeshRenderer::GetMaterial()
     return _material;
 }
 
-void MeshRenderer::Update( const GameTime& gameTime )
+void MeshRenderer::Update()
 {
 
 }
 
-void MeshRenderer::Draw( const GameTime& gameTime )
+void MeshRenderer::Draw()
 {
     // Get the world matrix
     XMFLOAT4X4 world = _gameObject->GetWorldMatrix();

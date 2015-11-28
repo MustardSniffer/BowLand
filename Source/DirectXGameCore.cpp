@@ -309,7 +309,6 @@ int DirectXGameCore::Run()
     MSG msg = {0};
 
     // Loop until we get a quit message from windows
-    _gameTime.Reset();
     Time::Start();
     while(msg.message != WM_QUIT)
     {
@@ -323,14 +322,12 @@ int DirectXGameCore::Run()
         else // No message to handle
         {
             // Standard game loop type stuff
-            _gameTime.Update();
-            
             Time::Update();
             CalculateFrameStats();
             
-            UpdateScene(_gameTime);
+            UpdateScene();
             Physics::Update();
-            DrawScene(_gameTime);
+            DrawScene();
         }
     }
 
@@ -349,7 +346,7 @@ void DirectXGameCore::CalculateFrameStats()
     static float timeElapsed = 0.0f;
     static float totalTime = 0.0f;
 
-    totalTime += _gameTime.GetElapsedTime();
+    totalTime += Time::GetElapsedTime();
     frameCount++;
 
     // Compute averages over ONE SECOND.

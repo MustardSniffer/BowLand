@@ -33,14 +33,6 @@ class TextRenderer : public Component
     /// </summary>
     void RebuildMesh();
 
-    // Hide the copy constructor and assignment operator
-    TextRenderer( const TextRenderer& ) = delete;
-    TextRenderer& operator=( const TextRenderer& ) = delete;
-
-    // Hide the move constructor and assignment operator
-    TextRenderer( TextRenderer&& ) = delete;
-    TextRenderer& operator=( TextRenderer&& ) = delete;
-    
 public:
     /// <summary>
     /// Creates a new text renderer.
@@ -89,11 +81,10 @@ public:
     /// <summary>
     /// Updates this text renderer.
     /// </summary>
-    void Update( const GameTime& gameTime ) override;
+    void Update() override;
 
     /// <summary>
     /// Draws this text renderer.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Draw( const GameTime& gameTime ) override;
+    void Draw() override;
 };

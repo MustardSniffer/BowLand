@@ -132,7 +132,7 @@ void Tweener::SetTweenMethod( TweenMethod method )
 }
 
 // Update tween component
-void Tweener::Update( const GameTime& gameTime )
+void Tweener::Update()
 {
     assert( AreValuesCompatible() && "Tween values are incompatible!" );
 
@@ -144,7 +144,7 @@ void Tweener::Update( const GameTime& gameTime )
     }
 
     // Get the time, and make sure it doesn't go higher than the duration
-    float time = gameTime.GetTotalTime() - _startTime;
+    float time = Time::GetTotalTime() - _startTime;
     if ( time >= _duration )
     {
         time = _duration;

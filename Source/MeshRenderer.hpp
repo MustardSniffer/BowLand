@@ -55,13 +55,11 @@ public:
     /// <summary>
     /// Updates the renderer.
     /// </summary>
-    /// <param name="gameTime">Reference to the current game time</param>
-    void Update(const GameTime& gameTime) override;
+    void Update() override;
 
     /// <summary>
     /// Draws the material and mesh of this renderer.
     /// </summary>
-    /// <param name="gameTime">Reference to the current game time.</param>
-    void Draw(const GameTime& gameTime) override;
+    void Draw() override;
 };
 

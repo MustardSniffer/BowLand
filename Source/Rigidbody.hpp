@@ -99,6 +99,5 @@ public:
     /// <summary>
     /// Updates this rigidbody.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime );
+    void Update() override;
 };

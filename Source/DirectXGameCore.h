@@ -12,7 +12,6 @@
 #pragma once
 
 #include "DirectX.hpp"
-#include "GameTime.hpp"
 #include <string>
 
 // --------------------------------------------------------
@@ -31,8 +30,8 @@ public:
     // derived classes to implement custom functionality
     virtual bool Init();
     virtual void OnResize();
-    virtual void UpdateScene( const GameTime& gameTime ) = 0;
-    virtual void DrawScene( const GameTime& gameTime ) = 0;
+    virtual void UpdateScene() = 0;
+    virtual void DrawScene() = 0;
     virtual LRESULT ProcessMessage( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
     // Convenience methods for handling mouse input, since we
@@ -78,8 +77,6 @@ protected:
     std::wstring windowCaption;
     int windowWidth;
     int windowHeight;
-
-    GameTime _gameTime;
 
 private:
     /// <summary>

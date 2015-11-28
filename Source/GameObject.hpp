@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include "DirectX.hpp"
-#include "GameTime.hpp"
+#include "EventListener.hpp"
 
 class Component;
 class Transform;
@@ -153,16 +153,14 @@ public:
     void SetWorldMatrixDirty();
 
     /// <summary>
-    /// Draws this game object and all components inside of it.
+    /// Updates this game object and all components inside of it.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime );
+    void Update();
 
     /// <summary>
-    /// Draws this component.
+    /// Draws this game object and all components inside of it.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Draw( const GameTime& gameTime );
+    void Draw();
 };
 
 #include "GameObject.inl"

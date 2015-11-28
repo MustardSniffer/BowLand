@@ -82,7 +82,6 @@ public:
     /// <summary>
     /// Updates this component.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    void Update( const GameTime& gameTime ) override;
+    void Update() override;
 };
 

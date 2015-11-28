@@ -27,6 +27,7 @@
 #include "GameObject.hpp"
 #include "Component.hpp"
 #include "Physics.hpp"
+#include "Time.hpp"
 
 #include "Transform.hpp"
 #include "MeshRenderer.hpp"
@@ -139,7 +140,7 @@ void MyDemoGame::OnResize()
 #define IsKeyDown(key) (GetAsyncKeyState(key) & 0x8000)
 
 // Updates the scene
-void MyDemoGame::UpdateScene( const GameTime& gameTime )
+void MyDemoGame::UpdateScene()
 {
     // Quit if the escape key is pressed
     if ( IsKeyDown( VK_ESCAPE ) )
@@ -148,12 +149,12 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
     }
     
 
-    _testScene->Update( gameTime );
+    _testScene->Update();
     
 
     // Update the camera based on input
-    float moveSpeed = gameTime.GetElapsedTime() * 4.0f;
-    float rotSpeed  = gameTime.GetElapsedTime() * 3.0f;
+    float moveSpeed = Time::GetElapsedTime() * 4.0f;
+    float rotSpeed  = Time::GetElapsedTime() * 3.0f;
 
     // Speed up when shift is pressed
     if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }
@@ -179,7 +180,7 @@ void MyDemoGame::UpdateScene( const GameTime& gameTime )
 }
 
 // Draws the scene
-void MyDemoGame::DrawScene( const GameTime& gameTime )
+void MyDemoGame::DrawScene()
 {
     // Background color (Cornflower Blue in this case) for clearing
     const float* color = Colors::CornflowerBlue;
@@ -193,8 +194,8 @@ void MyDemoGame::DrawScene( const GameTime& gameTime )
 
 
 
-    // Draw the game object
-    _testScene->Draw( gameTime );
+    // Draw the scene
+    _testScene->Draw();
 
 
 

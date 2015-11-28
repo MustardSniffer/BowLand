@@ -30,7 +30,7 @@ public:
     void Rotate(float x, float y);
 
     // Updating
-    void Update(const GameTime& gameTime) override;
+    void Update() override;
     void UpdateViewMatrix();
     void UpdateProjectionMatrix(float aspectRatio);
 

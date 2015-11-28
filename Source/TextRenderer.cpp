@@ -297,7 +297,7 @@ void TextRenderer::SetText( const std::string& value )
 }
 
 // Updates this text renderer
-void TextRenderer::Update( const GameTime& gameTime )
+void TextRenderer::Update()
 {
     if ( _isMeshDirty )
     {
@@ -307,7 +307,7 @@ void TextRenderer::Update( const GameTime& gameTime )
 }
 
 // Draws this text renderer
-void TextRenderer::Draw( const GameTime& gameTime )
+void TextRenderer::Draw()
 {
     // Don't do anything if we have nothing to draw
     if ( !_font || !_vertexBuffer || !_vertexShader || !_pixelShader )
@@ -340,19 +340,6 @@ void TextRenderer::Draw( const GameTime& gameTime )
     _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
     _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
     _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
-
-
-
-
-    /*static bool flag = false;
-    if ( !flag )
-    {
-        Image image;
-        flag = image.LoadFromTexture( *texture ) && image.Save( "Font.png" );
-    }*/
-
-
-
 
     // Set our shaders
     _vertexShader->SetShader( true );

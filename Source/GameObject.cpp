@@ -117,37 +117,37 @@ void GameObject::SetWorldMatrixDirty(){
 }
 
 // Update all components
-void GameObject::Update( const GameTime& gameTime )
+void GameObject::Update()
 {
     // Update all of our components
-    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    for ( auto& pair : _components )
     {
-        std::shared_ptr<Component>& component = iter->second;
+        auto& component = pair.second;
         if ( component->IsEnabled() )
         {
-            component->Update( gameTime );
+            component->Update();
         }
     }
 
     // Perform the late update on all of our components
-    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    for ( auto& pair : _components )
     {
-        std::shared_ptr<Component>& component = iter->second;
+        auto& component = pair.second;
         if ( component->IsEnabled() && component->UsesLateUpdate() )
         {
-            component->LateUpdate( gameTime );
+            component->LateUpdate();
         }
     }
 
     // Now update all of our children
-    for ( auto iter = _children.begin(); iter != _children.end(); ++iter )
+    for ( auto& child : _children )
     {
-        iter->get()->Update( gameTime );
+        child->Update();
     }
 }
 
 // Draw all components
-void GameObject::Draw( const GameTime& gameTime )
+void GameObject::Draw()
 {
     // If our world matrix is dirty, update it
     if ( dirtyWorldMatrix )
@@ -156,19 +156,18 @@ void GameObject::Draw( const GameTime& gameTime )
     }
 
     // Draw all of our components
-    for ( auto iter = _components.begin(); iter != _components.end(); ++iter )
+    for ( auto& pair : _components )
     {
-        std::shared_ptr<Component>& component = iter->second;
-        if ( component->IsDrawable() )
+        auto& component = pair.second;
+        if ( component->IsEnabled() && component->IsDrawable() )
         {
-            component->Draw( gameTime );
+            component->Draw();
         }
     }
 
     // Now update all of our children
-    for ( auto iter = _children.begin(); iter != _children.end(); ++iter )
+    for ( auto& child : _children )
     {
-        // TODO - Add some kind of renderer to sort these by depth
-        iter->get()->Draw( gameTime );
+        child->Draw();
     }
 }

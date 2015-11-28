@@ -28,7 +28,7 @@ ColliderType Collider::GetType() const
 }
 
 // Update this collider
-void Collider::Update( const GameTime& gameTime )
+void Collider::Update()
 {
     Transform* transform = _gameObject->GetTransform();
     XMFLOAT3 s = transform->GetScale();

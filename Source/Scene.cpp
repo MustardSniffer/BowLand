@@ -622,21 +622,19 @@ bool Scene::LoadFromMemory( const std::string& name, const std::string& contents
 }
 
 // Updates all objects in this scene
-void Scene::Update( const GameTime& gameTime )
+void Scene::Update()
 {
-    for ( auto iter = _gameObjects.begin(); iter != _gameObjects.end(); ++iter )
+    for ( auto& gameObject : _gameObjects )
     {
-        std::shared_ptr<GameObject>& gameObject = *iter;
-        gameObject->Update( gameTime );
+        gameObject->Update();
     }
 }
 
 // Draw all objects in this scene
-void Scene::Draw( const GameTime& gameTime )
+void Scene::Draw()
 {
-    for ( auto iter = _gameObjects.begin(); iter != _gameObjects.end(); ++iter )
+    for ( auto& gameObject : _gameObjects )
     {
-        std::shared_ptr<GameObject>& gameObject = *iter;
-        gameObject->Draw( gameTime );
+        gameObject->Draw();
     }
 }

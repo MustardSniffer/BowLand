@@ -87,6 +87,6 @@ void Transform::SetRotation( float yaw, float pitch, float roll )
 }
 
 // Updates this transform
-void Transform::Update( const GameTime& gameTime )
+void Transform::Update()
 {
 }

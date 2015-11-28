@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameTime.hpp"
+#include "DirectX.hpp"
 
 class GameObject;
 
@@ -76,18 +76,15 @@ public:
     /// <summary>
     /// Updates this component.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    virtual void Update( const GameTime& gameTime ) = 0;
+    virtual void Update() = 0;
 
     /// <summary>
     /// Performs a late update on this component.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    virtual void LateUpdate( const GameTime& gameTime ) { }
+    virtual void LateUpdate() { }
 
     /// <summary>
     /// Draws this component.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    virtual void Draw( const GameTime& gameTime ) { }
+    virtual void Draw() { }
 };

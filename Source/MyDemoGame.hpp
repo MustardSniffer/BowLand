@@ -22,8 +22,8 @@ public:
     // Overrides for base level methods
     bool Init();
     void OnResize();
-    void UpdateScene( const GameTime& gameTime );
-    void DrawScene( const GameTime& gameTime );
+    void UpdateScene();
+    void DrawScene();
 
     // For handing mouse input
     void OnMouseDown( WPARAM btnState, int x, int y );
@@ -33,7 +33,7 @@ public:
 private:
     std::shared_ptr<Scene> _testScene;
 
-	bool firstRun = true;
+    bool firstRun = true;
 
     // Keeps track of the old mouse position.  Useful for 
     // determining how far the mouse moved in a single frame.
