@@ -65,6 +65,54 @@ ID3D11DeviceContext* GameObject::GetDeviceContext()
     return _deviceContext;
 }
 
+// Get total number of children
+size_t GameObject::GetChildCount() const
+{
+    return _children.size();
+}
+
+// Get a child by index
+const GameObject* GameObject::GetChild( size_t index ) const
+{
+    if ( index >= _children.size() )
+    {
+        return nullptr;
+    }
+    return _children[ index ].get();
+}
+
+// Get a child by index
+GameObject* GameObject::GetChild( size_t index )
+{
+    if ( index >= _children.size() )
+    {
+        return nullptr;
+    }
+    return _children[ index ].get();
+}
+
+// Get a child by name
+const GameObject* GameObject::GetChildByName( const std::string& name ) const
+{
+    auto search = _childrenCache.find( name );
+    if ( search == _childrenCache.end() )
+    {
+        return nullptr;
+    }
+    return search->second.get();
+}
+
+// Get a child by name
+GameObject* GameObject::GetChildByName( const std::string& name )
+{
+    auto search = _childrenCache.find( name );
+    if ( search == _childrenCache.end() )
+    {
+        return nullptr;
+    }
+    return search->second.get();
+}
+
 // Get our name
 std::string GameObject::GetName() const
 {

@@ -16,7 +16,7 @@ class Transform;
 class GameObject
 {
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
-    std::unordered_map< std::string, std::shared_ptr<GameObject>> _childrenCache;
+    std::unordered_map<std::string, std::shared_ptr<GameObject>> _childrenCache;
     std::vector<std::shared_ptr<GameObject>> _children;
     EventListener _eventListener;
     const std::string _name;
@@ -56,10 +56,6 @@ public:
     /// <param name="name">The name of the child.</param>
     GameObject* AddChild( const std::string& name );
 
-    // TODO - GetChildCount
-    // TODO - GetChild(index)
-    // TODO - GetChildByName
-
     /// <summary>
     /// Adds a component to this game object and then returns it.
     /// </summary>
@@ -85,6 +81,35 @@ public:
     /// <param name="eventName">The event name.</param>
     /// <param name="args">The arguments.</param>
     template<typename... Args> void DispatchEvent( const std::string& eventName, Args&&... args );
+
+    /// <summary>
+    /// Gets the number of children in this game object.
+    /// </summary>
+    size_t GetChildCount() const;
+
+    /// <summary>
+    /// Gets a child at the given index.
+    /// </summary>
+    /// <param name="index">The index of the child to get.</param>
+    const GameObject* GetChild( size_t index ) const;
+
+    /// <summary>
+    /// Gets a child at the given index.
+    /// </summary>
+    /// <param name="index">The index of the child to get.</param>
+    GameObject* GetChild( size_t index );
+
+    /// <summary>
+    /// Gets the child with the given name.
+    /// </summary>
+    /// <param name="name">The name of the child to get.</param>
+    const GameObject* GetChildByName( const std::string& name ) const;
+
+    /// <summary>
+    /// Gets the child with the given name.
+    /// </summary>
+    /// <param name="name">The name of the child to get.</param>
+    GameObject* GetChildByName( const std::string& name );
 
     /// <summary>
     /// Gets the component of the given type, if it exists.
