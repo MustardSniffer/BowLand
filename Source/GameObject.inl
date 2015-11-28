@@ -22,6 +22,24 @@ template<class T> T* GameObject::AddComponent()
     return component.get();
 }
 
+// Add an event listener
+template<typename T> void GameObject::AddEventListener( const std::string& eventName, T& func )
+{
+    _eventListener.AddEventListener( eventName, func );
+}
+
+// Add an event listener
+template<typename T> void GameObject::AddEventListener( const std::string& eventName, std::function<T>& func )
+{
+    _eventListener.AddEventListener( eventName, func );
+}
+
+// Dispatch an event
+template<typename... Args> void GameObject::DispatchEvent( const std::string& eventName, Args&&... args )
+{
+    _eventListener.DispatchEvent( eventName, args... );
+}
+
 // Get the component of the given type, if it exists
 template<class T> const T* GameObject::GetComponent() const
 {

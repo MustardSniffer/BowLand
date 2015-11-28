@@ -112,7 +112,10 @@ bool MyDemoGame::Init()
     std::cout << "Test1" << std::endl;
     // Create and load our test scene
     _testScene = std::make_shared<Scene>( device, deviceContext );
-    _testScene->LoadFromFile( "Scenes\\Test.scene" );
+    if ( !_testScene->LoadFromFile( "Scenes\\Test.scene" ) )
+    {
+        return false;
+    }
 
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 

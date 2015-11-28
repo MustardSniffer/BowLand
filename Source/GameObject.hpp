@@ -18,6 +18,7 @@ class GameObject
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
     std::unordered_map< std::string, std::shared_ptr<GameObject>> _childrenCache;
     std::vector<std::shared_ptr<GameObject>> _children;
+    EventListener _eventListener;
     const std::string _name;
     GameObject* _parent;
     Transform* _transform;
@@ -63,6 +64,27 @@ public:
     /// Adds a component to this game object and then returns it.
     /// </summary>
     template<class T> T* AddComponent();
+
+    /// <summary>
+    /// Adds an event listener.
+    /// </summary>
+    /// <param name="eventName">The event name.</param>
+    /// <param name="func">The function name.</param>
+    template<typename T> void AddEventListener( const std::string& eventName, T& func );
+
+    /// <summary>
+    /// Adds an event listener.
+    /// </summary>
+    /// <param name="eventName">The event name.</param>
+    /// <param name="func">The function name.</param>
+    template<typename T> void AddEventListener( const std::string& eventName, std::function<T>& func );
+
+    /// <summary>
+    /// Fires the given event name, calling all listeners with the given arguments.
+    /// </summary>
+    /// <param name="eventName">The event name.</param>
+    /// <param name="args">The arguments.</param>
+    template<typename... Args> void DispatchEvent( const std::string& eventName, Args&&... args );
 
     /// <summary>
     /// Gets the component of the given type, if it exists.
