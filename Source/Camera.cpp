@@ -17,34 +17,32 @@ static void GetYawPitchRollFromQuaternion( XMFLOAT4 quat, float* yaw, float* pit
 
     // Normalize the quaternion
     XMStoreFloat4( &quat, XMQuaternionNormalize( XMLoadFloat4( &quat ) ) );
-    const float& qx = quat.x;
-    const float& qy = quat.y;
-    const float& qz = quat.z;
-    const float& qw = quat.w;
+    const float& q0 = quat.x;
+    const float& q1 = quat.y;
+    const float& q2 = quat.z;
+    const float& q3 = quat.w;
 
-    // From http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+    // From https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
     
-    *pitch = asinf( 2 * ( qx * qy + qz * qw ) );
+    // Get the yaw (rotation around the Y axis)
+    *yaw = -asinf( 2 * ( q0 * q2 - q3 * q1 ) );
 
-    // Test if we're rotated towards the north pole
-    if ( qx *  qy + qz * qw == 0.5f )
+    // Get the pitch (rotation around the X axis)
+    *pitch = atan2f( 2.0f * ( q0 * q3 + q1 * q2 ),
+                     1.0f - 2.0f * ( q2 * q2 + q3 * q3 ) );
+    *pitch = XM_PI - *pitch;
+
+    // If the pitch is directly up or down, then roll is 0
+    if ( fabsf( fabsf( *pitch ) - XM_PIDIV2 ) < 0.001f )
     {
-        *yaw  = 2 * atan2f( qx, qw );
         *roll = 0.0f;
-
-        return;
     }
-    // Test if we're rotated towards the south pole
-    else if ( qx *  qy + qz * qw == -0.5f )
+    else
     {
-        *yaw  = -2 * atan2f( qx, qw );
-        *roll = 0.0f;
-
-        return;
+        // Get the roll (rotation around the Z axis)
+        *roll = atan2f( 2.0f * ( q0 * q1 + q2 * q3 ),
+                        1.0f - 2.0f * ( q1 * q1 + q2 * q2 ) );
     }
-
-    *yaw  = atan2f( 2 * ( qy * qw - qx * qz ), 1 - 2 * ( qy * qy - qz * qz ) );
-    *roll = atan2f( 2 * ( qx * qw - qy * qz ), 1 - 2 * ( qx * qx - qz * qz ) );
 }
 
 // Creates a camera at the specified position

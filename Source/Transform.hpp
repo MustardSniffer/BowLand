@@ -74,10 +74,10 @@ public:
     /// <summary>
     /// Sets this transform's rotation from Euler angles in radians.
     /// </summary>
-    /// <param name="yaw">The rotation's yaw.</param>
     /// <param name="pitch">The rotation's pitch.</param>
+    /// <param name="yaw">The rotation's yaw.</param>
     /// <param name="roll">The rotation's roll.</param>
-    void SetRotation( float yaw, float pitch, float roll );
+    void SetRotation( float pitch, float yaw, float roll );
 
     /// <summary>
     /// Updates this component.

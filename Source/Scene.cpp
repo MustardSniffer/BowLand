@@ -70,7 +70,7 @@ static void ParseTransform( Transform* value, json::Object& object )
         else if ( "Rotation" == iter->first )
         {
             XMFLOAT3 rotation = ParseFloat3( iter->second );
-            value->SetRotation( rotation.y, rotation.x, rotation.z );
+            value->SetRotation( rotation.x, rotation.y, rotation.z );
         }
         else if ( "Scale" == iter->first )
         {

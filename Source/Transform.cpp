@@ -80,7 +80,7 @@ void Transform::SetRotation( const XMFLOAT4& nRot )
 }
 
 // Set the rotation
-void Transform::SetRotation( float yaw, float pitch, float roll )
+void Transform::SetRotation( float pitch, float yaw, float roll )
 {
     XMStoreFloat4( &_rotation, XMQuaternionRotationRollPitchYaw( pitch, yaw, roll ) );
     _gameObject->SetWorldMatrixDirty();
