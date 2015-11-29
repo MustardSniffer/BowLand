@@ -40,7 +40,7 @@ public:
     void SetActive();
 
     // Getters
-    DirectX::XMFLOAT3 GetPosition() const { return position; }
+    DirectX::XMFLOAT3 GetPosition() const { return _position; }
     DirectX::XMFLOAT4X4 GetView() const { return viewMatrix; }
     DirectX::XMFLOAT4X4 GetProjection() const { return projMatrix; }
 
@@ -53,8 +53,8 @@ private:
     float farClip;
 
     // Transformations
-    DirectX::XMFLOAT3& position;
-    DirectX::XMFLOAT4& rotation;
+    DirectX::XMFLOAT3 _position;
+    DirectX::XMFLOAT4 _rotation;
     float xRotation;
     float yRotation;
 };

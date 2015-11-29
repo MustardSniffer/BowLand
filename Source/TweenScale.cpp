@@ -7,8 +7,9 @@ using namespace DirectX;
 // Creates a new tween rotation component
 TweenScale::TweenScale( GameObject* gameObject )
     : Tweener( gameObject )
+    , _scale( 1, 1, 1 )
 {
-    _targetValue.SetTarget( &_gameObject->GetTransform()->_scale );
+    _targetValue.SetTarget( &_scale );
 
     SetStartValue( XMFLOAT3( 1, 1, 1 ) );
     SetEndValue( XMFLOAT3( 1, 1, 1 ) );
@@ -44,5 +45,7 @@ void TweenScale::SetEndValue( const XMFLOAT3& value )
 void TweenScale::Update()
 {
     Tweener::Update();
-    _gameObject->SetWorldMatrixDirty();
+
+    Transform* transform = _gameObject->GetTransform();
+    transform->SetScale( _scale );
 }

@@ -7,8 +7,9 @@ using namespace DirectX;
 // Creates a new tween position component
 TweenPosition::TweenPosition( GameObject* gameObject )
     : Tweener( gameObject )
+    , _position( 0, 0, 0 )
 {
-    _targetValue.SetTarget( &_gameObject->GetTransform()->_position );
+    _targetValue.SetTarget( &_position );
 
     SetStartValue( XMFLOAT3( 0, 0, 0 ) );
     SetEndValue( XMFLOAT3( 0, 0, 0 ) );
@@ -44,5 +45,7 @@ void TweenPosition::SetEndValue( const XMFLOAT3& value )
 void TweenPosition::Update()
 {
     Tweener::Update();
-    _gameObject->SetWorldMatrixDirty();
+    
+    Transform* transform = _gameObject->GetTransform();
+    transform->SetPosition( _position );
 }

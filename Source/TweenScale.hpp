@@ -7,6 +7,8 @@
 /// </summary>
 class TweenScale : public Tweener
 {
+    DirectX::XMFLOAT3 _scale;
+
 public:
     /// <summary>
     /// Creates a new tween scale component.

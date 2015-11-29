@@ -51,7 +51,7 @@ void MeshRenderer::Update()
 void MeshRenderer::Draw()
 {
     // Get the world matrix
-    XMFLOAT4X4 world = _gameObject->GetWorldMatrix();
+    XMFLOAT4X4 world = _gameObject->GetTransform()->GetWorldMatrix();
     XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
 
     // Prepare material

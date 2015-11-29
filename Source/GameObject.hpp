@@ -25,9 +25,7 @@ class GameObject
     ID3D11Device* _device;
     ID3D11DeviceContext* _deviceContext;
 
-    DirectX::XMFLOAT4X4 worldMat;
-    bool dirtyWorldMatrix;
-
+private:
     // Prevent the use of the copy constructor and copy assignment operator
     GameObject( const GameObject& ) = delete;
     GameObject& operator=( const GameObject& ) = delete;
@@ -177,27 +175,6 @@ public:
     /// Gets this game object's transform.
     /// </summary>
     Transform* GetTransform();
-
-    /// <summary>
-    /// Gets this game object's world matrix.
-    /// </summary>
-    DirectX::XMFLOAT4X4 GetWorldMatrix() const;
-
-    /// <summary>
-    /// Updates the world matrix based on the current transform.
-    /// </summary>
-    void UpdateWorldMatrix();
-
-    /// <summary>
-    /// Returns true if the object has been moved, rotated, or scaled and
-    /// the world matrix has not been updated
-    /// </summary>
-    bool isWorldMatrixDirty() const;
-
-    /// <summary>
-    /// Sets the world matrix to 'dirty' and let's the object know it needs to be updated
-    /// </summary>
-    void SetWorldMatrixDirty();
 
     /// <summary>
     /// Updates this game object and all components inside of it.

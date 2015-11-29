@@ -131,39 +131,6 @@ Transform* GameObject::GetTransform()
     return _transform;
 }
 
-// Get this game object's world matrix
-XMFLOAT4X4 GameObject::GetWorldMatrix() const
-{
-    return worldMat;
-}
-
-// Update world matrix
-void GameObject::UpdateWorldMatrix()
-{
-    XMFLOAT4X4 world4x4 = _transform->GetWorldMatrix();
-    XMMATRIX world = XMLoadFloat4x4( &world4x4 );
-    
-    // Check if we have a parent, then combine the matrices if necessary
-    if (_parent)
-    {
-        XMFLOAT4X4 parentWorld = _parent->GetWorldMatrix();
-        world = XMLoadFloat4x4( &parentWorld ) * world;
-    }
-
-    XMStoreFloat4x4( &worldMat, world );
-    dirtyWorldMatrix = false;
-}
-
-// Check if the world matrix needs to be updated
-bool GameObject::isWorldMatrixDirty() const{
-    return dirtyWorldMatrix;
-}
-
-// Set that the world matrix needs to be updated
-void GameObject::SetWorldMatrixDirty(){
-    dirtyWorldMatrix = true;
-}
-
 // Update all components
 void GameObject::Update()
 {
@@ -197,12 +164,6 @@ void GameObject::Update()
 // Draw all components
 void GameObject::Draw()
 {
-    // If our world matrix is dirty, update it
-    if ( dirtyWorldMatrix )
-    {
-        UpdateWorldMatrix();
-    }
-
     // Draw all of our components
     for ( auto& pair : _components )
     {

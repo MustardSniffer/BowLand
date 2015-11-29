@@ -3,23 +3,16 @@
 #include "Component.hpp"
 #include "GameObject.hpp"
 
+/// <summary>
+/// Defines a transform, containing a position, scale, and rotation.
+/// </summary>
 class Transform : public Component
 {
-    friend class Camera;
-    friend class TweenRotation;
-    friend class TweenPosition;
-    friend class TweenScale;
-
-protected:
+    mutable DirectX::XMFLOAT4X4 _worldMatrix;
     DirectX::XMFLOAT4 _rotation;
     DirectX::XMFLOAT3 _position;
     DirectX::XMFLOAT3 _scale;
-
-    /// <summary>
-    ///	Initializes the starting values of this transform
-    /// </summary
-    /// <param name="nPos">The initial position of this transform</param>
-    void InitializeTransform( DirectX::XMFLOAT3 nPos );
+    mutable bool _isWorldMatrixDirty;
 
 public:
     /// <summary>

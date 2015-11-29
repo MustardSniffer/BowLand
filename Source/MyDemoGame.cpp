@@ -216,8 +216,8 @@ void MyDemoGame::UpdateScene()
     
 
     // Update the camera based on input
-    float moveSpeed = Time::GetElapsedTime() * 4.0f;
-    float rotSpeed  = Time::GetElapsedTime() * 3.0f;
+    float moveSpeed = Time::GetElapsedTime() * 4.00f;
+    float rotSpeed  = Time::GetElapsedTime() * 0.25f;
 
     // Speed up when shift is pressed
     if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }
@@ -266,7 +266,7 @@ void MyDemoGame::DrawScene()
     //  - Puts the image we're drawing into the window so the user can see it
     //  - Do this exactly ONCE PER FRAME
     //  - Always at the very end of the frame
-    HR( swapChain->Present( 0, 0 ) );
+    HR( swapChain->Present( 1, 0 ) );
 }
 
 // --------------------------------------------------------

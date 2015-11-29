@@ -335,7 +335,7 @@ void TextRenderer::Draw()
     // Set our shader variables
     Camera* camera = Camera::GetActiveCamera();
     Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
-    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetWorldMatrix() );
+    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetTransform()->GetWorldMatrix() );
     _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
     _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
     _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );

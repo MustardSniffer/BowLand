@@ -7,6 +7,8 @@
 /// </summary>
 class TweenPosition : public Tweener
 {
+    DirectX::XMFLOAT3 _position;
+
 public:
     /// <summary>
     /// Creates a new tween position component.

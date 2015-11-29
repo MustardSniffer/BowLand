@@ -140,16 +140,10 @@ void Rigidbody::CopyTransformFromBullet()
     _myMotionState->getWorldTransform( btTrans );
     Transform&   myTrans = *( _gameObject->GetTransform() );
 
-
     // Copy the position
     XMFLOAT3 position = BTtoXM( btTrans.getOrigin() );
     myTrans.SetPosition( position );
     
-
-    float yaw, pitch, roll;
-    btTrans.getBasis().getEulerZYX( yaw, pitch, roll );
-
-
     // Copy the rotation
     btQuaternion btRot = btTrans.getRotation();
     XMFLOAT4 xmRot(

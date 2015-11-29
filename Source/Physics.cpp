@@ -81,7 +81,7 @@ void Physics::Update()
 {
     // Update Bullet
     float elapsedTime = Time::GetElapsedTime();
-    _world->stepSimulation( elapsedTime, 16 );
+    _world->stepSimulation( elapsedTime, 1 );
 
     // Copy all rigidbody transforms back from Bullet
     for ( auto& rb : _rigidbodies )

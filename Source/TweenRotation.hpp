@@ -1,7 +1,5 @@
 #pragma once
 
-// TODO - This needs to be redone because of the switch to quaternions
-
 #include "Tweener.hpp"
 
 /// <summary>
@@ -9,6 +7,8 @@
 /// </summary>
 class TweenRotation : public Tweener
 {
+    DirectX::XMFLOAT3 _rotation;
+
 public:
     /// <summary>
     /// Creates a new tween rotation component.

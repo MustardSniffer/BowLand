@@ -6,22 +6,18 @@ using namespace DirectX;
 // Constructor
 Transform::Transform( GameObject* gameObj )
     : Component( gameObj )
+    , _position( 0, 0, 0 )
+    , _scale( 1, 1, 1 )
+    , _isWorldMatrixDirty( false )
 {
-    InitializeTransform( DirectX::XMFLOAT3( +0.0f, +0.0f, +0.0f ) );
-    _gameObject->SetWorldMatrixDirty();
+    XMStoreFloat4( &_rotation, XMQuaternionIdentity() );
+    XMStoreFloat4x4( &_worldMatrix, XMMatrixIdentity() );
+    _isWorldMatrixDirty = false;
 }
 
 // Destructor
 Transform::~Transform()
 {
-}
-
-// Initialize starting values for Position, Scale, and Rotation
-void Transform::InitializeTransform( XMFLOAT3 nPos )
-{
-    _position = nPos;
-    _scale = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f );
-    XMStoreFloat4( &_rotation, XMQuaternionIdentity() );
 }
 
 // Get the position
@@ -45,49 +41,53 @@ XMFLOAT4 Transform::GetRotation() const
 // Get the world matrix representing this transform
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() const
 {
-    // For some reason this needs to be Scale, Rotate, Translate
-    // instead of Translate, Rotate, Scale
-    XMFLOAT4X4 matrix;
-    XMStoreFloat4x4(
-        &matrix,
-        XMMatrixMultiply(
+    if (_isWorldMatrixDirty)
+    {
+        // For some reason this needs to be Scale, Rotate, Translate
+        // instead of Translate, Rotate, Scale
+        XMStoreFloat4x4(
+            &_worldMatrix,
             XMMatrixMultiply(
-                XMMatrixScaling( _scale.x, _scale.y, _scale.z ),
-                XMMatrixRotationQuaternion( XMLoadFloat4( &_rotation ) )
-            ),
-            XMMatrixTranslation( _position.x, _position.y, _position.z )
-        )
-    );
+                XMMatrixMultiply(
+                    XMMatrixScaling( _scale.x, _scale.y, _scale.z ),
+                    XMMatrixRotationQuaternion( XMLoadFloat4( &_rotation ) )
+                ),
+                XMMatrixTranslation( _position.x, _position.y, _position.z )
+            )
+        );
 
-    return matrix;
+        _isWorldMatrixDirty = false;
+    }
+
+    return _worldMatrix;
 }
 
 // Set the position
 void Transform::SetPosition( const XMFLOAT3& nPos )
 {
     _position = nPos;
-    _gameObject->SetWorldMatrixDirty();
+    _isWorldMatrixDirty = true;
 }
 
 // Set the scale
 void Transform::SetScale( const XMFLOAT3& nSca )
 {
     _scale = nSca;
-    _gameObject->SetWorldMatrixDirty();
+    _isWorldMatrixDirty = true;
 }
 
 // Set the rotation
 void Transform::SetRotation( const XMFLOAT4& nRot )
 {
     _rotation = nRot;
-    _gameObject->SetWorldMatrixDirty();
+    _isWorldMatrixDirty = true;
 }
 
 // Set the rotation
 void Transform::SetRotation( float pitch, float yaw, float roll )
 {
     XMStoreFloat4( &_rotation, XMQuaternionRotationRollPitchYaw( pitch, yaw, roll ) );
-    _gameObject->SetWorldMatrixDirty();
+    _isWorldMatrixDirty = true;
 }
 
 // Updates this transform
