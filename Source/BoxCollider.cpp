@@ -36,5 +36,6 @@ void BoxCollider::SetSize( const DirectX::XMFLOAT3& size ) const
         size.y * 0.5f,
         size.z * 0.5f
     );
-    _myBoxShape->setImplicitShapeDimensions( halfSize );
+    //_myBoxShape->setImplicitShapeDimensions( halfSize );
+    _myBoxShape->setSafeMargin( halfSize, 0.0f );
 }
