@@ -45,14 +45,18 @@ XMFLOAT4 Transform::GetRotation() const
 // Get the world matrix representing this transform
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() const
 {
-    XMVECTOR quat = XMQuaternionNormalize( XMLoadFloat4( &_rotation ) );
-
+    // For some reason this needs to be Scale, Rotate, Translate
+    // instead of Translate, Rotate, Scale
     XMFLOAT4X4 matrix;
     XMStoreFloat4x4(
         &matrix,
-        XMMatrixTranslation( _position.x, _position.y, _position.z ) *
-        XMMatrixRotationQuaternion( quat ) *
-        XMMatrixScaling( _scale.x, _scale.y, _scale.z )
+        XMMatrixMultiply(
+            XMMatrixMultiply(
+                XMMatrixScaling( _scale.x, _scale.y, _scale.z ),
+                XMMatrixRotationQuaternion( XMLoadFloat4( &_rotation ) )
+            ),
+            XMMatrixTranslation( _position.x, _position.y, _position.z )
+        )
     );
 
     return matrix;

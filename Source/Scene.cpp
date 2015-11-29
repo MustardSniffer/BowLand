@@ -462,6 +462,27 @@ Scene::~Scene()
     ReleaseMacro( _device );
 }
 
+// Add a game object to this scene
+GameObject* Scene::AddGameObject( const std::string& name )
+{
+    std::shared_ptr<GameObject> go = CreateGameObject( name );
+    return go.get();
+}
+
+// Create a managed game object
+std::shared_ptr<GameObject> Scene::CreateGameObject( const std::string& name )
+{
+    // Create the game object
+    std::shared_ptr<GameObject> go = std::make_shared<GameObject>( name, _device, _deviceContext );
+    assert( go && "Failed to allocate memory for a game object!" );
+
+    // Record the game object
+    _gameObjectCache[ go->GetName() ] = _gameObjects.size();
+    _gameObjects.push_back( go );
+
+    return go;
+}
+
 // Disposes of this scene
 void Scene::Dispose()
 {
@@ -497,10 +518,12 @@ bool Scene::ParseComponent( std::shared_ptr<GameObject>& go, const std::string& 
 std::shared_ptr<GameObject> Scene::ParseGameObject( const std::string& name, json::Object& object )
 {
     // Create the game object
-    std::shared_ptr<GameObject> go = std::make_shared<GameObject>( name, _device, _deviceContext );
-    assert( go && "Failed to allocate memory for a game object!" );
-
-
+    std::shared_ptr<GameObject> go = CreateGameObject( name );
+    if ( !go )
+    {
+        return go;
+    }
+    
     // Parse through all of the properties in the object for components
     for ( auto iter = object.begin(); iter != object.end(); ++iter )
     {
@@ -509,6 +532,7 @@ std::shared_ptr<GameObject> Scene::ParseGameObject( const std::string& name, jso
         if ( value.GetType() != json::ValueType::ObjectVal )
         {
             std::cout << "Component '" << iter->first << "' in object '" << go->GetName() << "' is not a JSON object!" << std::endl;
+            RemoveGameObject( go->GetName() );
             go.reset();
             return go; // TODO - Do we want to recover from parsing a bad component?
         }
@@ -516,11 +540,11 @@ std::shared_ptr<GameObject> Scene::ParseGameObject( const std::string& name, jso
         // Now parse out the component
         if ( !ParseComponent( go, iter->first, value.ToObject() ) )
         {
+            RemoveGameObject( go->GetName() );
             go.reset();
             return go; // TODO - Do we want to recover from parsing a bad component?
         }
     }
-
 
     // Return the parsed game object
     return go;
@@ -540,15 +564,11 @@ bool Scene::ParseSceneRoot( json::Object& root )
     {
         if ( iter->second.GetType() == json::ValueType::ObjectVal )
         {
-            // Parse out the game object then record it
+            // Attempt to parse the game object
             std::shared_ptr<GameObject> go = ParseGameObject( iter->first, iter->second.ToObject() );
-            if ( go )
+            if ( !go )
             {
-                _gameObjectCache[ go->GetName() ] = go;
-                _gameObjects.push_back( go );
-            }
-            else
-            {
+                RemoveGameObject( go->GetName() );
                 std::cout << "Failed to parse '" << iter->first << "' in scene root." << std::endl;
                 //return false; // TODO - Do we want to recover from parsing a bad object?
             }
@@ -619,6 +639,23 @@ bool Scene::LoadFromMemory( const std::string& name, const std::string& contents
 
     // Parse the scene root
     return ParseSceneRoot( parsed.ToObject() );
+}
+
+// Remove a game object
+bool Scene::RemoveGameObject( const std::string& name )
+{
+    // Attempt to find the game object
+    auto search = _gameObjectCache.find( name );
+    if ( search == _gameObjectCache.end() )
+    {
+        return false;
+    }
+
+    // Now erase it from the list
+    size_t index = search->second;
+    _gameObjects.erase( _gameObjects.begin() + index );
+
+    return true;
 }
 
 // Updates all objects in this scene

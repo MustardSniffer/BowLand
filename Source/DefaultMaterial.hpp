@@ -63,10 +63,22 @@ public:
     bool LoadNormalMap( const std::string& fname );
 
     /// <summary>
+    /// Sets this material's diffuse map.
+    /// </summary>
+    /// <param name="map">The diffuse map.</param>
+    void SetDiffuseMap( std::shared_ptr<Texture2D> map );
+
+    /// <summary>
     /// Sets the first directional light's value.
     /// </summary>
     /// <param name="light">The light value.</param>
     void SetDirectionalLight( const DirectionalLight& light );
+
+    /// <summary>
+    /// Sets this material's normal map.
+    /// </summary>
+    /// <param name="map">The normal map.</param>
+    void SetNormalMap( std::shared_ptr<Texture2D> map );
 
     /// <summary>
     /// Sets the second directional light's value.

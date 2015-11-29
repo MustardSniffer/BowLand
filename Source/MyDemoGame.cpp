@@ -25,20 +25,16 @@
 #include "Vertex.hpp"
 #include "MeshLoader.hpp"
 #include "GameObject.hpp"
-#include "Component.hpp"
+#include "Components.hpp"
 #include "Physics.hpp"
 #include "Time.hpp"
-
-#include "Transform.hpp"
-#include "MeshRenderer.hpp"
-#include "TweenRotation.hpp"
-#include "DefaultMaterial.hpp"
 
 #include <sstream>
 #include <DirectXColors.h>
 
 #include <iostream>
 #include <fstream>
+#include <time.h>
 
 // Include run-time memory checking in debug builds, so 
 // we can be notified of memory leaks
@@ -109,14 +105,78 @@ bool MyDemoGame::Init()
     // geometric primitives we'll be using and how to interpret them
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
-    std::cout << "Test1" << std::endl;
     // Create and load our test scene
     _testScene = std::make_shared<Scene>( device, deviceContext );
     if ( !_testScene->LoadFromFile( "Scenes\\Test.scene" ) )
     {
         return false;
     }
+    
+    DirectionalLight dl;
+    dl.DiffuseColor = XMFLOAT4( 0.960784376f, 0.870588303f, 0.701960802f, 1.0f );
+    dl.Direction = XMFLOAT3( 0, -1, 0 );
 
+    PointLight pl;
+    pl.DiffuseColor = dl.DiffuseColor;
+    pl.Position = XMFLOAT3( 0, -100, 0 );
+
+    std::shared_ptr<Mesh> spMesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
+    std::shared_ptr<Texture2D> spTex = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" );
+    std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" );
+
+    // Helper function for getting a random value
+    srand( static_cast<unsigned>( time( nullptr ) ) );
+    auto random = []() -> float
+    {
+        return static_cast<float>( rand() ) / RAND_MAX;
+    };
+
+    // Add some test spheres
+    const int SQ = 1;
+    for ( int x = -SQ; x <= SQ; ++x )
+    {
+        for ( int z = -SQ; z <= SQ; ++z )
+        {
+            for ( int y = 8; y <= 9 + SQ; ++y )
+            {
+                std::string name = std::to_string( x ) + std::to_string( y ) + std::to_string( z );
+                GameObject* go = _testScene->AddGameObject( name );
+
+                std::string msg = "Creating " + name + "\n";
+                OutputDebugStringA( msg.c_str() );
+
+                // Set the position to be slightly off kilter
+                Transform* tr = go->GetTransform();
+                tr->SetPosition( XMFLOAT3(
+                    x * 1.1f + random() * 0.05f,
+                    y * 1.1f + random() * 0.05f,
+                    z * 1.1f + random() * 0.05f
+                ) );
+                
+                // Add the sphere collider
+                SphereCollider* sp = go->AddComponent<SphereCollider>();
+                sp->SetRadius( 0.5f );
+
+                // Add the rigidbody
+                Rigidbody* rb = go->AddComponent<Rigidbody>();
+                rb->SetMass( 1.0f );
+
+                // Add the default material
+                DefaultMaterial* dm = go->AddComponent<DefaultMaterial>();
+                dm->SetDiffuseMap( spTex );
+                dm->SetNormalMap( spNorm );
+                dm->SetDirectionalLight( dl );
+                dm->SetPointLight( pl );
+
+                // Add the mesh renderer
+                MeshRenderer* mr = go->AddComponent<MeshRenderer>();
+                mr->SetMaterial( dm );
+                mr->SetMesh( spMesh );
+            }
+        }
+    }
+
+    // Update the active camera's projection matrix
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 
     // Successfully initialized

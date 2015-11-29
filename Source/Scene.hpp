@@ -9,11 +9,17 @@
 /// </summary>
 class Scene
 {
-    std::unordered_map<std::string, std::shared_ptr<GameObject>> _gameObjectCache;
+    std::unordered_map<std::string, size_t> _gameObjectCache;
     std::vector<std::shared_ptr<GameObject>> _gameObjects;
     std::string _name;
     ID3D11Device* _device;
     ID3D11DeviceContext* _deviceContext;
+
+    /// <summary>
+    /// Creates a game object that is managed by this scene.
+    /// </summary>
+    /// <param name="name">The game object's name.</param>
+    std::shared_ptr<GameObject> CreateGameObject( const std::string& name );
 
     /// <summary>
     /// Parses a component out of a JSON object.
@@ -63,6 +69,12 @@ public:
     ~Scene();
 
     /// <summary>
+    /// Adds a game object to this scene.
+    /// </summary>
+    /// <param name="name">The game object's name.</param>
+    GameObject* AddGameObject( const std::string& name );
+
+    /// <summary>
     /// Loads scene data from the given file.
     /// </summary>
     /// <param name="fname">The file name.</param>
@@ -74,6 +86,12 @@ public:
     /// <param name="name">The name of the scene.</param>
     /// <param name="json">The JSON describing a scene.</param>
     bool LoadFromMemory( const std::string& name, const std::string& json );
+
+    /// <summary>
+    /// Removes the game object with the given name from this scene.
+    /// </summary>
+    /// <param name="name">The game object's name.</param>
+    bool RemoveGameObject( const std::string& name );
 
     /// <summary>
     /// Updates all game objects within this scene.

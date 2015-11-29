@@ -1,6 +1,7 @@
 #include "Camera.hpp"
 #include "Component.hpp"
 #include "GameObject.hpp"
+#include "Math.hpp"
 #include "Time.hpp"
 #include "Transform.hpp"
 #include <Windows.h>
@@ -9,41 +10,6 @@ using namespace DirectX;
 
 Camera* Camera::ActiveCamera = nullptr;
 std::vector<Camera*> Camera::Cameras;
-
-// Gets the yaw, pitch, and roll from a quaternion
-static void GetYawPitchRollFromQuaternion( XMFLOAT4 quat, float* yaw, float* pitch, float* roll )
-{
-    // TODO - This is broken
-
-    // Normalize the quaternion
-    XMStoreFloat4( &quat, XMQuaternionNormalize( XMLoadFloat4( &quat ) ) );
-    const float& q0 = quat.x;
-    const float& q1 = quat.y;
-    const float& q2 = quat.z;
-    const float& q3 = quat.w;
-
-    // From https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Conversion
-    
-    // Get the yaw (rotation around the Y axis)
-    *yaw = -asinf( 2 * ( q0 * q2 - q3 * q1 ) );
-
-    // Get the pitch (rotation around the X axis)
-    *pitch = atan2f( 2.0f * ( q0 * q3 + q1 * q2 ),
-                     1.0f - 2.0f * ( q2 * q2 + q3 * q3 ) );
-    *pitch = XM_PI - *pitch;
-
-    // If the pitch is directly up or down, then roll is 0
-    if ( fabsf( fabsf( *pitch ) - XM_PIDIV2 ) < 0.001f )
-    {
-        *roll = 0.0f;
-    }
-    else
-    {
-        // Get the roll (rotation around the Z axis)
-        *roll = atan2f( 2.0f * ( q0 * q1 + q2 * q3 ),
-                        1.0f - 2.0f * ( q1 * q1 + q2 * q2 ) );
-    }
-}
 
 // Creates a camera at the specified position
 Camera::Camera( GameObject* gameObj )
@@ -54,8 +20,10 @@ Camera::Camera( GameObject* gameObj )
     _isDrawable = false;
 
     // Get the yaw, pitch, and roll from the transform
-    float roll = 0.0f;
-    GetYawPitchRollFromQuaternion( rotation, &yRotation, &xRotation, &roll );
+    XMFLOAT3 yawPitchRoll;
+    Math::DecomposeQuat( rotation, yawPitchRoll );
+    xRotation = yawPitchRoll.x;
+    yRotation = yawPitchRoll.y;
 
     nearClip = 0.1f;
     farClip = 100.0f;

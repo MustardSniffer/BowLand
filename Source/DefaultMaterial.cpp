@@ -80,10 +80,23 @@ bool DefaultMaterial::LoadNormalMap( const std::string& fname )
     return _useNormalMap;
 }
 
+// Set our diffuse map
+void DefaultMaterial::SetDiffuseMap( std::shared_ptr<Texture2D> map )
+{
+    _diffuseMap = map;
+}
+
 // Set the first test light
 void DefaultMaterial::SetDirectionalLight( const DirectionalLight& light )
 {
     assert( _pixelShader->SetData( "Light0", &light, sizeof( DirectionalLight ) ) );
+}
+
+// Set our normal map
+void DefaultMaterial::SetNormalMap( std::shared_ptr<Texture2D> map )
+{
+    _normalMap = map;
+    _useNormalMap = static_cast<bool>( _normalMap );
 }
 
 // Set the second test light
@@ -112,8 +125,8 @@ void DefaultMaterial::UpdateShaderData()
     assert( _pixelShader->SetFloat3( "CameraPosition", activeCamera->GetPosition() ) );
 
     // Send stuff
-    assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap->GetShaderResourceView() ) );
-    assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap->GetShaderResourceView() ) );
+    if ( _diffuseMap ) assert( _pixelShader->SetShaderResourceView( "DiffuseMap", _diffuseMap->GetShaderResourceView() ) );
+    if ( _normalMap  ) assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap->GetShaderResourceView() ) );
     assert( _pixelShader->SetSamplerState( "TextureSampler", _samplerState ) );
     assert( _pixelShader->SetFloat4( "AmbientColor", _ambientColor ) );
     assert( _pixelShader->SetFloat( "SpecularPower", _specularPower ) );

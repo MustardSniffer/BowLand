@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO - This needs to be redone because of the switch to quaternions
+
 #include "Tweener.hpp"
 
 /// <summary>

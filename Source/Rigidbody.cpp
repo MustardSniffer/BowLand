@@ -1,9 +1,10 @@
 #include "Rigidbody.hpp"
-#include "GameObject.hpp"
-#include "Transform.hpp"
-#include "Physics.hpp"
 #include "BoxCollider.hpp"
+#include "GameObject.hpp"
+#include "Math.hpp"
+#include "Physics.hpp"
 #include "SphereCollider.hpp"
+#include "Transform.hpp"
 #include <math.h>
 
 using namespace DirectX;
@@ -139,15 +140,25 @@ void Rigidbody::CopyTransformFromBullet()
     _myMotionState->getWorldTransform( btTrans );
     Transform&   myTrans = *( _gameObject->GetTransform() );
 
-    
+
     // Copy the position
     XMFLOAT3 position = BTtoXM( btTrans.getOrigin() );
     myTrans.SetPosition( position );
     
-    //// Copy the rotation
-    //btQuaternion btRot = btTrans.getRotation();
-    //XMFLOAT4 xmRot( btRot.getX(), btRot.getY(), btRot.getZ(), btRot.getW() );
-    //myTrans.SetRotation( xmRot );
+
+    float yaw, pitch, roll;
+    btTrans.getBasis().getEulerZYX( yaw, pitch, roll );
+
+
+    // Copy the rotation
+    btQuaternion btRot = btTrans.getRotation();
+    XMFLOAT4 xmRot(
+        btRot.getX(),
+        btRot.getY(),
+        btRot.getZ(),
+        btRot.getW()
+    );
+    myTrans.SetRotation( xmRot );
 }
 
 // Copies our transform to Bullet's transform
@@ -181,8 +192,8 @@ void Rigidbody::SetMass( float mass )
 // Updates this rigid body
 void Rigidbody::Update()
 {
-    if ( fabsf( GetVelocity().y ) <= 0.01f )
+    /*if ( fabsf( GetVelocity().y ) <= 0.01f )
     {
         ApplyImpulse( XMFLOAT3( 0, 10, 0 ) );
-    }
+    }*/
 }
