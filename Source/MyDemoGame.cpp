@@ -22,12 +22,12 @@
 // ----------------------------------------------------------------------------
 
 #include "MyDemoGame.hpp"
+#include "Input.hpp"
+#include "Time.hpp"
 #include "Vertex.hpp"
 #include "MeshLoader.hpp"
 #include "GameObject.hpp"
 #include "Components.hpp"
-#include "Physics.hpp"
-#include "Time.hpp"
 
 #include <sstream>
 #include <DirectXColors.h>
@@ -200,15 +200,14 @@ void MyDemoGame::OnResize()
     
 }
 
-#define IsKeyDown(key) (GetAsyncKeyState(key) & 0x8000)
-
 // Updates the scene
 void MyDemoGame::UpdateScene()
 {
     // Quit if the escape key is pressed
-    if ( IsKeyDown( VK_ESCAPE ) )
+    if ( Input::IsKeyDown( Key::Escape ) )
     {
         Quit();
+        return;
     }
     
 
@@ -220,21 +219,22 @@ void MyDemoGame::UpdateScene()
     float rotSpeed  = Time::GetElapsedTime() * 0.25f;
 
     // Speed up when shift is pressed
-    if ( IsKeyDown( VK_SHIFT ) ) { moveSpeed *= 5; }
+    if ( Input::IsKeyDown( Key::LeftShift ) ) { moveSpeed *= 5; }
 
     // Movement
-    if (IsKeyDown('W')) { Camera::GetActiveCamera()->MoveRelative(0, 0, moveSpeed); }
-    if (IsKeyDown('S')) { Camera::GetActiveCamera()->MoveRelative(0, 0, -moveSpeed); }
-    if (IsKeyDown('A')) { Camera::GetActiveCamera()->MoveRelative(-moveSpeed, 0, 0); }
-    if (IsKeyDown('D')) { Camera::GetActiveCamera()->MoveRelative(moveSpeed, 0, 0); }
-    if (IsKeyDown('Q')) { Camera::GetActiveCamera()->MoveAbsolute(0, -moveSpeed, 0); }
-    if (IsKeyDown('E')) { Camera::GetActiveCamera()->MoveAbsolute(0, moveSpeed, 0); }
+    if (Input::IsKeyDown(Key::W)) { Camera::GetActiveCamera()->MoveRelative(0, 0, moveSpeed); }
+    if (Input::IsKeyDown(Key::S)) { Camera::GetActiveCamera()->MoveRelative(0, 0, -moveSpeed); }
+    if (Input::IsKeyDown(Key::A)) { Camera::GetActiveCamera()->MoveRelative(-moveSpeed, 0, 0); }
+    if (Input::IsKeyDown(Key::D)) { Camera::GetActiveCamera()->MoveRelative(moveSpeed, 0, 0); }
+    if (Input::IsKeyDown(Key::Q)) { Camera::GetActiveCamera()->MoveAbsolute(0, -moveSpeed, 0); }
+    if (Input::IsKeyDown(Key::E)) { Camera::GetActiveCamera()->MoveAbsolute(0, moveSpeed, 0); }
     
     if ( hasMouseFocus )
     {
         // Rotate the camera
-        Camera::GetActiveCamera()->Rotate(rotSpeed * (currMousePos.y - prevMousePos.y),
-                        rotSpeed * ( currMousePos.x - prevMousePos.x ) );
+        XMFLOAT2 deltaMouse = Input::GetDeltaMousePosition();
+        Camera::GetActiveCamera()->Rotate(rotSpeed * deltaMouse.y,
+                                          rotSpeed * deltaMouse.x );
     }
     Camera::GetActiveCamera()->UpdateViewMatrix();
 

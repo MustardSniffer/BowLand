@@ -10,10 +10,15 @@
 // -------------------------------------------------------------
 
 #include "DirectXGameCore.h"
+#include "Input.hpp"
 #include "Physics.hpp"
 #include "Time.hpp"
+#include <DirectXTK\Keyboard.h>
+#include <DirectXTK\Mouse.h>
 #include <WindowsX.h>
 #include <sstream>
+
+using namespace DirectX;
 
 // We need a global reference to the DirectX Game so that we can
 // pass OS-level window messages to our application.
@@ -99,6 +104,12 @@ bool DirectXGameCore::Init()
 
     // Attempt to initialize the physics system
     if ( !Physics::Initialize() )
+    {
+        return false;
+    }
+
+    // Attempt to initialize input
+    if ( !Input::Initialize( hMainWnd ) )
     {
         return false;
     }
@@ -309,26 +320,28 @@ int DirectXGameCore::Run()
     MSG msg = {0};
 
     // Loop until we get a quit message from windows
+    bool running = true;
     Time::Start();
-    while(msg.message != WM_QUIT)
+    while (running)
     {
         // Peek at the next message (and remove it from the queue)
-        if(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
         {
+            running &= ( msg.message != WM_QUIT );
+
             // Handle this message
             TranslateMessage( &msg );
             DispatchMessage( &msg );
         }
-        else // No message to handle
-        {
-            // Standard game loop type stuff
-            Time::Update();
-            CalculateFrameStats();
+
+        // Standard game loop type stuff
+        Time::Update();
+        Input::Update();
+        CalculateFrameStats();
             
-            UpdateScene();
-            Physics::Update();
-            DrawScene();
-        }
+        UpdateScene();
+        Physics::Update();
+        DrawScene();
     }
 
     // If we make it outside the game loop, return the most
@@ -403,6 +416,9 @@ void DirectXGameCore::Quit()
 // --------------------------------------------------------
 LRESULT DirectXGameCore::ProcessMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    // Allow the input to process the message
+    Input::ProcessMessage( msg, wParam, lParam );
+
     switch( msg )
     {
     // WM_ACTIVATE is sent when the window is activated or deactivated.

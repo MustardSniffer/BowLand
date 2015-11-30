@@ -117,6 +117,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
   <ItemGroup>
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -157,6 +158,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClInclude Include="BoxCollider.hpp" />
     <ClInclude Include="Components.hpp" />
     <ClInclude Include="EventListener.hpp" />
+    <ClInclude Include="Input.hpp" />
     <ClInclude Include="Math.hpp" />
     <ClInclude Include="Physics.hpp" />
     <ClInclude Include="Camera.hpp" />

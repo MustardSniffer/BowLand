@@ -29,5 +29,6 @@ float SphereCollider::GetRadius() const
 // Set collider radius
 void SphereCollider::SetRadius( float radius )
 {
-    _mySphereShape->setUnscaledRadius( radius );
+    //_mySphereShape->setUnscaledRadius( radius );
+    _mySphereShape->setSafeMargin( btVector3( radius, radius, radius ), 0.0f );
 }
