@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Config.hpp"
 #include "DirectX.hpp"
 
 class GameObject;
@@ -9,10 +10,8 @@ class GameObject;
 /// </summary>
 class Component
 {
-    Component( const Component& ) = delete;
-    Component( Component&& ) = delete;
-    Component& operator=( const Component& ) = delete;
-    Component& operator=( Component&& ) = delete;
+    ImplementNonCopyableClass( Component );
+    ImplementNonMovableClass( Component );
 
 protected:
     // TODO - Use enum flags instead of bools?

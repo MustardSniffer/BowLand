@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Config.hpp"
 #include "Mesh.hpp"
 #include <memory>
+#include <unordered_map>
 #include <string>
 
 struct aiNode;
@@ -13,6 +15,10 @@ struct aiScene;
 /// </summary>
 class MeshLoader
 {
+    ImplementStaticClass( MeshLoader );
+
+    static std::unordered_map<std::string, std::shared_ptr<Mesh>> _meshCache;
+
     /// <summary>
     /// Processes a mesh's node into the given vertices and indices.
     /// </summary>
@@ -22,14 +28,6 @@ class MeshLoader
     /// Processes a mesh into the given vertices and indices.
     /// </summary>
     static void ProcessMesh( std::vector<Vertex>& vertices, std::vector<UINT>& indices, const aiScene* scene, aiMesh* mesh );
-
-    // Hide all of the instance-based methods
-    MeshLoader() = delete;
-    MeshLoader( const MeshLoader& ) = delete;
-    MeshLoader( MeshLoader&& ) = delete;
-    ~MeshLoader() = delete;
-    MeshLoader& operator=( const MeshLoader& ) = delete;
-    MeshLoader& operator=( MeshLoader&& ) = delete;
 
 public:
     /// <summary>

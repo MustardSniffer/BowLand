@@ -147,6 +147,9 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="RenderManager.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
@@ -284,6 +287,18 @@
     <ClInclude Include="Input.hpp">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="RenderManager.hpp">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ComPtr.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject.inl">
@@ -300,6 +315,15 @@
     </None>
     <None Include="EventListener.inl">
       <Filter>Header Files\Utility</Filter>
+    </None>
+    <None Include="Cache.inl">
+      <Filter>Header Files\Utility</Filter>
+    </None>
+    <None Include="ComPtr.inl">
+      <Filter>Header Files\Utility</Filter>
+    </None>
+    <None Include="Mesh.inl">
+      <Filter>Header Files\Graphics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

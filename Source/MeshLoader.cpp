@@ -3,6 +3,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+std::unordered_map<std::string, std::shared_ptr<Mesh>> MeshLoader::_meshCache;
+
 // Processes an Assimp node
 void MeshLoader::ProcessNode( std::vector<Vertex>& vertices, std::vector<UINT>& indices, const aiScene* scene, aiNode* node )
 {
@@ -63,6 +65,13 @@ void MeshLoader::ProcessMesh( std::vector<Vertex>& vertices, std::vector<UINT>& 
 // Loads a mesh from a file
 std::shared_ptr<Mesh> MeshLoader::Load( const std::string& fname, ID3D11Device* device, ID3D11DeviceContext* deviceContext )
 {
+    // If the mesh has been loaded before, we don't need to re-load it
+    auto search = _meshCache.find( fname );
+    if ( search != _meshCache.end() )
+    {
+        return search->second;
+    }
+
     // Load the mesh's information
     Assimp::Importer importer;
     UINT importFlags = aiProcess_CalcTangentSpace
@@ -84,6 +93,7 @@ std::shared_ptr<Mesh> MeshLoader::Load( const std::string& fname, ID3D11Device* 
     ProcessNode( vertices, indices, scene, scene->mRootNode );
 
     // Now create the mesh
-    mesh = std::make_shared<Mesh>( device, deviceContext, vertices, indices );
+    mesh = std::make_shared<Mesh>( device, vertices, indices );
+    _meshCache[ fname ] = mesh;
     return mesh;
 }

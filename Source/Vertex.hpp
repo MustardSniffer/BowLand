@@ -15,12 +15,32 @@ struct Vertex
 
 struct ParticleVertex
 {
-	int Type;
-	float Age;
-	DirectX::XMFLOAT3 StartPosition;
-	DirectX::XMFLOAT3 StartVelocity;
-	DirectX::XMFLOAT4 StartColor;
-	DirectX::XMFLOAT4 MidColor;
-	DirectX::XMFLOAT4 EndColor;
-	DirectX::XMFLOAT3 StartMidEndSize;
+    int Type;
+    float Age;
+    DirectX::XMFLOAT3 StartPosition;
+    DirectX::XMFLOAT3 StartVelocity;
+    DirectX::XMFLOAT4 StartColor;
+    DirectX::XMFLOAT4 MidColor;
+    DirectX::XMFLOAT4 EndColor;
+    DirectX::XMFLOAT3 StartMidEndSize;
+};
+
+/// <summary>
+/// Defines a vertex for a text mesh.
+/// </summary>
+struct TextVertex
+{
+    DirectX::XMFLOAT2 Position;
+    DirectX::XMFLOAT2 UV;
+
+    TextVertex()
+        : TextVertex( 0, 0, 0, 0 )
+    {
+    }
+
+    TextVertex( float x, float y, float u, float v )
+        : Position( x, y )
+        , UV( u, v )
+    {
+    }
 };

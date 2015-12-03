@@ -1,38 +1,19 @@
 #include "TextRenderer.hpp"
 #include "Camera.hpp"
 #include "GameObject.hpp"
+#include "RenderManager.hpp"
 #include "Transform.hpp"
+#include "Vertex.hpp"
 #include <algorithm> // TODO - Replace with custom math class
 #include <DirectXColors.h>
 #include <vector>
 #include <iostream>
 
-// TODO - We need some kind of way to guarantee that text is drawn on top of everything else
 // TODO - Add TextMaterial
 
 using namespace DirectX;
 
 static const float TextBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-/// <summary>
-/// Defines a vertex for a text mesh.
-/// </summary>
-struct TextVertex
-{
-    XMFLOAT2 Position;
-    XMFLOAT2 UV;
-
-    TextVertex()
-        : TextVertex( 0, 0, 0, 0 )
-    {
-    }
-
-    TextVertex( float x, float y, float u, float v )
-        : Position( x, y )
-        , UV( u, v )
-    {
-    }
-};
 
 // Create a new text renderer
 TextRenderer::TextRenderer( GameObject* gameObject )
@@ -68,6 +49,8 @@ TextRenderer::TextRenderer( GameObject* gameObject )
 #endif
         _pixelShader.reset();
     }
+
+    RenderManager::AddTextRenderer( this );
 }
 
 // Destroys this text renderer
@@ -78,6 +61,8 @@ TextRenderer::~TextRenderer()
     ReleaseMacro( _depthStencilState );
     ReleaseMacro( _rasterizerState );
     ReleaseMacro( _vertexBuffer );
+
+    RenderManager::RemoveTextRenderer( this );
 }
 
 // Get our font

@@ -1,5 +1,7 @@
 #include "Texture2D.hpp"
 
+std::unordered_map<std::string, std::shared_ptr<Texture2D>> Texture2D::_textureCache;
+
 // Create an empty texture
 std::shared_ptr<Texture2D> Texture2D::Create( ID3D11Device* device, ID3D11DeviceContext* deviceContext, unsigned int width, unsigned int height )
 {
@@ -9,13 +11,21 @@ std::shared_ptr<Texture2D> Texture2D::Create( ID3D11Device* device, ID3D11Device
 // Load a texture from a file
 std::shared_ptr<Texture2D> Texture2D::FromFile( ID3D11Device* device, ID3D11DeviceContext* deviceContext, const std::string& fname )
 {
+    // Check if the texture has already been loaded
+    auto search = _textureCache.find( fname );
+    if ( search != _textureCache.end() )
+    {
+        return search->second;
+    }
+
     std::shared_ptr<Texture2D> texture;
 
     // Attempt to load the file as an image
     Image image;
     if ( image.LoadFromFile( fname ) )
     {
-        return Texture2D::FromImage( device, deviceContext, image );
+        texture = Texture2D::FromImage( device, deviceContext, image );
+        _textureCache[ fname ] = texture;
     }
 
     return texture;

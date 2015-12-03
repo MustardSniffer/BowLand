@@ -3,6 +3,7 @@
 #include "Texture.hpp"
 #include "Image.hpp"
 #include <memory>
+#include <unordered_map>
 #include <string>
 
 /// <summary>
@@ -12,6 +13,8 @@ class Texture2D : public Texture
 {
     friend class Font;
     friend class Image;
+
+    static std::unordered_map<std::string, std::shared_ptr<Texture2D>> _textureCache;
 
     ID3D11Texture2D* _texture;
     unsigned int     _width;

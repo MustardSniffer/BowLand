@@ -26,6 +26,7 @@
 #include "Time.hpp"
 #include "Vertex.hpp"
 #include "MeshLoader.hpp"
+#include "RenderManager.hpp"
 #include "GameObject.hpp"
 #include "Components.hpp"
 
@@ -349,7 +350,8 @@ void MyDemoGame::DrawScene()
 
 
     // Draw the scene
-    _testScene->Draw();
+    //_testScene->Draw();
+    RenderManager::Draw();
 
 
 

@@ -24,7 +24,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -139,6 +139,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClCompile Include="Rigidbody.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleShader.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="SphereCollider.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -156,7 +157,10 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoxCollider.hpp" />
+    <ClInclude Include="Cache.hpp" />
     <ClInclude Include="Components.hpp" />
+    <ClInclude Include="ComPtr.hpp" />
+    <ClInclude Include="Config.hpp" />
     <ClInclude Include="EventListener.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="Math.hpp" />
@@ -179,6 +183,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClInclude Include="DirectXGameCore.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Rect.hpp" />
+    <ClInclude Include="RenderManager.hpp" />
     <ClInclude Include="Rigidbody.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="Shaders\DirectionalLight.hpp" />
@@ -202,8 +207,11 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClInclude Include="Vertex.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Cache.inl" />
+    <None Include="ComPtr.inl" />
     <None Include="EventListener.inl" />
     <None Include="GameObject.inl" />
+    <None Include="Mesh.inl" />
     <None Include="Rect.inl" />
     <None Include="Shaders\DefaultShaderCommon.hlsli" />
     <None Include="Shaders\TextShaderCommon.hlsli" />

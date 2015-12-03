@@ -173,7 +173,9 @@ UintRect Font::FindGlyphRect( GlyphPage& page, unsigned int width, unsigned int 
             }
             else
             {
+#if defined( _DEBUG ) || defined( DEBUG )
                 std::cout << "Could not find a suitable location in the font texture; maximum size reached." << std::endl;
+#endif
                 return UintRect( 0, 0, 2, 2 );
             }
         }

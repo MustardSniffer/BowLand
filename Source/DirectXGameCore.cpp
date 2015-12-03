@@ -12,6 +12,7 @@
 #include "DirectXGameCore.h"
 #include "Input.hpp"
 #include "Physics.hpp"
+#include "RenderManager.hpp"
 #include "Time.hpp"
 #include <DirectXTK\Keyboard.h>
 #include <DirectXTK\Mouse.h>
@@ -110,6 +111,12 @@ bool DirectXGameCore::Init()
 
     // Attempt to initialize input
     if ( !Input::Initialize( hMainWnd ) )
+    {
+        return false;
+    }
+
+    // Attempt to initialize the render manager
+    if ( !RenderManager::Initialize( device, deviceContext ) )
     {
         return false;
     }

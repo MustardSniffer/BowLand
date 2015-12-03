@@ -1,20 +1,24 @@
 #include "MeshRenderer.hpp"
+#include "RenderManager.hpp"
 #include <assert.h>
 
 using namespace DirectX;
 
 MeshRenderer::MeshRenderer( GameObject* gameObj )
     : Component( gameObj )
+    , _mesh( nullptr )
+    , _material( nullptr )
 {
     _isDrawable = true;
 
-    _mesh = nullptr;
-    _material = nullptr;
+    RenderManager::AddMeshRenderer( this );
 }
 
 MeshRenderer::~MeshRenderer()
 {
     _material = nullptr;
+
+    RenderManager::RemoveMeshRenderer( this );
 }
 
 void MeshRenderer::CopyMeshRenderer( MeshRenderer* nRender )
@@ -51,7 +55,7 @@ void MeshRenderer::Update()
 void MeshRenderer::Draw()
 {
     // Get the world matrix
-    XMFLOAT4X4 world = _gameObject->GetTransform()->GetWorldMatrix();
+    /* XMFLOAT4X4 world = _gameObject->GetTransform()->GetWorldMatrix();
     XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
 
     // Prepare material
@@ -59,5 +63,5 @@ void MeshRenderer::Draw()
     _material->Activate();
 
     // Draw the mesh
-    _mesh->Draw();
+    _mesh->Draw(); */
 }
