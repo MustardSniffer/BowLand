@@ -7,6 +7,7 @@
 #include "DirectX.hpp"
 #include "EventListener.hpp"
 
+class Collider;
 class Component;
 class Transform;
 
@@ -33,6 +34,12 @@ private:
     // Prevent the use of the move constructor and move assignment operator
     GameObject( GameObject&& ) = delete;
     GameObject& operator=( GameObject&& ) = delete;
+
+public:
+    /// <summary>
+    /// The function type used for collision callbacks.
+    /// </summary>
+    using CollisionCallback = std::function<void( const Collider* )>;
 
 public:
     /// <summary>

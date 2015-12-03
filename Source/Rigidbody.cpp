@@ -6,6 +6,7 @@
 #include "SphereCollider.hpp"
 #include "Transform.hpp"
 #include <math.h>
+#include <iostream> // For testing collision callback
 
 using namespace DirectX;
 
@@ -26,6 +27,20 @@ static inline XMFLOAT3 BTtoXM( const btVector3& bt )
     return DirectX::XMFLOAT3( bt.getX(), bt.getY(), bt.getZ() );
 }
 
+// The collision callback for Bullet objects
+static bool BulletCollisionCallback( btManifoldPoint& collisionPoint, const btCollisionObjectWrapper* obj1, int __unused0, int __unused1, const btCollisionObjectWrapper* obj2, int __unused2, int __unused3 )
+{
+    // Get the two colliders
+    Collider* obj1Collider = static_cast<Collider*>( obj1->getCollisionShape()->getUserPointer() );
+    Collider* obj2Collider = static_cast<Collider*>( obj2->getCollisionShape()->getUserPointer() );
+
+    // Send their messages
+    obj1Collider->GetGameObject()->DispatchEvent( "OnCollide", static_cast<const Collider*>( obj2Collider ) );
+    obj2Collider->GetGameObject()->DispatchEvent( "OnCollide", static_cast<const Collider*>( obj1Collider ) );
+
+    return false;
+}
+
 // Create a new rigidbody
 Rigidbody::Rigidbody( GameObject* gameObject )
     : Component( gameObject )
@@ -33,9 +48,17 @@ Rigidbody::Rigidbody( GameObject* gameObject )
 {
     _isEnabled = true;
 
+    // Set the Bullet collision callback
+    if ( gContactAddedCallback != BulletCollisionCallback )
+    {
+        gContactAddedCallback = BulletCollisionCallback;
+    }
+
+
 
     // Create our motion state
     _motionState.reset( new btDefaultMotionState(), btAlignedFreeInternal );
+
 
 
     // Create the rigidbody
@@ -44,11 +67,21 @@ Rigidbody::Rigidbody( GameObject* gameObject )
     shape->calculateLocalInertia( DefaultMass, inertia );
     btRigidBody::btRigidBodyConstructionInfo constructInfo( DefaultMass, _myMotionState, shape, inertia );
     _rigidbody.reset( new btRigidBody( constructInfo ), btAlignedFreeInternal );
-    
+    _myRigidbody->setUserPointer( this );
+    _myRigidbody->setCollisionFlags( _myRigidbody->getCollisionFlags() |
+                                     btRigidBody::CF_CUSTOM_MATERIAL_CALLBACK );
+
+
+
+    // Add our test callback
+	// Can change to any method so long as it takes a const Collider* as a parameter
+    GameObject::CollisionCallback callback = std::bind( &Rigidbody::OnCollide, this, _1 );
+    _gameObject->AddEventListener( "OnCollide", callback );
+
+
 
     // Copy our transform to Bullet
     CopyTransformToBullet();
-
 
     // Add ourself to the physics system
     Physics::AddRigidbody( this );
@@ -83,6 +116,50 @@ void Rigidbody::ApplyImpulse( const XMFLOAT3& impulse )
 void Rigidbody::ApplyImpulse( float x, float y, float z )
 {
     _myRigidbody->applyImpulse( btVector3( x, y, z ), ZeroVector );
+}
+
+// Copies Bullet's transform to our transform
+void Rigidbody::CopyTransformFromBullet()
+{
+    // Get the two transforms
+    btTransform  btTrans;
+    _myMotionState->getWorldTransform( btTrans );
+    Transform&   myTrans = *( _gameObject->GetTransform() );
+
+    // Copy the position
+    XMFLOAT3 position = BTtoXM( btTrans.getOrigin() );
+    myTrans.SetPosition( position );
+
+    // Copy the rotation
+    btQuaternion btRot = btTrans.getRotation();
+    XMFLOAT4 xmRot(
+        btRot.getX(),
+        btRot.getY(),
+        btRot.getZ(),
+        btRot.getW()
+    );
+    myTrans.SetRotation( xmRot );
+}
+
+// Copies our transform to Bullet's transform
+void Rigidbody::CopyTransformToBullet()
+{
+    // Get the two transforms
+    btTransform  btTrans;
+    _myMotionState->getWorldTransform( btTrans );
+    Transform&   myTrans = *( _gameObject->GetTransform() );
+
+    // Copy the position
+    btTrans.setOrigin( XMtoBT( myTrans.GetPosition() ) );
+
+    // Copy the rotation
+    XMFLOAT4 xmRot = myTrans.GetRotation();
+    btQuaternion btRot( xmRot.x, xmRot.y, xmRot.z, xmRot.w );
+    btTrans.setRotation( btRot );
+
+    // Now set the transform
+    _myMotionState->setWorldTransform( btTrans );
+    _myRigidbody->setWorldTransform( btTrans );
 }
 
 // Get our collider
@@ -132,48 +209,13 @@ XMFLOAT3 Rigidbody::GetVelocity() const
     return BTtoXM( _myRigidbody->getLinearVelocity() );
 }
 
-// Copies Bullet's transform to our transform
-void Rigidbody::CopyTransformFromBullet()
+// Handle when we collide with something else
+void Rigidbody::OnCollide( const Collider* collider )
 {
-    // Get the two transforms
-    btTransform  btTrans;
-    _myMotionState->getWorldTransform( btTrans );
-    Transform&   myTrans = *( _gameObject->GetTransform() );
+    std::string thisName = _gameObject->GetName();
+    std::string thatName = collider->GetGameObject()->GetName();
 
-    // Copy the position
-    XMFLOAT3 position = BTtoXM( btTrans.getOrigin() );
-    myTrans.SetPosition( position );
-    
-    // Copy the rotation
-    btQuaternion btRot = btTrans.getRotation();
-    XMFLOAT4 xmRot(
-        btRot.getX(),
-        btRot.getY(),
-        btRot.getZ(),
-        btRot.getW()
-    );
-    myTrans.SetRotation( xmRot );
-}
-
-// Copies our transform to Bullet's transform
-void Rigidbody::CopyTransformToBullet()
-{
-    // Get the two transforms
-    btTransform  btTrans;
-    _myMotionState->getWorldTransform( btTrans );
-    Transform&   myTrans = *( _gameObject->GetTransform() );
-
-    // Copy the position
-    btTrans.setOrigin( XMtoBT( myTrans.GetPosition() ) );
-
-    // Copy the rotation
-    XMFLOAT4 xmRot = myTrans.GetRotation();
-    btQuaternion btRot( xmRot.x, xmRot.y, xmRot.z, xmRot.w );
-    btTrans.setRotation( btRot );
-
-    // Now set the transform
-    _myMotionState->setWorldTransform( btTrans );
-    _myRigidbody->setWorldTransform( btTrans );
+    std::cout << thisName << " collided with " << thatName << std::endl;
 }
 
 // Get our mass
