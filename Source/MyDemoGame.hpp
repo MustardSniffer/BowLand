@@ -25,7 +25,8 @@ public:
     void UpdateScene();
     void DrawScene();
 
-	GameObject* SpawnArrow();
+	GameObject* SpawnArrow(DirectX::XMFLOAT3 pos);
+	void CollideArrow(const Collider* collider);
 
     // For handing mouse input
     void OnMouseDown( WPARAM btnState, int x, int y );
@@ -47,6 +48,8 @@ private:
 	GameObject* p2;
 	std::vector<GameObject*> arrows;
 	GAMESTATE curGameState;
+	bool chargingShot = false;
+	float chargeTime = 0.0f;
 
     // Keeps track of the old mouse position.  Useful for 
     // determining how far the mouse moved in a single frame.

@@ -196,9 +196,9 @@ bool MyDemoGame::Init()
     return true;
 }
 
-// TEMP
+// ----- TEMP -----
 // Spawns an arrow in
-GameObject* MyDemoGame::SpawnArrow(){
+GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
 	DirectionalLight dl;
 	dl.DiffuseColor = XMFLOAT4(0.960784376f, 0.870588303f, 0.701960802f, 1.0f);
 	dl.Direction = XMFLOAT3(0, -1, 0);
@@ -217,7 +217,7 @@ GameObject* MyDemoGame::SpawnArrow(){
 
 	// Set position
 	Transform* tra = arrow->GetTransform();
-	tra->SetPosition(XMFLOAT3(+0.0f, +0.0f, +0.0f));
+	tra->SetPosition(pos);
 	tra->SetScale(XMFLOAT3(+0.4f, +0.4f, +0.4f));
 
 	// Add collider
@@ -227,6 +227,10 @@ GameObject* MyDemoGame::SpawnArrow(){
 	// Add rigidbody
 	Rigidbody* rb = arrow->AddComponent<Rigidbody>();
 	rb->SetMass(+1.0f);
+
+	// Add collision callback
+	GameObject::CollisionCallback callback = std::bind(&MyDemoGame::CollideArrow, this, _1);
+	arrow->AddEventListener("OnArrowCollide", callback);
 
 	// Add default material
 	DefaultMaterial* dm = arrow->AddComponent<DefaultMaterial>();
@@ -243,13 +247,17 @@ GameObject* MyDemoGame::SpawnArrow(){
 	return arrow;
 }
 
+void MyDemoGame::CollideArrow(const Collider* collider){
+	
+}
+
+// ----------------
 // Handle the window resizing
 void MyDemoGame::OnResize()
 {
     // Handle base-level DX resize stuff
     DirectXGameCore::OnResize();
     
-    std::cout << "test2" << std::endl;
     // Update the camera's projection
     // firstRun is to prevent the ProjectionMatrix attempting to update before the cameras are created from the scene
     if (firstRun){
@@ -272,38 +280,50 @@ void MyDemoGame::UpdateScene()
     
     _testScene->Update();
 
-    // Update the camera based on input
-    float moveSpeed = Time::GetElapsedTime() * 4.00f;
-    float rotSpeed  = Time::GetElapsedTime() * 0.25f;
-
-    // Speed up when shift is pressed
-    if ( Input::IsKeyDown( Key::LeftShift ) ) { moveSpeed *= 5; }
-
-    // Movement
-    if (Input::IsKeyDown(Key::W)) { Camera::GetActiveCamera()->MoveRelative(0, 0, moveSpeed); }
-    if (Input::IsKeyDown(Key::S)) { Camera::GetActiveCamera()->MoveRelative(0, 0, -moveSpeed); }
-    if (Input::IsKeyDown(Key::A)) { Camera::GetActiveCamera()->MoveRelative(-moveSpeed, 0, 0); }
-    if (Input::IsKeyDown(Key::D)) { Camera::GetActiveCamera()->MoveRelative(moveSpeed, 0, 0); }
-    if (Input::IsKeyDown(Key::Q)) { Camera::GetActiveCamera()->MoveAbsolute(0, -moveSpeed, 0); }
-    if (Input::IsKeyDown(Key::E)) { Camera::GetActiveCamera()->MoveAbsolute(0, moveSpeed, 0); }
-    
-    if ( hasMouseFocus )
-    {
-        // Rotate the camera
-        XMFLOAT2 deltaMouse = Input::GetDeltaMousePosition();
-        Camera::GetActiveCamera()->Rotate(rotSpeed * deltaMouse.y,
-                                          rotSpeed * deltaMouse.x );
-    }
     Camera::GetActiveCamera()->UpdateViewMatrix();
 
 	switch (curGameState){
 		case PLAYER_ONE_TURN:
-			if (Input::IsKeyDown(Key::Space)) {
-				GameObject* arrowObj = SpawnArrow();
-				arrows.push_back(arrowObj);
+			if (Input::IsKeyDown(Key::Space) && !chargingShot) {
+				chargingShot = true;
+			}else if (Input::IsKeyDown(Key::Space) && chargingShot){
+				if (chargeTime < +100.0f) { chargeTime += 0.2f; }
+			} else if (Input::IsKeyUp(Key::Space) && chargingShot){
+				GameObject* arrowObj1 = SpawnArrow(XMFLOAT3(
+					p1->GetTransform()->GetPosition().x + 2,
+					p1->GetTransform()->GetPosition().y,
+					p1->GetTransform()->GetPosition().z));
+				arrows.push_back(arrowObj1);
+
+				Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
+				rb1->ApplyImpulse(XMFLOAT3(chargeTime, chargeTime/5.0f, +0.0f));
+
+				chargeTime = +0.0f;
+				chargingShot = false;
+				curGameState = PLAYER_TWO_TURN;
 			}
 			break;
-		case PLAYER_TWO_TURN: 
+		case PLAYER_TWO_TURN:
+			if (Input::IsKeyDown(Key::Space) && !chargingShot) {
+				chargingShot = true;
+			}else if (Input::IsKeyDown(Key::Space) && chargingShot){
+				if (chargeTime < +100.0f) { chargeTime += 0.2f; }
+			}else if (Input::IsKeyUp(Key::Space) && chargingShot){
+				GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
+					p2->GetTransform()->GetPosition().x - 2,
+					p2->GetTransform()->GetPosition().y,
+					p2->GetTransform()->GetPosition().z
+					));
+				arrows.push_back(arrowObj2);
+
+				Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
+				rb2->ApplyImpulse(XMFLOAT3(-chargeTime, chargeTime/5.0f, +0.0f));
+
+				chargeTime = +0.0f;
+				chargingShot = false;
+
+				curGameState = PLAYER_ONE_TURN;
+			}
 			break;
 		case GAME_OVER: 
 			break;

@@ -75,8 +75,8 @@ Rigidbody::Rigidbody( GameObject* gameObject )
 
     // Add our test callback
 	// Can change to any method so long as it takes a const Collider* as a parameter
-    GameObject::CollisionCallback callback = std::bind( &Rigidbody::OnCollide, this, _1 );
-    _gameObject->AddEventListener( "OnCollide", callback );
+    // GameObject::CollisionCallback callback = std::bind( &Rigidbody::OnCollide, this, _1 );
+    //_gameObject->AddEventListener( "OnCollide", callback );
 
 
 
