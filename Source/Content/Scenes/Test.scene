@@ -11,8 +11,8 @@
     },
     "Floor": {
         "Transform": {
-            "Position": [0, 0, 0],
-            "Scale": [20, 1, 20]
+            "Position": [0, -10, 0],
+            "Scale": [30, 0.5, 30]
         },
         "BoxCollider": {
             "Size": [1, 1, 1]
