@@ -9,6 +9,7 @@ SphereCollider::SphereCollider( GameObject* gameObject )
     : Collider( gameObject, ColliderType::Sphere )
 {
     _collisionShape.reset( new btSphereShape( 0.5f ), btAlignedFreeInternal );
+    _mySphereShape->setUserPointer( this );
 }
 
 // Destroy sphere collider

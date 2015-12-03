@@ -139,7 +139,9 @@ bool MyDemoGame::Init()
         {
             for ( int y = 8; y <= 9 + SQ; ++y )
             {
-                std::string name = std::to_string( x ) + std::to_string( y ) + std::to_string( z );
+                std::string name = "Ball_" + std::to_string( x ) +
+                                   "_" + std::to_string( y ) +
+                                   "_" + std::to_string( z );
                 GameObject* go = _testScene->AddGameObject( name );
 
                 std::string msg = "Creating " + name + "\n";

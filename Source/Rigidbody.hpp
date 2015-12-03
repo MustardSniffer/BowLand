@@ -25,6 +25,12 @@ private:
     /// </summary>
     void CopyTransformToBullet();
 
+    /// <summary>
+    /// Handles when this rigidbody collides with something.
+    /// </summary>
+    /// <param name="collider">The collider we collided with.</param>
+    void OnCollide( const Collider* collider );
+
 public:
     /// <summary>
     /// Creates a new rigidbody.

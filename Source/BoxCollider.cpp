@@ -10,6 +10,7 @@ BoxCollider::BoxCollider( GameObject* gameObject )
 {
     btVector3 halfSize( 0.5f, 0.5f, 0.5f );
     _collisionShape.reset( new btBoxShape( halfSize ), btAlignedFreeInternal );
+    _myBoxShape->setUserPointer( this );
 }
 
 // Destroy this box collider
