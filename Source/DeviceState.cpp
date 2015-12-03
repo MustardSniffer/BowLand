@@ -6,6 +6,10 @@ static const float EmptyBlendFactor[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
 DeviceState::DeviceState( ID3D11Device* device, ID3D11DeviceContext* deviceContext )
     : _device( nullptr )
     , _deviceContext( nullptr )
+    , _rasterizerState( nullptr )
+    , _depthStencilState( nullptr )
+    , _samplerState( nullptr )
+    , _blendState( nullptr )
 {
     UpdateD3DResource( _device, device );
     UpdateD3DResource( _deviceContext, deviceContext );
