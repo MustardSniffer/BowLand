@@ -121,6 +121,7 @@ bool MyDemoGame::Init()
     pl.Position = XMFLOAT3( 0, -100, 0 );
 
     std::shared_ptr<Mesh> spMesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
+	std::shared_ptr<Mesh> cubeMesh = MeshLoader::Load( "Models\\cube.obj", device, deviceContext );
     std::shared_ptr<Texture2D> spTex = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" );
     std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" );
 
@@ -131,56 +132,115 @@ bool MyDemoGame::Init()
         return static_cast<float>( rand() ) / RAND_MAX;
     };
 
-    // Add some test spheres
-    const int SQ = 1;
-    for ( int x = -SQ; x <= SQ; ++x )
-    {
-        for ( int z = -SQ; z <= SQ; ++z )
-        {
-            for ( int y = 8; y <= 9 + SQ; ++y )
-            {
-                std::string name = std::to_string( x ) + std::to_string( y ) + std::to_string( z );
-                GameObject* go = _testScene->AddGameObject( name );
+	// Add players
+	// Player 1
+	p1 = _testScene->AddGameObject( "Player_1" );
+	
+	// Set position
+	Transform* tr1 = p1->GetTransform();
+	tr1->SetPosition( XMFLOAT3(-20.0f, +0.0f, +10.0f) );
 
-                std::string msg = "Creating " + name + "\n";
-                OutputDebugStringA( msg.c_str() );
+	// Add collider
+	BoxCollider* bc1 = p1->AddComponent<BoxCollider>();
+	bc1->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
 
-                // Set the position to be slightly off kilter
-                Transform* tr = go->GetTransform();
-                tr->SetPosition( XMFLOAT3(
-                    x * 1.1f + random() * 0.05f,
-                    y * 1.1f + random() * 0.05f,
-                    z * 1.1f + random() * 0.05f
-                ) );
-                
-                // Add the sphere collider
-                SphereCollider* sp = go->AddComponent<SphereCollider>();
-                sp->SetRadius( 0.5f );
+	// Add rigidbody
+	Rigidbody* rb1 = p1->AddComponent<Rigidbody>();
+	rb1->SetMass( +0.0f );
 
-                // Add the rigidbody
-                Rigidbody* rb = go->AddComponent<Rigidbody>();
-                rb->SetMass( 1.0f );
+	// Add default material
+	DefaultMaterial* dm1 = p1->AddComponent<DefaultMaterial>();
+	dm1->SetDiffuseMap(spTex);
+	dm1->SetNormalMap(spNorm);
+	dm1->SetDirectionalLight(dl);
+	dm1->SetPointLight(pl);
 
-                // Add the default material
-                DefaultMaterial* dm = go->AddComponent<DefaultMaterial>();
-                dm->SetDiffuseMap( spTex );
-                dm->SetNormalMap( spNorm );
-                dm->SetDirectionalLight( dl );
-                dm->SetPointLight( pl );
+	// Add mesh renderer
+	MeshRenderer* mr1 = p1->AddComponent<MeshRenderer>();
+	mr1->SetMaterial(dm1);
+	mr1->SetMesh(cubeMesh);
 
-                // Add the mesh renderer
-                MeshRenderer* mr = go->AddComponent<MeshRenderer>();
-                mr->SetMaterial( dm );
-                mr->SetMesh( spMesh );
-            }
-        }
-    }
+	// Player 2
+	p2 = _testScene->AddGameObject( "Player_2" );
+
+	// Set Position
+	Transform* tr2 = p2->GetTransform();
+	tr2->SetPosition( XMFLOAT3(+20.0f, +0.0f, +10.0f) );
+
+	// Add collider
+	BoxCollider* bc2 = p2->AddComponent<BoxCollider>();
+	bc2->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
+
+	// Add rigidbody
+	Rigidbody* rb2 = p2->AddComponent<Rigidbody>();
+	rb2->SetMass(+0.0f);
+
+	// Add default material
+	DefaultMaterial* dm2 = p2->AddComponent<DefaultMaterial>();
+	dm2->SetDiffuseMap(spTex);
+	dm2->SetNormalMap(spNorm);
+	dm2->SetDirectionalLight(dl);
+	dm2->SetPointLight(pl);
+
+	// Add mesh renderer
+	MeshRenderer* mr2 = p2->AddComponent<MeshRenderer>();
+	mr2->SetMaterial(dm2);
+	mr2->SetMesh(cubeMesh);
+
+	curGameState = PLAYER_ONE_TURN;
 
     // Update the active camera's projection matrix
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 
     // Successfully initialized
     return true;
+}
+
+// TEMP
+// Spawns an arrow in
+GameObject* MyDemoGame::SpawnArrow(){
+	DirectionalLight dl;
+	dl.DiffuseColor = XMFLOAT4(0.960784376f, 0.870588303f, 0.701960802f, 1.0f);
+	dl.Direction = XMFLOAT3(0, -1, 0);
+
+	PointLight pl;
+	pl.DiffuseColor = dl.DiffuseColor;
+	pl.Position = XMFLOAT3(0, -100, 0);
+
+	std::shared_ptr<Mesh> spMesh = MeshLoader::Load("Models\\sphere.obj", device, deviceContext);
+	std::shared_ptr<Texture2D> spTex = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2.jpg");
+	std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2Normals.jpg");
+
+	// Add players
+	// Player 1
+	GameObject* arrow = _testScene->AddGameObject("Arrow_" + arrows.size());
+
+	// Set position
+	Transform* tra = arrow->GetTransform();
+	tra->SetPosition(XMFLOAT3(+0.0f, +0.0f, +0.0f));
+	tra->SetScale(XMFLOAT3(+0.4f, +0.4f, +0.4f));
+
+	// Add collider
+	SphereCollider* bc = arrow->AddComponent<SphereCollider>();
+	bc->SetRadius(+0.4f);
+
+	// Add rigidbody
+	Rigidbody* rb = arrow->AddComponent<Rigidbody>();
+	rb->SetMass(+1.0f);
+
+	// Add default material
+	DefaultMaterial* dm = arrow->AddComponent<DefaultMaterial>();
+	dm->SetDiffuseMap(spTex);
+	dm->SetNormalMap(spNorm);
+	dm->SetDirectionalLight(dl);
+	dm->SetPointLight(pl);
+
+	// Add mesh renderer
+	MeshRenderer* mr = arrow->AddComponent<MeshRenderer>();
+	mr->SetMaterial(dm);
+	mr->SetMesh(spMesh);
+
+	return arrow;
 }
 
 // Handle the window resizing
@@ -210,9 +270,7 @@ void MyDemoGame::UpdateScene()
         return;
     }
     
-
     _testScene->Update();
-    
 
     // Update the camera based on input
     float moveSpeed = Time::GetElapsedTime() * 4.00f;
@@ -237,6 +295,19 @@ void MyDemoGame::UpdateScene()
                                           rotSpeed * deltaMouse.x );
     }
     Camera::GetActiveCamera()->UpdateViewMatrix();
+
+	switch (curGameState){
+		case PLAYER_ONE_TURN:
+			if (Input::IsKeyDown(Key::Space)) {
+				GameObject* arrowObj = SpawnArrow();
+				arrows.push_back(arrowObj);
+			}
+			break;
+		case PLAYER_TWO_TURN: 
+			break;
+		case GAME_OVER: 
+			break;
+	}
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;

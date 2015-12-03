@@ -25,15 +25,28 @@ public:
     void UpdateScene();
     void DrawScene();
 
+	GameObject* SpawnArrow();
+
     // For handing mouse input
     void OnMouseDown( WPARAM btnState, int x, int y );
     void OnMouseUp( WPARAM btnState, int x, int y );
     void OnMouseMove( WPARAM btnState, int x, int y );
 
 private:
+	enum GAMESTATE{
+		PLAYER_ONE_TURN = 0,
+		PLAYER_TWO_TURN,
+		GAME_OVER,
+	};
+
     std::shared_ptr<Scene> _testScene;
 
     bool firstRun = true;
+
+	GameObject* p1;
+	GameObject* p2;
+	std::vector<GameObject*> arrows;
+	GAMESTATE curGameState;
 
     // Keeps track of the old mouse position.  Useful for 
     // determining how far the mouse moved in a single frame.
