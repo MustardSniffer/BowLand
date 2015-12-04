@@ -1,10 +1,12 @@
 #include "RenderManager.hpp"
+#include "Components.hpp"
 #include <iostream>
 
 using namespace DirectX;
 
 Cache<MeshRenderer*>             RenderManager::_meshRenderers;
 Cache<TextRenderer*>             RenderManager::_textRenderers;
+const float                      RenderManager::_textBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
 std::shared_ptr<DeviceState>     RenderManager::_deviceState;
 ComPtr<ID3D11BlendState>         RenderManager::_textBlendState;
 ComPtr<ID3D11SamplerState>       RenderManager::_textSamplerState;
@@ -31,21 +33,51 @@ void RenderManager::Draw()
     DrawTextRenderers();
 }
 
+// Draws the given mesh
+void RenderManager::DrawMesh( std::shared_ptr<Mesh> mesh )
+{
+    _deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+    const UINT    stride = mesh->GetVertexStride();
+    const UINT    offset = 0;
+    ID3D11Buffer* vertexBuffer = mesh->GetVertexBuffer().Get();
+
+    // If the mesh has an index buffer, then we need to draw it using that
+    if ( mesh->GetIndexCount() > 0 )
+    {
+        ID3D11Buffer* indexBuffer = mesh->GetIndexBuffer().Get();
+
+        _deviceContext->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
+        _deviceContext->IASetVertexBuffers( 0, 1, &vertexBuffer, &stride, &offset );
+        _deviceContext->DrawIndexed( mesh->GetIndexCount(), 0, 0 );
+    }
+    else
+    {
+        _deviceContext->IASetIndexBuffer( nullptr, DXGI_FORMAT_UNKNOWN, 0 );
+        _deviceContext->IASetVertexBuffers( 0, 1, &vertexBuffer, &stride, &offset );
+        _deviceContext->Draw( mesh->GetVertexCount(), 0 );
+    }
+}
+
 // Draw all model meshes
 void RenderManager::DrawMeshRenderers()
 {
     std::shared_ptr<Mesh> mesh;
     Material* material;
-    ID3D11Buffer* vertexBuffer;
-    ID3D11Buffer* indexBuffer;
     XMFLOAT4X4 world;
 
     for ( auto iter = _meshRenderers.Begin(); iter != _meshRenderers.End(); ++iter )
     {
-        // Get the mesh
+        // Get the mesh and material
         MeshRenderer* renderer = *iter;
+        if ( !renderer->IsEnabled() )
+        {
+            continue;
+        }
         mesh = renderer->GetMesh();
         material = renderer->GetMaterial();
+
+
 
         // Ensure that the mesh and material exist
         if ( !mesh || !material )
@@ -63,13 +95,7 @@ void RenderManager::DrawMeshRenderers()
             continue;
         }
 
-        // Get the stride and offset
-        const UINT stride = mesh->GetVertexStride();
-        const UINT offset = 0;
 
-        // Get the buffers
-        vertexBuffer = mesh->GetVertexBuffer().Get();
-        indexBuffer = mesh->GetIndexBuffer().Get();
 
         // Get and set the world matrix, then activate the shader
         XMFLOAT4X4 world = renderer->GetGameObject()->GetTransform()->GetWorldMatrix();
@@ -77,67 +103,69 @@ void RenderManager::DrawMeshRenderers()
         material->GetVertexShader()->SetMatrix4x4( "World", world );
         material->Activate();
 
-        // Bind and draw
-        _deviceContext->IASetVertexBuffers( 0, 1, &vertexBuffer, &stride, &offset );
-        _deviceContext->IASetIndexBuffer( indexBuffer, DXGI_FORMAT_R32_UINT, 0 );
-        _deviceContext->DrawIndexed( mesh->GetIndexCount(), 0, 0 );
+
+
+        // Draw the mesh
+        DrawMesh( mesh );
     }
 }
 
 // Draw all text meshes
 void RenderManager::DrawTextRenderers()
 {
-    /*
-    // Don't do anything if we have nothing to draw
-    if ( !_font || !_vertexBuffer || !_vertexShader || !_pixelShader )
+    // Cache the current states and set our states
+    _deviceState->Cache();
+    _deviceContext->OMSetBlendState( _textBlendState.Get(), _textBlendFactor, 0xFFFFFFFF );
+    _deviceContext->OMSetDepthStencilState( _textDepthStencilState.Get(), 0xFFFFFFFF );
+    _deviceContext->RSSetState( _textRasterizerState.Get() );
+
+
+
+    // Create the projection matrix
+    XMFLOAT4X4 projection;
+    XMStoreFloat4x4( &projection, XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f ) );
+
+    // Now iterate over all of the text renderers
+    for ( auto iter = _textRenderers.Begin(); iter != _textRenderers.End(); ++iter )
     {
-    return;
+        // Ensure we can render the text
+        TextRenderer* renderer = *iter;
+        if ( !renderer->IsEnabled() || !renderer->IsValid() )
+        {
+            continue;
+        }
+
+        // Get the text material and mesh
+        std::shared_ptr<Mesh> mesh = renderer->GetMesh();
+        TextMaterial* material = renderer->GetGameObject()->GetComponent<TextMaterial>();
+        if ( !material )
+        {
+#if defined( _DEBUG ) || defined( DEBUG )
+            std::cout << renderer->GetGameObject() << " has a TextRenderer, but not a TextMaterial" << std::endl;
+#endif
+            continue;
+        }
+
+        // Get the world matrix
+        XMFLOAT4X4 world = material->GetGameObject()->GetTransform()->GetWorldMatrix();
+        XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
+
+        // Get the font texture, send data to the shaders, and activate the material
+        std::shared_ptr<Texture2D> texture = renderer->GetFont()->GetTexture( renderer->GetFontSize() );
+        material->GetVertexShader()->SetMatrix4x4        ( "World", world );
+        material->GetVertexShader()->SetMatrix4x4        ( "Projection", projection );
+        material->GetPixelShader()->SetSamplerState      ( "TextSampler", _textSamplerState.Get() );
+        material->GetPixelShader()->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
+        material->Activate();
+
+        // Draw the mesh
+        DrawMesh( mesh );
     }
 
 
-    ID3D11Device* device = _gameObject->GetDevice();
-    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
 
-
-    // Cache the current states and set our states
-    _deviceState->Cache();
-    deviceContext->OMSetBlendState( _blendState, TextBlendFactor, 0xFFFFFFFF );
-    deviceContext->OMSetDepthStencilState( _depthStencilState, 0xFFFFFFFF );
-    deviceContext->RSSetState( _rasterizerState );
-
-
-    // Get our projection matrix
-    XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f );
-    XMFLOAT4X4 projectionFloat4x4;
-    XMStoreFloat4x4( &projectionFloat4x4, projectionMatrix );
-
-    // Set our shader variables
-    Camera* camera = Camera::GetActiveCamera();
-    Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
-    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetTransform()->GetWorldMatrix() );
-    _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
-    _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
-    _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
-    _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
-
-    // Set our shaders
-    _vertexShader->SetShader( true );
-    _pixelShader->SetShader( true );
-
-
-    // Draw the buffer
-    const UINT stride = sizeof( TextVertex );
-    const UINT offset = 0;
-
-    deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-    deviceContext->IASetIndexBuffer( nullptr, DXGI_FORMAT_UNKNOWN, 0 );
-    deviceContext->IASetVertexBuffers( 0, 1, &_vertexBuffer, &stride, &offset );
-    deviceContext->Draw( _vertexCount, 0 );
-
-
-    // Restore the device state
+    // Restore the device's state
     _deviceState->Restore();
-    */
 }
 
 // Attempts to initialize the render manager

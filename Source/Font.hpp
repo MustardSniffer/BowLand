@@ -8,6 +8,7 @@
  *                                                                                  *
  ************************************************************************************/
 
+#include "Config.hpp"
 #include "Rect.hpp"
 #include "Texture2D.hpp"
 #include <string>
@@ -19,7 +20,11 @@
 /// </summary>
 class Font
 {
+    friend class RenderManager;
     friend class TextRenderer;
+
+    ImplementNonCopyableClass( Font );
+    ImplementNonMovableClass( Font );
 
     #pragma region Structures
 
@@ -110,6 +115,7 @@ class Font
 
     #pragma endregion
 
+private:
     GlyphPageTable _pages;
     std::vector<unsigned char> _pixelBuffer;
     std::string _fontName;
@@ -118,8 +124,7 @@ class Font
     void* _library;
     void* _fontFace;
 
-    #pragma region Private Functions
-
+private:
     /// <summary>
     /// Finds a suitable location for a glyph on a glyph page.
     /// </summary>
@@ -166,16 +171,6 @@ class Font
     /// <param name="ch">The character.</param>
     /// <param name="size">The character size.</param>
     Glyph LoadGlyph( char ch, unsigned int size );
-
-    #pragma endregion
-
-    // Hide the copy constructor and assignment operator
-    Font( const Font& ) = delete;
-    Font& operator=( const Font& ) = delete;
-
-    // Hide the move constructor and assignment operator
-    Font( Font&& ) = delete;
-    Font& operator=( Font&& ) = delete;
 
 public:
     /// <summary>

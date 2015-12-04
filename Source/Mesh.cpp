@@ -24,6 +24,12 @@ size_t Mesh::GetIndexCount() const
     return _indexCount;
 }
 
+// Get the vertex count
+size_t Mesh::GetVertexCount() const
+{
+    return _vertexCount;
+}
+
 // Get the size of a vertex
 size_t Mesh::GetVertexStride() const
 {

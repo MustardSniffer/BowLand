@@ -3,6 +3,7 @@
 #include "Component.hpp"
 #include "DeviceState.hpp"
 #include "Font.hpp"
+#include "Mesh.hpp"
 #include "SimpleShader.h"
 
 /// <summary>
@@ -10,16 +11,23 @@
 /// </summary>
 class TextRenderer : public Component
 {
-    std::shared_ptr<Font> _font;
+    friend class RenderManager;
+
+private:
     std::string _text;
-    ID3D11Buffer* _vertexBuffer;
-    unsigned int _vertexCount;
+    std::shared_ptr<Font> _font;
+    std::shared_ptr<Mesh> _mesh;
     bool _isMeshDirty;
 
     /// <summary>
     /// Creates the device states used to render text.
     /// </summary>
     void CreateDeviceStates();
+
+    /// <summary>
+    /// Gets the font used by this text renderer.
+    /// </summary>
+    Font* GetFont();
 
     /// <summary>
     /// Rebuilds our text mesh.
@@ -49,9 +57,19 @@ public:
     unsigned int GetFontSize() const;
 
     /// <summary>
+    /// Gets the text mesh.
+    /// </summary>
+    std::shared_ptr<Mesh> GetMesh() const;
+
+    /// <summary>
     /// Gets the text being renderer.
     /// </summary>
     std::string GetText() const;
+
+    /// <summary>
+    /// Checks to see if this text renderer is valid.
+    /// </summary>
+    bool IsValid() const;
 
     /// <summary>
     /// Sets this text renderer's font.

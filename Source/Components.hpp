@@ -6,11 +6,11 @@
 #include "BoxCollider.hpp"
 #include "SphereCollider.hpp"
 
-#include "Material.hpp"
 #include "MeshRenderer.hpp"
-#include "DefaultMaterial.hpp"
-
 #include "TextRenderer.hpp"
+#include "Material.hpp"
+#include "DefaultMaterial.hpp"
+#include "TextMaterial.hpp"
 
 #include "TweenPosition.hpp"
 #include "TweenRotation.hpp"

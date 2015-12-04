@@ -9,17 +9,11 @@
 #include <vector>
 #include <iostream>
 
-// TODO - Add TextMaterial
-
 using namespace DirectX;
-
-static const float TextBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 // Create a new text renderer
 TextRenderer::TextRenderer( GameObject* gameObject )
     : Component( gameObject )
-    , _vertexBuffer( nullptr )
-    , _vertexCount( 0 )
     , _isMeshDirty( false )
 {
     RenderManager::AddTextRenderer( this );
@@ -37,6 +31,12 @@ const Font* TextRenderer::GetFont() const
     return _font.get();
 }
 
+// Get our font
+Font* TextRenderer::GetFont()
+{
+    return _font.get();
+}
+
 // Get our font's size
 unsigned int TextRenderer::GetFontSize() const
 {
@@ -47,17 +47,27 @@ unsigned int TextRenderer::GetFontSize() const
     return 0;
 }
 
+// Get our mesh
+std::shared_ptr<Mesh> TextRenderer::GetMesh() const
+{
+    return _mesh;
+}
+
 // Get our text
 std::string TextRenderer::GetText() const
 {
     return _text;
 }
 
+// Check if we're valid
+bool TextRenderer::IsValid() const
+{
+    return static_cast<bool>( _font );
+}
+
 // Rebuild our text mesh (expensive operation)
 void TextRenderer::RebuildMesh()
 {
-    ReleaseMacro( _vertexBuffer );
-
     // If there's nothing to do, then... don't do anything
     if ( !_font || _text.empty() || !_isMeshDirty )
     {
@@ -76,7 +86,6 @@ void TextRenderer::RebuildMesh()
     float vScale = 1.0f / _font->GetTexture( fontSize )->GetHeight();
     char  chPrev = 0;
     std::vector<TextVertex> vertices;
-    ID3D11Device* device = _gameObject->GetDevice();
 
 
 
@@ -135,23 +144,12 @@ void TextRenderer::RebuildMesh()
         x += glyph.Advance;
     }
 
-    // Update our vertex count
-    _vertexCount = vertices.size();
 
 
-
-    // Now we need to create our vertex buffer
-    D3D11_BUFFER_DESC desc;
-    ZeroMemory( &desc, sizeof( D3D11_BUFFER_DESC ) );
-    desc.Usage = D3D11_USAGE_IMMUTABLE;
-    desc.ByteWidth = sizeof( TextVertex ) * vertices.size();
-    desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-    D3D11_SUBRESOURCE_DATA resource;
-    resource.pSysMem = &( vertices[ 0 ] );
-
-    // Send the vertex data to DirectX
-    HR( device->CreateBuffer( &desc, &resource, &_vertexBuffer ) );
+    // Create the mesh
+    ID3D11Device* device = _gameObject->GetDevice();
+    std::vector<UINT> indices;
+    _mesh = std::make_shared<Mesh>( device, vertices, indices );
 }
 
 // Set the font

@@ -18,6 +18,7 @@ private:
     ComPtr<ID3D11Buffer> _vertexBuffer;
     ComPtr<ID3D11Buffer> _indexBuffer;
     size_t _indexCount;
+    size_t _vertexCount;
     size_t _vertexStride;
 
 public:
@@ -49,6 +50,11 @@ public:
     /// Gets this mesh's vertex buffer.
     /// </summary>
     ComPtr<ID3D11Buffer> GetVertexBuffer() const;
+
+    /// <summary>
+    /// Gets the number of vertices in this mesh.
+    /// </summary>
+    size_t GetVertexCount() const;
 
     /// <summary>
     /// Gets the vertex stride in this mesh.

@@ -19,12 +19,18 @@ class RenderManager
 private:
     static Cache<MeshRenderer*>             _meshRenderers;
     static Cache<TextRenderer*>             _textRenderers;
+    static const float                      _textBlendFactor[ 4 ];
     static std::shared_ptr<DeviceState>     _deviceState;
     static ComPtr<ID3D11BlendState>         _textBlendState;
     static ComPtr<ID3D11SamplerState>       _textSamplerState;
     static ComPtr<ID3D11DepthStencilState>  _textDepthStencilState;
     static ComPtr<ID3D11RasterizerState>    _textRasterizerState;
     static ID3D11DeviceContext*             _deviceContext;
+
+    /// <summary>
+    /// Draws the given mesh.
+    /// </summary>
+    static void DrawMesh( std::shared_ptr<Mesh> mesh );
 
     /// <summary>
     /// Draws all of the mesh renderers.

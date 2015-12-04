@@ -36,15 +36,5 @@
             "Mesh": "Models\\cube.obj",
             "Material": "this DefaultMaterial"
         }
-    },
-    "TestText": {
-        "Transform": {
-            "Position": [0, 0]
-        },
-        "TextRenderer": {
-            "Font": "Fonts\\OpenSans-Regular.ttf",
-            "FontSize": 32,
-            "Text": "Hello, world!"
-        }
     }
 }

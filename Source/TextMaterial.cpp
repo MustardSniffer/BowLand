@@ -8,8 +8,8 @@ TextMaterial::TextMaterial( GameObject* gameObject )
     : Material( gameObject )
 {
     // Load the default vertex and pixel shaders
-    assert( _vertexShader->LoadShaderFile( L"Shaders\\PixelVertexShader.cso" ) );
-    assert( _pixelShader->LoadShaderFile( L"Shaders\\PixelPixelShader.cso" ) );
+    assert( _vertexShader->LoadShaderFile( L"Shaders\\TextVertexShader.cso" ) );
+    assert( _pixelShader->LoadShaderFile ( L"Shaders\\TextPixelShader.cso" ) );
 }
 
 // Destroys this text material
