@@ -666,12 +666,3 @@ void Scene::Update()
         gameObject->Update();
     }
 }
-
-// Draw all objects in this scene
-void Scene::Draw()
-{
-    for ( auto& gameObject : _gameObjects )
-    {
-        gameObject->Draw();
-    }
-}

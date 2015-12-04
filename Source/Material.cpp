@@ -11,18 +11,15 @@ Material::Material( GameObject* gameObject )
     : Component( gameObject )
     , _device( nullptr )
     , _deviceContext( nullptr )
-    // The shaders /have/ to be initialized here??
-    , _vertexShader( new SimpleVertexShader( gameObject->GetDevice(), gameObject->GetDeviceContext() ) )
-    , _pixelShader( new SimplePixelShader( gameObject->GetDevice(), gameObject->GetDeviceContext() ) )
 {
-    // Set our component properties
-    _usesLateUpdate = false;    // We don't update
-    _isDrawable = false;        // We're not drawable
-
     // Add references to the device and device context
     UpdateD3DResource( _device, gameObject->GetDevice() );
     UpdateD3DResource( _deviceContext, gameObject->GetDeviceContext() );
     assert( _device != nullptr && _deviceContext != nullptr && "Materials must have a valid device and device context!" );
+
+    // Create the vertex and pixel shaders
+    _vertexShader = std::make_shared<SimpleVertexShader>( gameObject->GetDevice(), gameObject->GetDeviceContext() );
+    _pixelShader  = std::make_shared<SimplePixelShader>( gameObject->GetDevice(), gameObject->GetDeviceContext() );
 }
 
 // Destroy this material
@@ -102,6 +99,11 @@ SimpleVertexShader* Material::GetVertexShader()
 SimplePixelShader* Material::GetPixelShader()
 {
     return _pixelShader.get();
+}
+
+// Updates this material
+void Material::Update()
+{
 }
 
 // Copies all shader buffer data from CPU to the GPU

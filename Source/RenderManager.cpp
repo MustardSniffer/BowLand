@@ -1,4 +1,5 @@
 #include "RenderManager.hpp"
+#include <iostream>
 
 using namespace DirectX;
 
@@ -46,6 +47,22 @@ void RenderManager::DrawMeshRenderers()
         mesh = renderer->GetMesh();
         material = renderer->GetMaterial();
 
+        // Ensure that the mesh and material exist
+        if ( !mesh || !material )
+        {
+#if defined( _DEBUG ) || defined( DEBUG )
+            if ( !mesh )
+            {
+                std::cout << renderer->GetGameObject()->GetName() << " does not have a mesh" << std::endl;
+            }
+            if ( !material )
+            {
+                std::cout << renderer->GetGameObject()->GetName() << " does not have a material" << std::endl;
+            }
+#endif
+            continue;
+        }
+
         // Get the stride and offset
         const UINT stride = mesh->GetVertexStride();
         const UINT offset = 0;
@@ -70,6 +87,57 @@ void RenderManager::DrawMeshRenderers()
 // Draw all text meshes
 void RenderManager::DrawTextRenderers()
 {
+    /*
+    // Don't do anything if we have nothing to draw
+    if ( !_font || !_vertexBuffer || !_vertexShader || !_pixelShader )
+    {
+    return;
+    }
+
+
+    ID3D11Device* device = _gameObject->GetDevice();
+    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+
+
+    // Cache the current states and set our states
+    _deviceState->Cache();
+    deviceContext->OMSetBlendState( _blendState, TextBlendFactor, 0xFFFFFFFF );
+    deviceContext->OMSetDepthStencilState( _depthStencilState, 0xFFFFFFFF );
+    deviceContext->RSSetState( _rasterizerState );
+
+
+    // Get our projection matrix
+    XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f );
+    XMFLOAT4X4 projectionFloat4x4;
+    XMStoreFloat4x4( &projectionFloat4x4, projectionMatrix );
+
+    // Set our shader variables
+    Camera* camera = Camera::GetActiveCamera();
+    Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
+    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetTransform()->GetWorldMatrix() );
+    _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
+    _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
+    _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
+    _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
+
+    // Set our shaders
+    _vertexShader->SetShader( true );
+    _pixelShader->SetShader( true );
+
+
+    // Draw the buffer
+    const UINT stride = sizeof( TextVertex );
+    const UINT offset = 0;
+
+    deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    deviceContext->IASetIndexBuffer( nullptr, DXGI_FORMAT_UNKNOWN, 0 );
+    deviceContext->IASetVertexBuffers( 0, 1, &_vertexBuffer, &stride, &offset );
+    deviceContext->Draw( _vertexCount, 0 );
+
+
+    // Restore the device state
+    _deviceState->Restore();
+    */
 }
 
 // Attempts to initialize the render manager

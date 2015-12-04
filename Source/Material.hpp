@@ -85,7 +85,7 @@ public:
     /// <summary>
     /// Updates this material.
     /// </summary>
-    virtual void Update() = 0;
+    virtual void Update() override;
 
     /// <summary>
     /// Sends this material's information to the shaders.

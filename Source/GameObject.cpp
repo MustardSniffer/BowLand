@@ -160,23 +160,3 @@ void GameObject::Update()
         child->Update();
     }
 }
-
-// Draw all components
-void GameObject::Draw()
-{
-    // Draw all of our components
-    for ( auto& pair : _components )
-    {
-        auto& component = pair.second;
-        if ( component->IsEnabled() && component->IsDrawable() )
-        {
-            component->Draw();
-        }
-    }
-
-    // Now update all of our children
-    for ( auto& child : _children )
-    {
-        child->Draw();
-    }
-}

@@ -17,8 +17,6 @@ Camera::Camera( GameObject* gameObj )
     , _position( gameObj->GetTransform()->GetPosition() )
     , _rotation( gameObj->GetTransform()->GetRotation() )
 {
-    _isDrawable = false;
-
     // Get the yaw, pitch, and roll from the transform
     XMFLOAT3 yawPitchRoll;
     Math::DecomposeQuat( _rotation, yawPitchRoll );

@@ -93,11 +93,6 @@ public:
     void SetSpecularPower( float value );
 
     /// <summary>
-    /// Updates this material.
-    /// </summary>
-    void Update() override;
-
-    /// <summary>
     /// Sends this material's information to the shaders.
     /// </summary>
     void UpdateShaderData() override;

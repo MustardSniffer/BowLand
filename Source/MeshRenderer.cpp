@@ -4,16 +4,16 @@
 
 using namespace DirectX;
 
+// Creates a new mesh renderer
 MeshRenderer::MeshRenderer( GameObject* gameObj )
     : Component( gameObj )
     , _mesh( nullptr )
     , _material( nullptr )
 {
-    _isDrawable = true;
-
     RenderManager::AddMeshRenderer( this );
 }
 
+// Destroys this mesh renderer
 MeshRenderer::~MeshRenderer()
 {
     _material = nullptr;
@@ -21,47 +21,31 @@ MeshRenderer::~MeshRenderer()
     RenderManager::RemoveMeshRenderer( this );
 }
 
-void MeshRenderer::CopyMeshRenderer( MeshRenderer* nRender )
-{
-    SetMesh( nRender->GetMesh() );
-    SetMaterial( nRender->GetMaterial() );
-}
-
+// Sets our mesh
 void MeshRenderer::SetMesh( std::shared_ptr<Mesh> nMesh )
 {
     _mesh = nMesh;
 }
 
+// Sets our material
 void MeshRenderer::SetMaterial( Material* nMaterial )
 {
     _material = nMaterial;
 }
 
+// Gets our mesh
 std::shared_ptr<Mesh> MeshRenderer::GetMesh()
 {
     return _mesh;
 }
 
+// Gets our material
 Material* MeshRenderer::GetMaterial()
 {
     return _material;
 }
 
+// Updates this mesh renderer
 void MeshRenderer::Update()
 {
-
-}
-
-void MeshRenderer::Draw()
-{
-    // Get the world matrix
-    /* XMFLOAT4X4 world = _gameObject->GetTransform()->GetWorldMatrix();
-    XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
-
-    // Prepare material
-    assert( _material->GetVertexShader()->SetMatrix4x4( "World", world ) );
-    _material->Activate();
-
-    // Draw the mesh
-    _mesh->Draw(); */
 }

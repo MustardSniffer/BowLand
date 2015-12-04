@@ -18,50 +18,16 @@ static const float TextBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
 // Create a new text renderer
 TextRenderer::TextRenderer( GameObject* gameObject )
     : Component( gameObject )
-    , _blendState( nullptr )
-    , _samplerState( nullptr )
-    , _depthStencilState( nullptr )
-    , _rasterizerState( nullptr )
     , _vertexBuffer( nullptr )
     , _vertexCount( 0 )
     , _isMeshDirty( false )
-    , _vertexShader( new SimpleVertexShader( _gameObject->GetDevice(), _gameObject->GetDeviceContext() ) )
-    , _pixelShader( new SimplePixelShader( _gameObject->GetDevice(), _gameObject->GetDeviceContext() ) )
-    , _deviceState( new DeviceState( _gameObject->GetDevice(), _gameObject->GetDeviceContext() ) )
 {
-    _isDrawable = true;
-
-    // Create our device states
-    CreateDeviceStates();
-
-    // Attempt to load our shaders
-    if ( !_vertexShader->LoadShaderFile( L"Shaders\\TextVertexShader.cso" ) )
-    {
-#if defined( _DEBUG ) || defined( DEBUG )
-        std::cout << "Failed to load text vertex shader!" << std::endl;
-#endif
-        _vertexShader.reset();
-    }
-    if ( !_pixelShader->LoadShaderFile( L"Shaders\\TextPixelShader.cso" ) )
-    {
-#if defined( _DEBUG ) || defined( DEBUG )
-        std::cout << "Failed to load text pixel shader!" << std::endl;
-#endif
-        _pixelShader.reset();
-    }
-
     RenderManager::AddTextRenderer( this );
 }
 
 // Destroys this text renderer
 TextRenderer::~TextRenderer()
 {
-    ReleaseMacro( _blendState );
-    ReleaseMacro( _samplerState );
-    ReleaseMacro( _depthStencilState );
-    ReleaseMacro( _rasterizerState );
-    ReleaseMacro( _vertexBuffer );
-
     RenderManager::RemoveTextRenderer( this );
 }
 
@@ -85,72 +51,6 @@ unsigned int TextRenderer::GetFontSize() const
 std::string TextRenderer::GetText() const
 {
     return _text;
-}
-
-// Create our device states
-void TextRenderer::CreateDeviceStates()
-{
-    ID3D11Device* device = _gameObject->GetDevice();
-
-
-    // First, create the blend state (values from XNA BlendState.AlphaBlend)
-    D3D11_BLEND_DESC blendDesc;
-    ZeroMemory( &blendDesc, sizeof( D3D11_BLEND_DESC ) );
-    blendDesc.RenderTarget[ 0 ].BlendEnable           = true;
-    blendDesc.RenderTarget[ 0 ].BlendOp               = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[ 0 ].BlendOpAlpha          = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[ 0 ].DestBlend             = D3D11_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[ 0 ].DestBlendAlpha        = D3D11_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[ 0 ].RenderTargetWriteMask = 0x0F;
-    blendDesc.RenderTarget[ 0 ].SrcBlend              = D3D11_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[ 0 ].SrcBlendAlpha         = D3D11_BLEND_SRC_ALPHA;
-
-    HR( device->CreateBlendState( &blendDesc, &_blendState ) );
-
-
-    // Now create the sampler state (values from XNA SamplerState.LinearClamp)
-    D3D11_SAMPLER_DESC samplerDesc;
-    ZeroMemory( &samplerDesc, sizeof( D3D11_SAMPLER_DESC ) );
-    samplerDesc.AddressU        = D3D11_TEXTURE_ADDRESS_CLAMP;
-    samplerDesc.AddressV        = D3D11_TEXTURE_ADDRESS_CLAMP;
-    samplerDesc.AddressW        = D3D11_TEXTURE_ADDRESS_CLAMP;
-    samplerDesc.Filter          = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    samplerDesc.ComparisonFunc  = D3D11_COMPARISON_ALWAYS;
-    samplerDesc.MaxAnisotropy   = 4;
-
-    HR( device->CreateSamplerState( &samplerDesc, &_samplerState ) );
-
-
-    // Now create the depth/stencil state (values from XNA DepthStencilState.None)
-    D3D11_DEPTH_STENCIL_DESC dsDesc;
-    ZeroMemory( &dsDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
-    dsDesc.BackFace.StencilDepthFailOp  = D3D11_STENCIL_OP_KEEP;
-    dsDesc.BackFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
-    dsDesc.BackFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
-    dsDesc.BackFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
-    dsDesc.DepthEnable                  = false;
-    dsDesc.DepthFunc                    = D3D11_COMPARISON_LESS_EQUAL;
-    dsDesc.DepthWriteMask               = D3D11_DEPTH_WRITE_MASK_ZERO;
-    dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-    dsDesc.FrontFace.StencilFailOp      = D3D11_STENCIL_OP_KEEP;
-    dsDesc.FrontFace.StencilFunc        = D3D11_COMPARISON_ALWAYS;
-    dsDesc.FrontFace.StencilPassOp      = D3D11_STENCIL_OP_KEEP;
-    dsDesc.StencilEnable                = false;
-    dsDesc.StencilReadMask              = 0xFF;
-    dsDesc.StencilWriteMask             = 0xFF;
-
-    HR( device->CreateDepthStencilState( &dsDesc, &_depthStencilState ) );
-
-
-    // Finally, create the rasterizer state (values from XNA RasterizerState.CullCounterClockwise)
-    D3D11_RASTERIZER_DESC rasterDesc;
-    ZeroMemory( &rasterDesc, sizeof( D3D11_RASTERIZER_DESC ) );
-    rasterDesc.AntialiasedLineEnable    = true;
-    rasterDesc.CullMode                 = D3D11_CULL_BACK;
-    rasterDesc.FillMode                 = D3D11_FILL_SOLID;
-    rasterDesc.MultisampleEnable        = true;
-
-    HR( device->CreateRasterizerState( &rasterDesc, &_rasterizerState ) );
 }
 
 // Rebuild our text mesh (expensive operation)
@@ -289,58 +189,4 @@ void TextRenderer::Update()
         RebuildMesh();
         _isMeshDirty = false;
     }
-}
-
-// Draws this text renderer
-void TextRenderer::Draw()
-{
-    // Don't do anything if we have nothing to draw
-    if ( !_font || !_vertexBuffer || !_vertexShader || !_pixelShader )
-    {
-        return;
-    }
-    
-
-    ID3D11Device* device = _gameObject->GetDevice();
-    ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-
-
-    // Cache the current states and set our states
-    _deviceState->Cache();
-    deviceContext->OMSetBlendState( _blendState, TextBlendFactor, 0xFFFFFFFF );
-    deviceContext->OMSetDepthStencilState( _depthStencilState, 0xFFFFFFFF );
-    deviceContext->RSSetState( _rasterizerState );
-
-
-    // Get our projection matrix
-    XMMATRIX projectionMatrix = XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f );
-    XMFLOAT4X4 projectionFloat4x4;
-    XMStoreFloat4x4( &projectionFloat4x4, projectionMatrix );
-
-    // Set our shader variables
-    Camera* camera = Camera::GetActiveCamera();
-    Texture2D* texture = _font->GetTexture( GetFontSize() ).get();
-    _vertexShader->SetMatrix4x4        ( "World",       _gameObject->GetTransform()->GetWorldMatrix() );
-    _vertexShader->SetMatrix4x4        ( "Projection",  projectionFloat4x4 );
-    _pixelShader->SetFloat4            ( "TextColor",   Colors::Magenta );
-    _pixelShader->SetSamplerState      ( "TextSampler", _samplerState );
-    _pixelShader->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
-
-    // Set our shaders
-    _vertexShader->SetShader( true );
-    _pixelShader->SetShader( true );
-    
-
-    // Draw the buffer
-    const UINT stride = sizeof( TextVertex );
-    const UINT offset = 0;
-
-    deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-    deviceContext->IASetIndexBuffer( nullptr, DXGI_FORMAT_UNKNOWN, 0 );
-    deviceContext->IASetVertexBuffers( 0, 1, &_vertexBuffer, &stride, &offset );
-    deviceContext->Draw( _vertexCount, 0 );
-
-    
-    // Restore the device state
-    _deviceState->Restore();
 }

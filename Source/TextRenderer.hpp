@@ -10,15 +10,8 @@
 /// </summary>
 class TextRenderer : public Component
 {
-    std::shared_ptr<DeviceState> _deviceState;
     std::shared_ptr<Font> _font;
-    std::shared_ptr<SimpleVertexShader> _vertexShader;
-    std::shared_ptr<SimplePixelShader> _pixelShader;
     std::string _text;
-    ID3D11BlendState* _blendState;
-    ID3D11SamplerState* _samplerState;
-    ID3D11DepthStencilState* _depthStencilState;
-    ID3D11RasterizerState* _rasterizerState;
     ID3D11Buffer* _vertexBuffer;
     unsigned int _vertexCount;
     bool _isMeshDirty;
@@ -82,9 +75,4 @@ public:
     /// Updates this text renderer.
     /// </summary>
     void Update() override;
-
-    /// <summary>
-    /// Draws this text renderer.
-    /// </summary>
-    void Draw() override;
 };

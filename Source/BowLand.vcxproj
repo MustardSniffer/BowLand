@@ -141,6 +141,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClCompile Include="SimpleShader.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="SphereCollider.cpp" />
+    <ClCompile Include="TextMaterial.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture2D.cpp" />
@@ -191,6 +192,7 @@ xcopy "$(SolutionDir)Bin\x86\$(Configuration)\*" "$(OutDir)*" /y /d /q</Command>
     <ClInclude Include="Shaders\SharedTypes.hpp" />
     <ClInclude Include="SimpleShader.h" />
     <ClInclude Include="SphereCollider.hpp" />
+    <ClInclude Include="TextMaterial.hpp" />
     <ClInclude Include="TextRenderer.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Texture2D.hpp" />

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Config.hpp"
 #include <memory> // for std::shared_ptr
 #include <string>
 #include <unordered_map>
@@ -16,6 +17,10 @@ class Transform;
 /// </summary>
 class GameObject
 {
+    ImplementNonCopyableClass( GameObject );
+    ImplementNonMovableClass( GameObject );
+
+private:
     std::unordered_map<std::string, std::shared_ptr<Component>> _components;
     std::unordered_map<std::string, std::shared_ptr<GameObject>> _childrenCache;
     std::vector<std::shared_ptr<GameObject>> _children;
@@ -25,15 +30,6 @@ class GameObject
     Transform* _transform;
     ID3D11Device* _device;
     ID3D11DeviceContext* _deviceContext;
-
-private:
-    // Prevent the use of the copy constructor and copy assignment operator
-    GameObject( const GameObject& ) = delete;
-    GameObject& operator=( const GameObject& ) = delete;
-
-    // Prevent the use of the move constructor and move assignment operator
-    GameObject( GameObject&& ) = delete;
-    GameObject& operator=( GameObject&& ) = delete;
 
 public:
     /// <summary>
@@ -187,11 +183,6 @@ public:
     /// Updates this game object and all components inside of it.
     /// </summary>
     void Update();
-
-    /// <summary>
-    /// Draws this game object and all components inside of it.
-    /// </summary>
-    void Draw();
 };
 
 #include "GameObject.inl"

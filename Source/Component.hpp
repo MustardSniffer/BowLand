@@ -18,7 +18,6 @@ protected:
     GameObject* const _gameObject;
     bool _isEnabled;
     bool _usesLateUpdate;
-    bool _isDrawable;
 
 public:
     /// <summary>
@@ -51,14 +50,6 @@ public:
     }
 
     /// <summary>
-    /// Checks to see if this component is drawable.
-    /// </summary>
-    inline bool IsDrawable() const
-    {
-        return _isDrawable;
-    }
-
-    /// <summary>
     /// Checks to see if this component uses LateUpdate.
     /// </summary>
     inline bool UsesLateUpdate() const
@@ -72,12 +63,6 @@ public:
     /// <param name="enabled">True to enable the component, false to disable it.</param>
     void SetEnabled( bool enabled );
 
-	/// <summary>
-	/// Sets whether or not this component is drawable.
-	/// </summary>
-	/// <param name="enabled">True to draw the component, false to hide it.</param>
-	void SetDrawable(bool drawable);
-
     /// <summary>
     /// Updates this component.
     /// </summary>
@@ -87,9 +72,4 @@ public:
     /// Performs a late update on this component.
     /// </summary>
     virtual void LateUpdate() { }
-
-    /// <summary>
-    /// Draws this component.
-    /// </summary>
-    virtual void Draw() { }
 };

@@ -4,7 +4,7 @@
 Component::Component( GameObject* gameObject )
     : _gameObject( gameObject )
     , _isEnabled( true )
-    , _isDrawable( false )
+    , _usesLateUpdate( false )
 {
 }
 
@@ -24,9 +24,4 @@ GameObject* Component::GetGameObject()
 void Component::SetEnabled( bool enabled )
 {
     _isEnabled = enabled;
-}
-
-// Sets whether or not this component is drawable
-void Component::SetDrawable( bool drawable ){
-	_isDrawable = drawable;
 }

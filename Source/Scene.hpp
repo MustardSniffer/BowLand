@@ -97,9 +97,4 @@ public:
     /// Updates all game objects within this scene.
     /// </summary>
     void Update();
-
-    /// <summary>
-    /// Draws all game objects within this scene.
-    /// </summary>
-    void Draw();
 };

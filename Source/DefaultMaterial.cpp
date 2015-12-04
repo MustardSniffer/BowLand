@@ -111,11 +111,6 @@ void DefaultMaterial::SetSpecularPower( float value )
     _specularPower = value;
 }
 
-// Updates the default material
-void DefaultMaterial::Update()
-{
-}
-
 // Send shader data
 void DefaultMaterial::UpdateShaderData()
 {

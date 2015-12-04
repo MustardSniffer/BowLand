@@ -16,9 +16,8 @@ Tweener::Tweener( GameObject* gameObject )
     , _duration( 1.0f )
     , _startTime( 0.0f )
 {
-    _isDrawable = false;
+    // We're initially disabled
     _isEnabled = false;
-    _usesLateUpdate = false;
 
     // Create the tween functions if they haven't been yet
     if ( _tweenFunctions.size() == 0 )
