@@ -69,6 +69,73 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
     return game.Run();
 }
 
+
+struct TestLineRenderer : public Component
+{
+    LineRenderer* lr;
+    LineMaterial* lm;
+    TextRenderer* tr;
+    TextMaterial* tm;
+    XMFLOAT2 lineDown;
+
+    TestLineRenderer( GameObject* go )
+        : Component( go )
+    {
+        lr = go->AddComponent<LineRenderer>();
+        lr->SetEnabled( false );
+
+        lm = go->AddComponent<LineMaterial>();
+        lm->SetLineColor( XMFLOAT4( Colors::Black ) );
+
+
+        GameObject* go2 = go->AddChild( go->GetName() + "_CHILD" );
+
+
+        std::shared_ptr<Font> font = std::make_shared<Font>( go->GetDevice(), go->GetDeviceContext() );
+        assert( font->LoadFromFile( "Fonts\\OpenSans-Regular.ttf" ) );
+        tr = go2->AddComponent<TextRenderer>();
+        tr->SetFont( font );
+        tr->SetFontSize( 20U );
+        tr->SetEnabled( false );
+
+        tm = go2->AddComponent<TextMaterial>();
+        tm->SetTextColor( XMFLOAT4( Colors::Magenta ) );
+    }
+
+    void Update() override
+    {
+        if ( Input::WasButtonPressed( MouseButton::Left ) )
+        {
+            lineDown = Input::GetMousePosition();
+        }
+
+        if ( Input::IsButtonDown( MouseButton::Left ) )
+        {
+            XMFLOAT2 mouse = Input::GetMousePosition();
+
+            lr->SetStartPoint( lineDown );
+            lr->SetEndPoint( mouse );
+
+            lr->Update(); // Force update to rebuild buffers
+            lr->SetEnabled( true );
+            tr->SetEnabled( true );
+
+            XMFLOAT2 d( lineDown.x - mouse.x, lineDown.y - mouse.y );
+            tr->SetText( std::to_string( sqrt( d.x * d.x + d.y * d.y ) ) );
+            tr->Update(); // Also force update to rebuild buffers
+
+            XMFLOAT3 tp( mouse.x - 50, mouse.y + 20, 0 );
+            tr->GetGameObject()->GetTransform()->SetPosition( tp );
+        }
+        else
+        {
+            lr->SetEnabled( false );
+            tr->SetEnabled( false );
+        }
+    }
+};
+
+
 // Creates a new game
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
@@ -122,73 +189,73 @@ bool MyDemoGame::Init()
     pl.Position = XMFLOAT3( 0, -100, 0 );
 
     std::shared_ptr<Mesh> spMesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
-	std::shared_ptr<Mesh> cubeMesh = MeshLoader::Load( "Models\\cube.obj", device, deviceContext );
+    std::shared_ptr<Mesh> cubeMesh = MeshLoader::Load( "Models\\cube.obj", device, deviceContext );
     std::shared_ptr<Texture2D> spTex = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" );
     std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" );
 
-    // Helper function for getting a random value
-    srand( static_cast<unsigned>( time( nullptr ) ) );
-    auto random = []() -> float
-    {
-        return static_cast<float>( rand() ) / RAND_MAX;
-    };
 
-	// Add players
-	// Player 1
-	p1 = _testScene->AddGameObject( "Player_1" );
-	
-	// Set position
-	Transform* tr1 = p1->GetTransform();
-	tr1->SetPosition( XMFLOAT3(-20.0f, +0.0f, +10.0f) );
+    // Add a test line and text renderer object
+    auto lineObj = _testScene->AddGameObject( "TEST_LINE_OBJECT" );
+    lineObj->AddComponent<TestLineRenderer>();
 
-	// Add collider
-	BoxCollider* bc1 = p1->AddComponent<BoxCollider>();
-	bc1->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
 
-	// Add rigidbody
-	Rigidbody* rb1 = p1->AddComponent<Rigidbody>();
-	rb1->SetMass( +0.0f );
 
-	// Add default material
-	DefaultMaterial* dm1 = p1->AddComponent<DefaultMaterial>();
-	dm1->SetDiffuseMap(spTex);
-	dm1->SetNormalMap(spNorm);
-	dm1->SetDirectionalLight(dl);
-	dm1->SetPointLight(pl);
+    // Add players
+    // Player 1
+    p1 = _testScene->AddGameObject( "Player_1" );
+    
+    // Set position
+    Transform* tr1 = p1->GetTransform();
+    tr1->SetPosition( XMFLOAT3(-20.0f, +0.0f, +10.0f) );
 
-	// Add mesh renderer
-	MeshRenderer* mr1 = p1->AddComponent<MeshRenderer>();
-	mr1->SetMaterial(dm1);
-	mr1->SetMesh(cubeMesh);
+    // Add collider
+    BoxCollider* bc1 = p1->AddComponent<BoxCollider>();
+    bc1->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
 
-	// Player 2
-	p2 = _testScene->AddGameObject( "Player_2" );
+    // Add rigidbody
+    Rigidbody* rb1 = p1->AddComponent<Rigidbody>();
+    rb1->SetMass( +0.0f );
 
-	// Set Position
-	Transform* tr2 = p2->GetTransform();
-	tr2->SetPosition( XMFLOAT3(+20.0f, +0.0f, +10.0f) );
+    // Add default material
+    DefaultMaterial* dm1 = p1->AddComponent<DefaultMaterial>();
+    dm1->SetDiffuseMap(spTex);
+    dm1->SetNormalMap(spNorm);
+    dm1->SetDirectionalLight(dl);
+    dm1->SetPointLight(pl);
 
-	// Add collider
-	BoxCollider* bc2 = p2->AddComponent<BoxCollider>();
-	bc2->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
+    // Add mesh renderer
+    MeshRenderer* mr1 = p1->AddComponent<MeshRenderer>();
+    mr1->SetMaterial(dm1);
+    mr1->SetMesh(cubeMesh);
 
-	// Add rigidbody
-	Rigidbody* rb2 = p2->AddComponent<Rigidbody>();
-	rb2->SetMass(+0.0f);
+    // Player 2
+    p2 = _testScene->AddGameObject( "Player_2" );
 
-	// Add default material
-	DefaultMaterial* dm2 = p2->AddComponent<DefaultMaterial>();
-	dm2->SetDiffuseMap(spTex);
-	dm2->SetNormalMap(spNorm);
-	dm2->SetDirectionalLight(dl);
-	dm2->SetPointLight(pl);
+    // Set Position
+    Transform* tr2 = p2->GetTransform();
+    tr2->SetPosition( XMFLOAT3(+20.0f, +0.0f, +10.0f) );
 
-	// Add mesh renderer
-	MeshRenderer* mr2 = p2->AddComponent<MeshRenderer>();
-	mr2->SetMaterial(dm2);
-	mr2->SetMesh(cubeMesh);
+    // Add collider
+    BoxCollider* bc2 = p2->AddComponent<BoxCollider>();
+    bc2->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
 
-	curGameState = PLAYER_ONE_TURN;
+    // Add rigidbody
+    Rigidbody* rb2 = p2->AddComponent<Rigidbody>();
+    rb2->SetMass(+0.0f);
+
+    // Add default material
+    DefaultMaterial* dm2 = p2->AddComponent<DefaultMaterial>();
+    dm2->SetDiffuseMap(spTex);
+    dm2->SetNormalMap(spNorm);
+    dm2->SetDirectionalLight(dl);
+    dm2->SetPointLight(pl);
+
+    // Add mesh renderer
+    MeshRenderer* mr2 = p2->AddComponent<MeshRenderer>();
+    mr2->SetMaterial(dm2);
+    mr2->SetMesh(cubeMesh);
+
+    curGameState = PLAYER_ONE_TURN;
 
     // Update the active camera's projection matrix
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
@@ -200,56 +267,56 @@ bool MyDemoGame::Init()
 // ----- TEMP -----
 // Spawns an arrow in
 GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
-	DirectionalLight dl;
-	dl.DiffuseColor = XMFLOAT4(0.960784376f, 0.870588303f, 0.701960802f, 1.0f);
-	dl.Direction = XMFLOAT3(0, -1, 0);
+    DirectionalLight dl;
+    dl.DiffuseColor = XMFLOAT4(0.960784376f, 0.870588303f, 0.701960802f, 1.0f);
+    dl.Direction = XMFLOAT3(0, -1, 0);
 
-	PointLight pl;
-	pl.DiffuseColor = dl.DiffuseColor;
-	pl.Position = XMFLOAT3(0, -100, 0);
+    PointLight pl;
+    pl.DiffuseColor = dl.DiffuseColor;
+    pl.Position = XMFLOAT3(0, -100, 0);
 
-	std::shared_ptr<Mesh> spMesh = MeshLoader::Load("Models\\sphere.obj", device, deviceContext);
-	std::shared_ptr<Texture2D> spTex = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2.jpg");
-	std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2Normals.jpg");
+    std::shared_ptr<Mesh> spMesh = MeshLoader::Load("Models\\sphere.obj", device, deviceContext);
+    std::shared_ptr<Texture2D> spTex = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2.jpg");
+    std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2Normals.jpg");
 
-	// Add players
-	// Player 1
-	GameObject* arrow = _testScene->AddGameObject("Arrow_" + arrows.size());
+    // Add players
+    // Player 1
+    GameObject* arrow = _testScene->AddGameObject("Arrow_" + arrows.size());
 
-	// Set position
-	Transform* tra = arrow->GetTransform();
-	tra->SetPosition(pos);
-	tra->SetScale(XMFLOAT3(+0.4f, +0.4f, +0.4f));
+    // Set position
+    Transform* tra = arrow->GetTransform();
+    tra->SetPosition(pos);
+    tra->SetScale(XMFLOAT3(+0.4f, +0.4f, +0.4f));
 
-	// Add collider
-	SphereCollider* bc = arrow->AddComponent<SphereCollider>();
-	bc->SetRadius(+0.4f);
+    // Add collider
+    SphereCollider* bc = arrow->AddComponent<SphereCollider>();
+    bc->SetRadius(+0.4f);
 
-	// Add rigidbody
-	Rigidbody* rb = arrow->AddComponent<Rigidbody>();
-	rb->SetMass(+1.0f);
+    // Add rigidbody
+    Rigidbody* rb = arrow->AddComponent<Rigidbody>();
+    rb->SetMass(+1.0f);
 
-	// Add collision callback
-	GameObject::CollisionCallback callback = std::bind(&MyDemoGame::CollideArrow, this, _1);
-	arrow->AddEventListener("OnArrowCollide", callback);
+    // Add collision callback
+    GameObject::CollisionCallback callback = std::bind(&MyDemoGame::CollideArrow, this, _1);
+    arrow->AddEventListener("OnArrowCollide", callback);
 
-	// Add default material
-	DefaultMaterial* dm = arrow->AddComponent<DefaultMaterial>();
-	dm->SetDiffuseMap(spTex);
-	dm->SetNormalMap(spNorm);
-	dm->SetDirectionalLight(dl);
-	dm->SetPointLight(pl);
+    // Add default material
+    DefaultMaterial* dm = arrow->AddComponent<DefaultMaterial>();
+    dm->SetDiffuseMap(spTex);
+    dm->SetNormalMap(spNorm);
+    dm->SetDirectionalLight(dl);
+    dm->SetPointLight(pl);
 
-	// Add mesh renderer
-	MeshRenderer* mr = arrow->AddComponent<MeshRenderer>();
-	mr->SetMaterial(dm);
-	mr->SetMesh(spMesh);
+    // Add mesh renderer
+    MeshRenderer* mr = arrow->AddComponent<MeshRenderer>();
+    mr->SetMaterial(dm);
+    mr->SetMesh(spMesh);
 
-	return arrow;
+    return arrow;
 }
 
 void MyDemoGame::CollideArrow(const Collider* collider){
-	
+    
 }
 
 // ----------------
@@ -283,52 +350,52 @@ void MyDemoGame::UpdateScene()
 
     Camera::GetActiveCamera()->UpdateViewMatrix();
 
-	switch (curGameState){
-		case PLAYER_ONE_TURN:
-			if (Input::IsKeyDown(Key::Space) && !chargingShot) {
-				chargingShot = true;
-			}else if (Input::IsKeyDown(Key::Space) && chargingShot){
-				if (chargeTime < +100.0f) { chargeTime += 0.2f; }
-			} else if (Input::IsKeyUp(Key::Space) && chargingShot){
-				GameObject* arrowObj1 = SpawnArrow(XMFLOAT3(
-					p1->GetTransform()->GetPosition().x + 2,
-					p1->GetTransform()->GetPosition().y,
-					p1->GetTransform()->GetPosition().z));
-				arrows.push_back(arrowObj1);
+    switch (curGameState){
+        case PLAYER_ONE_TURN:
+            if (Input::IsKeyDown(Key::Space) && !chargingShot) {
+                chargingShot = true;
+            }else if (Input::IsKeyDown(Key::Space) && chargingShot){
+                if (chargeTime < +100.0f) { chargeTime += 0.2f; }
+            } else if (Input::IsKeyUp(Key::Space) && chargingShot){
+                GameObject* arrowObj1 = SpawnArrow(XMFLOAT3(
+                    p1->GetTransform()->GetPosition().x + 2,
+                    p1->GetTransform()->GetPosition().y,
+                    p1->GetTransform()->GetPosition().z));
+                arrows.push_back(arrowObj1);
 
-				Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
-				rb1->ApplyImpulse(XMFLOAT3(chargeTime, chargeTime/5.0f, +0.0f));
+                Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
+                rb1->ApplyImpulse(XMFLOAT3(chargeTime, chargeTime/5.0f, +0.0f));
 
-				chargeTime = +0.0f;
-				chargingShot = false;
-				curGameState = PLAYER_TWO_TURN;
-			}
-			break;
-		case PLAYER_TWO_TURN:
-			if (Input::IsKeyDown(Key::Space) && !chargingShot) {
-				chargingShot = true;
-			}else if (Input::IsKeyDown(Key::Space) && chargingShot){
-				if (chargeTime < +100.0f) { chargeTime += 0.2f; }
-			}else if (Input::IsKeyUp(Key::Space) && chargingShot){
-				GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
-					p2->GetTransform()->GetPosition().x - 2,
-					p2->GetTransform()->GetPosition().y,
-					p2->GetTransform()->GetPosition().z
-					));
-				arrows.push_back(arrowObj2);
+                chargeTime = +0.0f;
+                chargingShot = false;
+                curGameState = PLAYER_TWO_TURN;
+            }
+            break;
+        case PLAYER_TWO_TURN:
+            if (Input::IsKeyDown(Key::Space) && !chargingShot) {
+                chargingShot = true;
+            }else if (Input::IsKeyDown(Key::Space) && chargingShot){
+                if (chargeTime < +100.0f) { chargeTime += 0.2f; }
+            }else if (Input::IsKeyUp(Key::Space) && chargingShot){
+                GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
+                    p2->GetTransform()->GetPosition().x - 2,
+                    p2->GetTransform()->GetPosition().y,
+                    p2->GetTransform()->GetPosition().z
+                    ));
+                arrows.push_back(arrowObj2);
 
-				Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
-				rb2->ApplyImpulse(XMFLOAT3(-chargeTime, chargeTime/5.0f, +0.0f));
+                Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
+                rb2->ApplyImpulse(XMFLOAT3(-chargeTime, chargeTime/5.0f, +0.0f));
 
-				chargeTime = +0.0f;
-				chargingShot = false;
+                chargeTime = +0.0f;
+                chargingShot = false;
 
-				curGameState = PLAYER_ONE_TURN;
-			}
-			break;
-		case GAME_OVER: 
-			break;
-	}
+                curGameState = PLAYER_ONE_TURN;
+            }
+            break;
+        case GAME_OVER: 
+            break;
+    }
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;

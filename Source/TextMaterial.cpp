@@ -6,6 +6,7 @@ using namespace DirectX;
 // Creates a new text material
 TextMaterial::TextMaterial( GameObject* gameObject )
     : Material( gameObject )
+    , _textColor( 0, 0, 0, 0 )
 {
     // Load the default vertex and pixel shaders
     assert( _vertexShader->LoadShaderFile( L"Shaders\\TextVertexShader.cso" ) );

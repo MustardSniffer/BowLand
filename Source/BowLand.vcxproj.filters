@@ -31,6 +31,18 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{bae97da6-3bfb-49ef-bce5-336b8a6d388f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\DefaultMaterial">
+      <UniqueIdentifier>{ee90606d-cc36-4379-bd2c-03f77816cd8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\LineMaterial">
+      <UniqueIdentifier>{a8c91da5-906c-4a98-9e69-09ef777eb1ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\ParticleSystem">
+      <UniqueIdentifier>{2b89685d-9048-40a4-8f98-a8786feb3cc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files\TextMaterial">
+      <UniqueIdentifier>{85f1888e-2297-413f-bd7f-253cbd02668d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dxerr.cpp">
@@ -151,6 +163,12 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="TextMaterial.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="LineRenderer.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="LineMaterial.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,6 +323,12 @@
     <ClInclude Include="TextMaterial.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="LineRenderer.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="LineMaterial.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject.inl">
@@ -312,12 +336,6 @@
     </None>
     <None Include="Rect.inl">
       <Filter>Header Files\Graphics</Filter>
-    </None>
-    <None Include="Shaders\DefaultShaderCommon.hlsli">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Shaders\TextShaderCommon.hlsli">
-      <Filter>Shader Files</Filter>
     </None>
     <None Include="EventListener.inl">
       <Filter>Header Files\Utility</Filter>
@@ -331,34 +349,49 @@
     <None Include="Mesh.inl">
       <Filter>Header Files\Graphics</Filter>
     </None>
+    <None Include="Shaders\DefaultShaderCommon.hlsli">
+      <Filter>Shader Files\DefaultMaterial</Filter>
+    </None>
+    <None Include="Shaders\LineShaderCommon.hlsli">
+      <Filter>Shader Files\LineMaterial</Filter>
+    </None>
+    <None Include="Shaders\TextShaderCommon.hlsli">
+      <Filter>Shader Files\TextMaterial</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\DefaultPixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\DefaultMaterial</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\DefaultVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\DefaultMaterial</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\TextPixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+    <FxCompile Include="Shaders\LinePixelShader.hlsl">
+      <Filter>Shader Files\LineMaterial</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\TextVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
+    <FxCompile Include="Shaders\LineVertexShader.hlsl">
+      <Filter>Shader Files\LineMaterial</Filter>
     </FxCompile>
     <FxCompile Include="ParticleGeometryShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\ParticleSystem</Filter>
     </FxCompile>
     <FxCompile Include="ParticlePixelShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\ParticleSystem</Filter>
     </FxCompile>
     <FxCompile Include="ParticleVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
-    </FxCompile>
-    <FxCompile Include="SpawnVertexShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\ParticleSystem</Filter>
     </FxCompile>
     <FxCompile Include="SpawnGeometryShader.hlsl">
-      <Filter>Shader Files</Filter>
+      <Filter>Shader Files\ParticleSystem</Filter>
+    </FxCompile>
+    <FxCompile Include="SpawnVertexShader.hlsl">
+      <Filter>Shader Files\ParticleSystem</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TextPixelShader.hlsl">
+      <Filter>Shader Files\TextMaterial</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\TextVertexShader.hlsl">
+      <Filter>Shader Files\TextMaterial</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

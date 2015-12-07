@@ -4,6 +4,7 @@
 #include "ComPtr.hpp"
 #include "DirectX.hpp"
 #include "DeviceState.hpp"
+#include "LineRenderer.hpp"
 #include "MeshRenderer.hpp"
 #include "TextRenderer.hpp"
 #include <unordered_map>
@@ -17,6 +18,7 @@ class RenderManager
     ImplementStaticClass( RenderManager );
 
 private:
+    static Cache<LineRenderer*>             _lineRenderers;
     static Cache<MeshRenderer*>             _meshRenderers;
     static Cache<TextRenderer*>             _textRenderers;
     static const float                      _textBlendFactor[ 4 ];
@@ -30,7 +32,9 @@ private:
     /// <summary>
     /// Draws the given mesh.
     /// </summary>
-    static void DrawMesh( std::shared_ptr<Mesh> mesh );
+    /// <param name="mesh">The mesh.</param>
+    /// <param name="topology">The topology to draw the mesh as.</param>
+    static void DrawMesh( std::shared_ptr<Mesh> mesh, D3D11_PRIMITIVE_TOPOLOGY topology );
 
     /// <summary>
     /// Draws all of the mesh renderers.
@@ -38,11 +42,17 @@ private:
     static void DrawMeshRenderers();
 
     /// <summary>
-    /// Draws all of the text renderers.
+    /// Draws all of the text and line renderers.
     /// </summary>
-    static void DrawTextRenderers();
+    static void DrawTextAndLineRenderers();
 
 public:
+    /// <summary>
+    /// Adds a line renderer.
+    /// </summary>
+    /// <param name="renderer">The line renderer.</param>
+    static void AddLineRenderer( LineRenderer* renderer );
+
     /// <summary>
     /// Adds a mesh renderer.
     /// </summary>
@@ -66,6 +76,12 @@ public:
     /// <param name="device">The D3D device to use.</param>
     /// <param name="deviceContext">The D3D device context to use.</param>
     static bool Initialize( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
+
+    /// <summary>
+    /// Removes a line renderer.
+    /// </summary>
+    /// <param name="renderer">The line renderer.</param>
+    static void RemoveLineRenderer( LineRenderer* renderer );
 
     /// <summary>
     /// Removes a mesh renderer.

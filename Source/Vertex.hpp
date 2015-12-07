@@ -13,6 +13,14 @@ struct Vertex
     DirectX::XMFLOAT3 Tangent;
 };
 
+/// <summary>
+/// Defines a vertex used for the line renderer.
+/// </summary>
+struct LineVertex
+{
+    DirectX::XMFLOAT2 Position;
+};
+
 struct ParticleVertex
 {
     int Type;

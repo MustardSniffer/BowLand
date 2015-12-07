@@ -1,9 +1,11 @@
 #include "RenderManager.hpp"
 #include "Components.hpp"
+#include "MyDemoGame.hpp"
 #include <iostream>
 
 using namespace DirectX;
 
+Cache<LineRenderer*>             RenderManager::_lineRenderers;
 Cache<MeshRenderer*>             RenderManager::_meshRenderers;
 Cache<TextRenderer*>             RenderManager::_textRenderers;
 const float                      RenderManager::_textBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -13,6 +15,12 @@ ComPtr<ID3D11SamplerState>       RenderManager::_textSamplerState;
 ComPtr<ID3D11DepthStencilState>  RenderManager::_textDepthStencilState;
 ComPtr<ID3D11RasterizerState>    RenderManager::_textRasterizerState;
 ID3D11DeviceContext*             RenderManager::_deviceContext;
+
+// Adds a line renderer
+void RenderManager::AddLineRenderer( LineRenderer* renderer )
+{
+    _lineRenderers.Add( renderer );
+}
 
 // Adds a mesh renderer
 void RenderManager::AddMeshRenderer( MeshRenderer* renderer )
@@ -30,13 +38,13 @@ void RenderManager::AddTextRenderer( TextRenderer* renderer )
 void RenderManager::Draw()
 {
     DrawMeshRenderers();
-    DrawTextRenderers();
+    DrawTextAndLineRenderers();
 }
 
 // Draws the given mesh
-void RenderManager::DrawMesh( std::shared_ptr<Mesh> mesh )
+void RenderManager::DrawMesh( std::shared_ptr<Mesh> mesh, D3D11_PRIMITIVE_TOPOLOGY topology )
 {
-    _deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    _deviceContext->IASetPrimitiveTopology( topology );
 
     const UINT    stride = mesh->GetVertexStride();
     const UINT    offset = 0;
@@ -59,7 +67,7 @@ void RenderManager::DrawMesh( std::shared_ptr<Mesh> mesh )
     }
 }
 
-// Draw all model meshes
+// Draw all mesh renderers
 void RenderManager::DrawMeshRenderers()
 {
     std::shared_ptr<Mesh> mesh;
@@ -106,12 +114,12 @@ void RenderManager::DrawMeshRenderers()
 
 
         // Draw the mesh
-        DrawMesh( mesh );
+        DrawMesh( mesh, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     }
 }
 
-// Draw all text meshes
-void RenderManager::DrawTextRenderers()
+// Draw all text and line renderer
+void RenderManager::DrawTextAndLineRenderers()
 {
     // Cache the current states and set our states
     _deviceState->Cache();
@@ -121,9 +129,15 @@ void RenderManager::DrawTextRenderers()
 
 
 
-    // Create the projection matrix
+    // Create the projection matrix (these window values should be dynamic)
+    const float WINDOW_WIDTH = 1280;
+    const float WINDOW_HEIGHT = 720;
+    const float Z_NEAR = -1.0f;
+    const float Z_FAR  = 1.0f;
     XMFLOAT4X4 projection;
-    XMStoreFloat4x4( &projection, XMMatrixOrthographicOffCenterLH( -640, 640, 360, -360, -0.1f, 0.1f ) );
+    XMStoreFloat4x4( &projection, XMMatrixTranspose( XMMatrixOrthographicOffCenterLH( 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, Z_NEAR, Z_FAR ) ) );
+
+
 
     // Now iterate over all of the text renderers
     for ( auto iter = _textRenderers.Begin(); iter != _textRenderers.End(); ++iter )
@@ -141,7 +155,7 @@ void RenderManager::DrawTextRenderers()
         if ( !material )
         {
 #if defined( _DEBUG ) || defined( DEBUG )
-            std::cout << renderer->GetGameObject() << " has a TextRenderer, but not a TextMaterial" << std::endl;
+            std::cout << renderer->GetGameObject()->GetName() << " has a TextRenderer, but not a TextMaterial" << std::endl;
 #endif
             continue;
         }
@@ -152,14 +166,64 @@ void RenderManager::DrawTextRenderers()
 
         // Get the font texture, send data to the shaders, and activate the material
         std::shared_ptr<Texture2D> texture = renderer->GetFont()->GetTexture( renderer->GetFontSize() );
-        material->GetVertexShader()->SetMatrix4x4        ( "World", world );
-        material->GetVertexShader()->SetMatrix4x4        ( "Projection", projection );
-        material->GetPixelShader()->SetSamplerState      ( "TextSampler", _textSamplerState.Get() );
-        material->GetPixelShader()->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() );
+        if ( texture )
+        {
+            assert( material->GetVertexShader()->SetMatrix4x4( "World", world ) );
+            assert( material->GetVertexShader()->SetMatrix4x4( "Projection", projection ) );
+            assert( material->GetPixelShader()->SetSamplerState( "TextSampler", _textSamplerState.Get() ) );
+            assert( material->GetPixelShader()->SetShaderResourceView( "TextTexture", texture->GetShaderResourceView() ) );
+            material->Activate();
+
+            // Draw the mesh
+            DrawMesh( mesh, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+        }
+    }
+
+
+
+    // Now we need to draw the line renderers!
+    _deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
+    for ( auto iter = _lineRenderers.Begin(); iter != _lineRenderers.End(); ++iter )
+    {
+        // Get the line renderer
+        LineRenderer* renderer = *iter;
+        if ( !renderer->IsEnabled() )
+        {
+            continue;
+        }
+
+        // Get the buffers and the material
+        ComPtr<ID3D11Buffer>& vertexBuffer = renderer->_vertexBuffer;
+        ComPtr<ID3D11Buffer>& indexBuffer  = renderer->_indexBuffer;
+        LineMaterial* material = renderer->GetGameObject()->GetComponent<LineMaterial>();
+
+        // Ensure we have a material
+        if ( !material )
+        {
+#if defined( _DEBUG ) || defined( DEBUG )
+            std::cout << renderer->GetGameObject()->GetName() << " has a LineRenderer, but not a LineMaterial" << std::endl;
+#endif
+            continue;
+        }
+
+        // Get the world matrix
+        XMFLOAT4X4 world;
+        XMStoreFloat4x4( &world, XMMatrixIdentity() );
+
+        // Set the world and projection matrices
+        assert( material->GetVertexShader()->SetMatrix4x4( "World", world ) );
+        assert( material->GetVertexShader()->SetMatrix4x4( "Projection", projection ) );
         material->Activate();
 
-        // Draw the mesh
-        DrawMesh( mesh );
+
+
+        // Draw the buffers
+        const UINT stride = sizeof( LineVertex );
+        const UINT offset = 0;
+
+        _deviceContext->IASetIndexBuffer( indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0 );
+        _deviceContext->IASetVertexBuffers( 0, 1, vertexBuffer.GetAddress(), &stride, &offset );
+        _deviceContext->DrawIndexed( 2, 0, 0 );
     }
 
 
@@ -264,6 +328,12 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
 
 
     return true;
+}
+
+// Removes a line renderer
+void RenderManager::RemoveLineRenderer( LineRenderer* renderer )
+{
+    _lineRenderers.Remove( renderer );
 }
 
 // Removes a mesh renderer
