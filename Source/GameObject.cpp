@@ -131,6 +131,24 @@ Transform* GameObject::GetTransform()
     return _transform;
 }
 
+/// Disables all components
+void GameObject::disable(){
+	for ( auto& pair : _components )
+    {
+        auto& component = pair.second;
+		component->SetEnabled(false);
+    }
+}
+
+/// Enables all components.
+void GameObject::enable(){
+	for (auto& pair : _components)
+	{
+		auto& component = pair.second;
+		component->SetEnabled(true);
+	}
+}
+
 // Update all components
 void GameObject::Update()
 {

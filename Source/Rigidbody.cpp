@@ -30,15 +30,19 @@ static inline XMFLOAT3 BTtoXM( const btVector3& bt )
 // The collision callback for Bullet objects
 static bool BulletCollisionCallback( btManifoldPoint& collisionPoint, const btCollisionObjectWrapper* obj1, int __unused0, int __unused1, const btCollisionObjectWrapper* obj2, int __unused2, int __unused3 )
 {
-    // Get the two colliders
+	
+	// Get the two colliders
     Collider* obj1Collider = static_cast<Collider*>( obj1->getCollisionShape()->getUserPointer() );
     Collider* obj2Collider = static_cast<Collider*>( obj2->getCollisionShape()->getUserPointer() );
 
-    // Send their messages
-    obj1Collider->GetGameObject()->DispatchEvent( "OnCollide", ( obj2Collider ) );
-    obj2Collider->GetGameObject()->DispatchEvent( "OnCollide", ( obj1Collider ) );
+	if (obj1Collider->IsEnabled() && obj2Collider->IsEnabled()){
+		// Send their messages
+		obj1Collider->GetGameObject()->DispatchEvent( "OnArrowCollide", ( obj2Collider ) );
+		obj2Collider->GetGameObject()->DispatchEvent( "OnArrowCollide", ( obj1Collider ) );
 
-    return false;
+	}
+
+     return false;
 }
 
 // Create a new rigidbody

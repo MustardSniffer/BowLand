@@ -326,11 +326,25 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
     return arrow;
 }
 
+// Called on arrow collision
 void MyDemoGame::CollideArrow( Collider* collider){
-	if (collider->GetGameObject()->GetName() == "Player_2")
-		curGameState = PLAYER_TWO_TURN;
-	else if (collider->GetGameObject()->GetName() == "Player_1")
-		curGameState = PLAYER_ONE_TURN;
+	
+	if (activeArrow->GetName() == "PLAYER_ONE_ARROW"){
+		if (collider->GetGameObject()->GetName() == "PLAYER_2")
+			curGameState = PLAYER_TWO_TURN;
+		else 
+			curGameState = PLAYER_TWO_TURN;
+	}
+	else if (activeArrow->GetName() == "PLAYER_TWO_ARROW"){
+		if (collider->GetGameObject()->GetName() == "PLAYER_1")
+			curGameState = PLAYER_ONE_TURN;
+		else
+			curGameState = PLAYER_ONE_TURN;
+	}	
+
+	std::cout << "test" << std::endl;
+
+	activeArrow->disable();
 }
 
 // ----------------
@@ -432,9 +446,9 @@ void MyDemoGame::UpdateScene()
 					shotPower = 50.0f;
 
 				GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
-					p1->GetTransform()->GetPosition().x + 2,
-					p1->GetTransform()->GetPosition().y,
-					p1->GetTransform()->GetPosition().z));
+					p2->GetTransform()->GetPosition().x - 2,
+					p2->GetTransform()->GetPosition().y,
+					p2->GetTransform()->GetPosition().z));
 				arrows.push_back(arrowObj2);
 
 				activeArrow = arrowObj2;

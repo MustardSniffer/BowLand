@@ -179,6 +179,16 @@ public:
     /// </summary>
     Transform* GetTransform();
 
+	/// <summary>
+	/// Disables all componets of this object.
+	/// </summary>
+	void disable();
+
+	/// <summary>
+	/// Enables all components of this object.
+	/// </summary>
+	void enable();
+
     /// <summary>
     /// Updates this game object and all components inside of it.
     /// </summary>
