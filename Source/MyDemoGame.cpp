@@ -31,6 +31,7 @@
 #include "Components.hpp"
 
 #include <sstream>
+#include <cmath>
 #include <DirectXColors.h>
 
 #include <iostream>
@@ -325,7 +326,7 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
     return arrow;
 }
 
-void MyDemoGame::CollideArrow(Collider* collider){
+void MyDemoGame::CollideArrow(const Collider* collider){
 	if (collider->GetGameObject()->GetName() == "PLAYER_ONE_ARROW")
 		curGameState = PLAYER_TWO_TURN;
 	else if (collider->GetGameObject()->GetName() == "PLAYER_TWO_ARROW")
@@ -371,13 +372,23 @@ void MyDemoGame::UpdateScene()
 			t = p1->GetComponentOfType<Transform>();
 			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
 													t->GetPosition().y, 
-													t->GetPosition().z - 10);
+													t->GetPosition().z - 15);
 
-            if (Input::IsKeyDown(Key::Space) && !chargingShot) {
+            if ( Input::IsButtonDown( MouseButton::Left ) && !chargingShot ) {
                 chargingShot = true;
-            }else if (Input::IsKeyDown(Key::Space) && chargingShot){
-                if (chargeTime < +100.0f) { chargeTime += 0.2f; }
-            } else if (Input::IsKeyUp(Key::Space) && chargingShot){
+				chargeShotStart = XMFLOAT2( currMousePos.x, currMousePos.y );
+            }else if ( Input::IsButtonDown( MouseButton::Left) && chargingShot){
+				chargeShotEnd = XMFLOAT2( currMousePos.x, currMousePos.y );
+            } else if ( Input::IsButtonUp( MouseButton::Left ) && chargingShot ){
+
+				// Calculate shot power
+				shotPower = sqrt(
+					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
+					pow((chargeShotStart.y - chargeShotEnd.y), 2));
+
+				if (shotPower > 50.0f)
+					shotPower = 50.0f;
+
                 GameObject* arrowObj1 = SpawnArrow(XMFLOAT3(
                     p1->GetTransform()->GetPosition().x + 2,
                     p1->GetTransform()->GetPosition().y,
@@ -387,9 +398,9 @@ void MyDemoGame::UpdateScene()
 				activeArrow = arrowObj1;
 
                 Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
-                rb1->ApplyImpulse(XMFLOAT3(chargeTime, chargeTime/5.0f, +0.0f));
+                rb1->ApplyImpulse(XMFLOAT3(shotPower, shotPower/5.0f, +0.0f));
 
-                chargeTime = +0.0f;
+                shotPower = +0.0f;
                 chargingShot = false;
 
 				arrowCamera->SetActive();
@@ -403,24 +414,35 @@ void MyDemoGame::UpdateScene()
 													t->GetPosition().y,
 													t->GetPosition().z - 15);
 
-            if (Input::IsKeyDown(Key::Space) && !chargingShot) {
-                chargingShot = true;
-            }else if (Input::IsKeyDown(Key::Space) && chargingShot){
-                if (chargeTime < +100.0f) { chargeTime += 0.2f; }
-            }else if (Input::IsKeyUp(Key::Space) && chargingShot){
-                GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
-                    p2->GetTransform()->GetPosition().x - 2,
-                    p2->GetTransform()->GetPosition().y,
-                    p2->GetTransform()->GetPosition().z
-                    ));
-                arrows.push_back(arrowObj2);
+			if (Input::IsButtonDown(MouseButton::Left) && !chargingShot) {
+				chargingShot = true;
+				chargeShotStart = XMFLOAT2(currMousePos.x, currMousePos.y);
+			}
+			else if (Input::IsButtonDown(MouseButton::Left) && chargingShot){
+				chargeShotEnd = XMFLOAT2(currMousePos.x, currMousePos.y);
+			}
+			else if (Input::IsButtonUp(MouseButton::Left) && chargingShot){
+
+				// Calculate shot power
+				shotPower = sqrt(
+					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
+					pow((chargeShotStart.y - chargeShotEnd.y), 2));
+
+				if (shotPower > 50.0f)
+					shotPower = 50.0f;
+
+				GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
+					p1->GetTransform()->GetPosition().x + 2,
+					p1->GetTransform()->GetPosition().y,
+					p1->GetTransform()->GetPosition().z));
+				arrows.push_back(arrowObj2);
 
 				activeArrow = arrowObj2;
 
                 Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
-                rb2->ApplyImpulse(XMFLOAT3(-chargeTime, chargeTime/5.0f, +0.0f));
+                rb2->ApplyImpulse(XMFLOAT3(-shotPower, shotPower/5.0f, +0.0f));
 
-                chargeTime = +0.0f;
+                shotPower = +0.0f;
                 chargingShot = false;
 
 				arrowCamera->SetActive();
@@ -432,7 +454,7 @@ void MyDemoGame::UpdateScene()
 			t = activeArrow->GetComponentOfType<Transform>();
 			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
 													t->GetPosition().y,
-													t->GetPosition().z - 15);
+													t->GetPosition().z - 20);
 			break;
         case GAME_OVER: 
             break;
