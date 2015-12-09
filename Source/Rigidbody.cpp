@@ -35,8 +35,8 @@ static bool BulletCollisionCallback( btManifoldPoint& collisionPoint, const btCo
     Collider* obj2Collider = static_cast<Collider*>( obj2->getCollisionShape()->getUserPointer() );
 
     // Send their messages
-    obj1Collider->GetGameObject()->DispatchEvent( "OnCollide", static_cast<const Collider*>( obj2Collider ) );
-    obj2Collider->GetGameObject()->DispatchEvent( "OnCollide", static_cast<const Collider*>( obj1Collider ) );
+    obj1Collider->GetGameObject()->DispatchEvent( "OnCollide", ( obj2Collider ) );
+    obj2Collider->GetGameObject()->DispatchEvent( "OnCollide", ( obj1Collider ) );
 
     return false;
 }
@@ -210,7 +210,7 @@ XMFLOAT3 Rigidbody::GetVelocity() const
 }
 
 // Handle when we collide with something else
-void Rigidbody::OnCollide( const Collider* collider )
+void Rigidbody::OnCollide( Collider* collider )
 {
     std::string thisName = _gameObject->GetName();
     std::string thatName = collider->GetGameObject()->GetName();

@@ -326,10 +326,10 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
     return arrow;
 }
 
-void MyDemoGame::CollideArrow(const Collider* collider){
-	if (collider->GetGameObject()->GetName() == "PLAYER_ONE_ARROW")
+void MyDemoGame::CollideArrow( Collider* collider){
+	if (collider->GetGameObject()->GetName() == "Player_2")
 		curGameState = PLAYER_TWO_TURN;
-	else if (collider->GetGameObject()->GetName() == "PLAYER_TWO_ARROW")
+	else if (collider->GetGameObject()->GetName() == "Player_1")
 		curGameState = PLAYER_ONE_TURN;
 }
 

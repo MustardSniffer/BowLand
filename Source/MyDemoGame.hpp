@@ -26,7 +26,7 @@ public:
     void DrawScene();
 
 	GameObject* SpawnArrow(DirectX::XMFLOAT3 pos);
-	void CollideArrow(const Collider* collider);
+	void CollideArrow( Collider* collider);
 
     // For handing mouse input
     void OnMouseDown( WPARAM btnState, int x, int y );

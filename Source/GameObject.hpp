@@ -35,7 +35,7 @@ public:
     /// <summary>
     /// The function type used for collision callbacks.
     /// </summary>
-    using CollisionCallback = std::function<void( const Collider* )>;
+    using CollisionCallback = std::function<void( Collider* )>;
 
 public:
     /// <summary>
