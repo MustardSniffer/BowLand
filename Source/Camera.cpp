@@ -69,9 +69,9 @@ void Camera::MoveRelative( float x, float y, float z )
 // Moves the camera in world space (not local space)
 void Camera::MoveAbsolute( float x, float y, float z )
 {
-    _position.x += x;
-    _position.y += y;
-    _position.z += z;
+    _position.x = x;
+    _position.y = y;
+    _position.z = z;
 }
 
 // Rotate on the X and/or Y axis

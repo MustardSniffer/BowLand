@@ -26,7 +26,7 @@ public:
     void DrawScene();
 
 	GameObject* SpawnArrow(DirectX::XMFLOAT3 pos);
-	void CollideArrow(const Collider* collider);
+	void CollideArrow(Collider* collider);
 
     // For handing mouse input
     void OnMouseDown( WPARAM btnState, int x, int y );
@@ -37,6 +37,7 @@ private:
 	enum GAMESTATE{
 		PLAYER_ONE_TURN = 0,
 		PLAYER_TWO_TURN,
+		ARROW_IN_FLIGHT,
 		GAME_OVER,
 	};
 
@@ -46,8 +47,14 @@ private:
 
 	GameObject* p1;
 	GameObject* p2;
+	GameObject* activeArrow;
 	std::vector<GameObject*> arrows;
 	GAMESTATE curGameState;
+
+	Camera* mainCamera;
+	Camera* arrowCamera;
+
+	
 	bool chargingShot = false;
 	float chargeTime = 0.0f;
 

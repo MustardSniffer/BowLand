@@ -198,7 +198,11 @@ bool MyDemoGame::Init()
     auto lineObj = _testScene->AddGameObject( "TEST_LINE_OBJECT" );
     lineObj->AddComponent<TestLineRenderer>();
 
-
+	// Save main camera
+	mainCamera = Camera::GetActiveCamera();
+	
+	auto arrowCamObj = _testScene->AddGameObject( "Arrow_Camera" );
+	arrowCamera = arrowCamObj->AddComponent < Camera>();
 
     // Add players
     // Player 1
@@ -279,9 +283,15 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
     std::shared_ptr<Texture2D> spTex = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2.jpg");
     std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2Normals.jpg");
 
-    // Add players
-    // Player 1
-    GameObject* arrow = _testScene->AddGameObject("Arrow_" + arrows.size());
+    // Add arrow
+	GameObject* arrow = NULL;
+
+	if (curGameState == PLAYER_ONE_TURN)
+		arrow = _testScene->AddGameObject("PLAYER_ONE_ARROW");
+	else if (curGameState == PLAYER_TWO_TURN)
+		arrow = _testScene->AddGameObject("PLAYER_TWO_ARROW");
+	else
+		std::cout << "ERROR: Invalid turn state in SpawnArrow()" << std::endl;
 
     // Set position
     Transform* tra = arrow->GetTransform();
@@ -315,8 +325,11 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
     return arrow;
 }
 
-void MyDemoGame::CollideArrow(const Collider* collider){
-    
+void MyDemoGame::CollideArrow(Collider* collider){
+	if (collider->GetGameObject()->GetName() == "PLAYER_ONE_ARROW")
+		curGameState = PLAYER_TWO_TURN;
+	else if (collider->GetGameObject()->GetName() == "PLAYER_TWO_ARROW")
+		curGameState = PLAYER_ONE_TURN;
 }
 
 // ----------------
@@ -351,7 +364,15 @@ void MyDemoGame::UpdateScene()
     Camera::GetActiveCamera()->UpdateViewMatrix();
 
     switch (curGameState){
+		Transform* t;
+
         case PLAYER_ONE_TURN:
+			// Move camera to active player
+			t = p1->GetComponentOfType<Transform>();
+			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
+													t->GetPosition().y, 
+													t->GetPosition().z - 10);
+
             if (Input::IsKeyDown(Key::Space) && !chargingShot) {
                 chargingShot = true;
             }else if (Input::IsKeyDown(Key::Space) && chargingShot){
@@ -363,15 +384,25 @@ void MyDemoGame::UpdateScene()
                     p1->GetTransform()->GetPosition().z));
                 arrows.push_back(arrowObj1);
 
+				activeArrow = arrowObj1;
+
                 Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
                 rb1->ApplyImpulse(XMFLOAT3(chargeTime, chargeTime/5.0f, +0.0f));
 
                 chargeTime = +0.0f;
                 chargingShot = false;
-                curGameState = PLAYER_TWO_TURN;
+
+				arrowCamera->SetActive();
+                curGameState = ARROW_IN_FLIGHT;
             }
             break;
         case PLAYER_TWO_TURN:
+			// Move camera to active player
+			t = p2->GetComponentOfType<Transform>();
+			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
+													t->GetPosition().y,
+													t->GetPosition().z - 15);
+
             if (Input::IsKeyDown(Key::Space) && !chargingShot) {
                 chargingShot = true;
             }else if (Input::IsKeyDown(Key::Space) && chargingShot){
@@ -384,15 +415,25 @@ void MyDemoGame::UpdateScene()
                     ));
                 arrows.push_back(arrowObj2);
 
+				activeArrow = arrowObj2;
+
                 Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
                 rb2->ApplyImpulse(XMFLOAT3(-chargeTime, chargeTime/5.0f, +0.0f));
 
                 chargeTime = +0.0f;
                 chargingShot = false;
 
-                curGameState = PLAYER_ONE_TURN;
+				arrowCamera->SetActive();
+                curGameState = ARROW_IN_FLIGHT;
             }
             break;
+		case ARROW_IN_FLIGHT: 
+			// Follow active arrow with camera
+			t = activeArrow->GetComponentOfType<Transform>();
+			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
+													t->GetPosition().y,
+													t->GetPosition().z - 15);
+			break;
         case GAME_OVER: 
             break;
     }
