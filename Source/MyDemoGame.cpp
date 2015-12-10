@@ -122,7 +122,14 @@ struct TestLineRenderer : public Component
             tr->SetEnabled( true );
 
             XMFLOAT2 d( lineDown.x - mouse.x, lineDown.y - mouse.y );
-            tr->SetText( std::to_string( sqrt( d.x * d.x + d.y * d.y ) ) );
+
+			// Divide to allow longer dragging
+			// cap power to avoid shots never landing
+			int power = sqrt(d.x * d.x + d.y * d.y) / 10;
+			if (power > 50.0f)
+				power = 50.0f;
+
+            tr->SetText( std::to_string(  power ) );
             tr->Update(); // Also force update to rebuild buffers
 
             XMFLOAT3 tp( mouse.x - 50, mouse.y + 20, 0 );
@@ -265,6 +272,9 @@ bool MyDemoGame::Init()
     // Update the active camera's projection matrix
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 
+	// Initialize HUD
+	CreateHUD();
+
     // Successfully initialized
     return true;
 }
@@ -330,21 +340,85 @@ GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
 void MyDemoGame::CollideArrow( Collider* collider){
 	
 	if (activeArrow->GetName() == "PLAYER_ONE_ARROW"){
-		if (collider->GetGameObject()->GetName() == "PLAYER_2")
+		if (collider->GetGameObject()->GetName() == "Player_2")
+			playerTwoHP--;
+
 			curGameState = PLAYER_TWO_TURN;
-		else 
-			curGameState = PLAYER_TWO_TURN;
+			turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player Two's Turn");
 	}
 	else if (activeArrow->GetName() == "PLAYER_TWO_ARROW"){
-		if (collider->GetGameObject()->GetName() == "PLAYER_1")
+		if (collider->GetGameObject()->GetName() == "Player_1")
+			playerOneHP--;
+
 			curGameState = PLAYER_ONE_TURN;
-		else
-			curGameState = PLAYER_ONE_TURN;
+			turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player One's Turn");
 	}	
 
-	std::cout << "test" << std::endl;
+	// Disable arrow
+	activeArrow->GetComponentOfType<Rigidbody>()->SetEnabled(false);
+}
 
-	activeArrow->disable();
+// Setup HUD
+void MyDemoGame::CreateHUD(){
+
+	// Player one HP counter
+	playerOneHealth = _testScene->AddGameObject( "Player_One_Health" );
+	std::shared_ptr<Font> font = std::make_shared<Font>(playerOneHealth->GetDevice(), playerOneHealth->GetDeviceContext());
+	assert(font->LoadFromFile("Fonts\\OpenSans-Regular.ttf"));
+	TextRenderer* tr1 = playerOneHealth->AddComponent<TextRenderer>();
+	tr1->SetFont(font);
+	tr1->SetFontSize(20U);
+
+	TextMaterial* tm1 = playerOneHealth->AddComponent<TextMaterial>();
+	tm1->SetTextColor(XMFLOAT4(Colors::Black));
+
+	tr1->SetEnabled(true);
+
+	XMFLOAT3 tp1(	0, 
+					0, 
+					0);
+	tr1->GetGameObject()->GetTransform()->SetPosition(tp1);
+
+	tr1->SetText("Player One Health: " + std::to_string(playerOneHP));
+	tr1->Update();
+
+	// Player two HP counter
+	playerTwoHealth = _testScene->AddGameObject( "Player_Two_Health" );
+	TextRenderer* tr2 = playerTwoHealth->AddComponent<TextRenderer>();
+	tr2->SetFont(font);
+	tr2->SetFontSize(20U);
+
+	TextMaterial* tm2 = playerTwoHealth->AddComponent<TextMaterial>();
+	tm2->SetTextColor(XMFLOAT4(Colors::Black));
+
+	tr2->SetEnabled(true);
+
+	XMFLOAT3 tp2(	1080,
+					0,
+					0);
+	tr2->GetGameObject()->GetTransform()->SetPosition(tp2);
+
+	tr2->SetText("Player Two Health: " + std::to_string(playerTwoHP));
+	tr2->Update();
+
+	// Turn indicator
+	turnIndicator = _testScene->AddGameObject("Turn_Indicator");
+	TextRenderer* tr3 = turnIndicator->AddComponent<TextRenderer>();
+	tr3->SetFont(font);
+	tr3->SetFontSize(20U);
+
+	TextMaterial* tm3 = turnIndicator->AddComponent<TextMaterial>();
+	tm3->SetTextColor(XMFLOAT4(Colors::Black));
+
+	tr3->SetEnabled(true);
+
+	XMFLOAT3 tp3(	540,
+					700,
+					0);
+	tr3->GetGameObject()->GetTransform()->SetPosition(tp3);
+
+	tr3->SetText("Player One's Turn");
+	tr3->Update();
 }
 
 // ----------------
@@ -400,6 +474,8 @@ void MyDemoGame::UpdateScene()
 					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
 					pow((chargeShotStart.y - chargeShotEnd.y), 2));
 
+				shotPower /= 10;
+
 				if (shotPower > 50.0f)
 					shotPower = 50.0f;
 
@@ -442,6 +518,8 @@ void MyDemoGame::UpdateScene()
 					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
 					pow((chargeShotStart.y - chargeShotEnd.y), 2));
 
+				shotPower /= 10;
+
 				if (shotPower > 50.0f)
 					shotPower = 50.0f;
 
@@ -473,6 +551,10 @@ void MyDemoGame::UpdateScene()
         case GAME_OVER: 
             break;
     }
+
+	// Update HUD
+	playerOneHealth->GetComponentOfType<TextRenderer>()->SetText("Player One Health: " + std::to_string(playerOneHP));
+	playerTwoHealth->GetComponentOfType<TextRenderer>()->SetText("Player Two Health: " + std::to_string(playerTwoHP));
 
     // After everything, we can get rid of mouse delta positions
     prevMousePos = currMousePos;

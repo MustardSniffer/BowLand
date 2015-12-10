@@ -21,6 +21,7 @@ public:
 
     // Overrides for base level methods
     bool Init();
+	void CreateHUD();
     void OnResize();
     void UpdateScene();
     void DrawScene();
@@ -54,7 +55,13 @@ private:
 	Camera* mainCamera;
 	Camera* arrowCamera;
 
-	
+	GameObject* playerOneHealth;
+	GameObject* playerTwoHealth;
+	GameObject* turnIndicator;
+
+	int playerOneHP = 5;
+	int playerTwoHP = 5;
+
 	DirectX::XMFLOAT2 chargeShotStart;
 	DirectX::XMFLOAT2 chargeShotEnd;
 	bool chargingShot = false;
