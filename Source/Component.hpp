@@ -61,7 +61,7 @@ public:
     /// Sets whether or not this component is enabled.
     /// </summary>
     /// <param name="enabled">True to enable the component, false to disable it.</param>
-    void SetEnabled( bool enabled );
+    virtual void SetEnabled( bool enabled );
 
     /// <summary>
     /// Updates this component.

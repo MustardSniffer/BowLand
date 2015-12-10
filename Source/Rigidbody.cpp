@@ -218,6 +218,15 @@ void Rigidbody::OnCollide( Collider* collider )
     std::cout << thisName << " collided with " << thatName << std::endl;
 }
 
+// Set whether or not this rigid body is enabled
+void Rigidbody::SetEnabled( bool enabled )
+{
+    Component::SetEnabled( enabled );
+
+    if ( enabled ) Physics::AddRigidbody( this );
+    else           Physics::RemoveRigidbody( this );
+}
+
 // Get our mass
 void Rigidbody::SetMass( float mass )
 {
