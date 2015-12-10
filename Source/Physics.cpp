@@ -61,10 +61,14 @@ bool Physics::Initialize()
 // Adds a rigidbody component to the physics system
 void Physics::AddRigidbody( Rigidbody* rigidbody )
 {
-    btRigidBody* rb = static_cast<btRigidBody*>( rigidbody->_rigidbody.get() );
-    _world->addRigidBody( rb );
+    auto search = _rigidbodies.find( rigidbody );
+    if ( search == _rigidbodies.end() )
+    {
+        btRigidBody* rb = static_cast<btRigidBody*>( rigidbody->_rigidbody.get() );
+        _world->addRigidBody( rb );
 
-    _rigidbodies.insert( rigidbody );
+        _rigidbodies.insert( rigidbody );
+    }
 }
 
 // Removes a rigidbody component from the physics system

@@ -95,6 +95,12 @@ public:
     /// Gets this rigidbody's velocity.
     /// </summary>
     DirectX::XMFLOAT3 GetVelocity() const;
+    
+    /// <summary>
+    /// Sets whether or not this component is enabled.
+    /// </summary>
+    /// <param name="enabled">True to enable the component, false to disable it.</param>
+    void SetEnabled( bool enabled ) override;
 
     /// <summary>
     /// Sets this rigidbody's mass.
