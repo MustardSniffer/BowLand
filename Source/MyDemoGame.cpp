@@ -354,6 +354,10 @@ void MyDemoGame::CollideArrow( Collider* collider){
 			turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player One's Turn");
 	}	
 
+	if (playerOneHP <= 0 || playerTwoHP <= 0){
+		curGameState = GAME_OVER;
+	}
+
 	// Disable arrow
 	activeArrow->GetComponentOfType<Rigidbody>()->SetEnabled(false);
 }
@@ -413,7 +417,7 @@ void MyDemoGame::CreateHUD(){
 	tr3->SetEnabled(true);
 
 	XMFLOAT3 tp3(	540,
-					700,
+					670,
 					0);
 	tr3->GetGameObject()->GetTransform()->SetPosition(tp3);
 
@@ -549,6 +553,21 @@ void MyDemoGame::UpdateScene()
 													t->GetPosition().z - 20);
 			break;
         case GAME_OVER: 
+			if (playerOneHP <= 0){
+				t = p2->GetComponentOfType<Transform>();
+				Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
+					t->GetPosition().y,
+					t->GetPosition().z - 15);
+
+				turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player Two Wins!");
+			} else {
+				t = p1->GetComponentOfType<Transform>();
+				Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
+					t->GetPosition().y,
+					t->GetPosition().z - 15);
+
+				turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player One Wins!");
+			}
             break;
     }
 
