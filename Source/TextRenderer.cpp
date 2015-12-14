@@ -175,8 +175,11 @@ void TextRenderer::SetFontSize( unsigned int value )
 // Set our text
 void TextRenderer::SetText( const std::string& value )
 {
-    _text = value;
-    _isMeshDirty = true;
+    if ( _text != value )
+    {
+        _text = value;
+        _isMeshDirty = true;
+    }
 }
 
 // Updates this text renderer

@@ -171,6 +171,9 @@
     <ClCompile Include="LineMaterial.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectX.hpp">
@@ -327,6 +330,9 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="LineMaterial.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>

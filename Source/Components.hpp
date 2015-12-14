@@ -6,6 +6,8 @@
 #include "BoxCollider.hpp"
 #include "SphereCollider.hpp"
 
+#include "GameManager.hpp"
+
 #include "LineRenderer.hpp"
 #include "MeshRenderer.hpp"
 #include "TextRenderer.hpp"

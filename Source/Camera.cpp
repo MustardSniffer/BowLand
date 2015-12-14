@@ -35,7 +35,6 @@ Camera::Camera( GameObject* gameObj )
 // Does nothing
 Camera::~Camera()
 {
-
 }
 
 // Returns the current active camera for projections

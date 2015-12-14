@@ -70,80 +70,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
     return game.Run();
 }
 
-
-struct TestLineRenderer : public Component
-{
-    LineRenderer* lr;
-    LineMaterial* lm;
-    TextRenderer* tr;
-    TextMaterial* tm;
-    XMFLOAT2 lineDown;
-
-    TestLineRenderer( GameObject* go )
-        : Component( go )
-    {
-        lr = go->AddComponent<LineRenderer>();
-        lr->SetEnabled( false );
-
-        lm = go->AddComponent<LineMaterial>();
-        lm->SetLineColor( XMFLOAT4( Colors::Black ) );
-
-
-        GameObject* go2 = go->AddChild( go->GetName() + "_CHILD" );
-
-
-        std::shared_ptr<Font> font = std::make_shared<Font>( go->GetDevice(), go->GetDeviceContext() );
-        assert( font->LoadFromFile( "Fonts\\OpenSans-Regular.ttf" ) );
-        tr = go2->AddComponent<TextRenderer>();
-        tr->SetFont( font );
-        tr->SetFontSize( 20U );
-        tr->SetEnabled( false );
-
-        tm = go2->AddComponent<TextMaterial>();
-        tm->SetTextColor( XMFLOAT4( Colors::Magenta ) );
-    }
-
-    void Update() override
-    {
-        if ( Input::WasButtonPressed( MouseButton::Left ) )
-        {
-            lineDown = Input::GetMousePosition();
-        }
-
-        if ( Input::IsButtonDown( MouseButton::Left ) )
-        {
-            XMFLOAT2 mouse = Input::GetMousePosition();
-
-            lr->SetStartPoint( lineDown );
-            lr->SetEndPoint( mouse );
-
-            lr->Update(); // Force update to rebuild buffers
-            lr->SetEnabled( true );
-            tr->SetEnabled( true );
-
-            XMFLOAT2 d( lineDown.x - mouse.x, lineDown.y - mouse.y );
-
-			// Divide to allow longer dragging
-			// cap power to avoid shots never landing
-			int power = sqrt(d.x * d.x + d.y * d.y) / 10;
-			if (power > 50.0f)
-				power = 50.0f;
-
-            tr->SetText( std::to_string(  power ) );
-            tr->Update(); // Also force update to rebuild buffers
-
-            XMFLOAT3 tp( mouse.x - 50, mouse.y + 20, 0 );
-            tr->GetGameObject()->GetTransform()->SetPosition( tp );
-        }
-        else
-        {
-            lr->SetEnabled( false );
-            tr->SetEnabled( false );
-        }
-    }
-};
-
-
 // Creates a new game
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
@@ -182,247 +108,21 @@ bool MyDemoGame::Init()
     deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
     // Create and load our test scene
-    _testScene = std::make_shared<Scene>( device, deviceContext );
-    if ( !_testScene->LoadFromFile( "Scenes\\Test.scene" ) )
+    Scene* scene = Scene::CreateInstance( device, deviceContext );
+    if ( !scene->LoadFromFile( "Scenes\\Test.scene" ) )
     {
         return false;
     }
-    
-    DirectionalLight dl;
-    dl.DiffuseColor = XMFLOAT4( 0.960784376f, 0.870588303f, 0.701960802f, 1.0f );
-    dl.Direction = XMFLOAT3( 0, -1, 0 );
 
-    PointLight pl;
-    pl.DiffuseColor = dl.DiffuseColor;
-    pl.Position = XMFLOAT3( 0, -100, 0 );
-
-    std::shared_ptr<Mesh> spMesh = MeshLoader::Load( "Models\\sphere.obj", device, deviceContext );
-    std::shared_ptr<Mesh> cubeMesh = MeshLoader::Load( "Models\\cube.obj", device, deviceContext );
-    std::shared_ptr<Texture2D> spTex = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" );
-    std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" );
-
-
-    // Add a test line and text renderer object
-    auto lineObj = _testScene->AddGameObject( "TEST_LINE_OBJECT" );
-    lineObj->AddComponent<TestLineRenderer>();
-
-	// Save main camera
-	mainCamera = Camera::GetActiveCamera();
-	
-	auto arrowCamObj = _testScene->AddGameObject( "Arrow_Camera" );
-	arrowCamera = arrowCamObj->AddComponent < Camera>();
-
-    // Add players
-    // Player 1
-    p1 = _testScene->AddGameObject( "Player_1" );
-    
-    // Set position
-    Transform* tr1 = p1->GetTransform();
-    tr1->SetPosition( XMFLOAT3(-20.0f, +0.0f, +10.0f) );
-
-    // Add collider
-    BoxCollider* bc1 = p1->AddComponent<BoxCollider>();
-    bc1->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
-
-    // Add rigidbody
-    Rigidbody* rb1 = p1->AddComponent<Rigidbody>();
-    rb1->SetMass( +0.0f );
-
-    // Add default material
-    DefaultMaterial* dm1 = p1->AddComponent<DefaultMaterial>();
-    dm1->SetDiffuseMap(spTex);
-    dm1->SetNormalMap(spNorm);
-    dm1->SetDirectionalLight(dl);
-    dm1->SetPointLight(pl);
-
-    // Add mesh renderer
-    MeshRenderer* mr1 = p1->AddComponent<MeshRenderer>();
-    mr1->SetMaterial(dm1);
-    mr1->SetMesh(cubeMesh);
-
-    // Player 2
-    p2 = _testScene->AddGameObject( "Player_2" );
-
-    // Set Position
-    Transform* tr2 = p2->GetTransform();
-    tr2->SetPosition( XMFLOAT3(+20.0f, +0.0f, +10.0f) );
-
-    // Add collider
-    BoxCollider* bc2 = p2->AddComponent<BoxCollider>();
-    bc2->SetSize( XMFLOAT3(+1.0f, +1.0f, +1.0f) );
-
-    // Add rigidbody
-    Rigidbody* rb2 = p2->AddComponent<Rigidbody>();
-    rb2->SetMass(+0.0f);
-
-    // Add default material
-    DefaultMaterial* dm2 = p2->AddComponent<DefaultMaterial>();
-    dm2->SetDiffuseMap(spTex);
-    dm2->SetNormalMap(spNorm);
-    dm2->SetDirectionalLight(dl);
-    dm2->SetPointLight(pl);
-
-    // Add mesh renderer
-    MeshRenderer* mr2 = p2->AddComponent<MeshRenderer>();
-    mr2->SetMaterial(dm2);
-    mr2->SetMesh(cubeMesh);
-
-    curGameState = PLAYER_ONE_TURN;
+    // Add in the game manager
+    GameObject* go = scene->AddGameObject( "GameManager" );
+    GameManager* gm = go->AddComponent<GameManager>();
 
     // Update the active camera's projection matrix
     Camera::GetActiveCamera()->UpdateProjectionMatrix(static_cast<float>(windowWidth) / windowHeight);
 
-	// Initialize HUD
-	CreateHUD();
-
     // Successfully initialized
     return true;
-}
-
-// ----- TEMP -----
-// Spawns an arrow in
-GameObject* MyDemoGame::SpawnArrow(XMFLOAT3 pos){
-    DirectionalLight dl;
-    dl.DiffuseColor = XMFLOAT4(0.960784376f, 0.870588303f, 0.701960802f, 1.0f);
-    dl.Direction = XMFLOAT3(0, -1, 0);
-
-    PointLight pl;
-    pl.DiffuseColor = dl.DiffuseColor;
-    pl.Position = XMFLOAT3(0, -100, 0);
-
-    std::shared_ptr<Mesh> spMesh = MeshLoader::Load("Models\\sphere.obj", device, deviceContext);
-    std::shared_ptr<Texture2D> spTex = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2.jpg");
-    std::shared_ptr<Texture2D> spNorm = Texture2D::FromFile(device, deviceContext, "Textures\\Rocks2Normals.jpg");
-
-    // Add arrow
-	GameObject* arrow = NULL;
-
-	if (curGameState == PLAYER_ONE_TURN)
-		arrow = _testScene->AddGameObject("PLAYER_ONE_ARROW");
-	else if (curGameState == PLAYER_TWO_TURN)
-		arrow = _testScene->AddGameObject("PLAYER_TWO_ARROW");
-	else
-		std::cout << "ERROR: Invalid turn state in SpawnArrow()" << std::endl;
-
-    // Set position
-    Transform* tra = arrow->GetTransform();
-    tra->SetPosition(pos);
-    tra->SetScale(XMFLOAT3(+0.4f, +0.4f, +0.4f));
-
-    // Add collider
-    SphereCollider* bc = arrow->AddComponent<SphereCollider>();
-    bc->SetRadius(+0.4f);
-
-    // Add rigidbody
-    Rigidbody* rb = arrow->AddComponent<Rigidbody>();
-    rb->SetMass(+1.0f);
-
-    // Add collision callback
-    GameObject::CollisionCallback callback = std::bind(&MyDemoGame::CollideArrow, this, _1);
-    arrow->AddEventListener("OnArrowCollide", callback);
-
-    // Add default material
-    DefaultMaterial* dm = arrow->AddComponent<DefaultMaterial>();
-    dm->SetDiffuseMap(spTex);
-    dm->SetNormalMap(spNorm);
-    dm->SetDirectionalLight(dl);
-    dm->SetPointLight(pl);
-
-    // Add mesh renderer
-    MeshRenderer* mr = arrow->AddComponent<MeshRenderer>();
-    mr->SetMaterial(dm);
-    mr->SetMesh(spMesh);
-
-    return arrow;
-}
-
-// Called on arrow collision
-void MyDemoGame::CollideArrow( Collider* collider){
-	
-	if (activeArrow->GetName() == "PLAYER_ONE_ARROW"){
-		if (collider->GetGameObject()->GetName() == "Player_2")
-			playerTwoHP--;
-
-			curGameState = PLAYER_TWO_TURN;
-			turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player Two's Turn");
-	}
-	else if (activeArrow->GetName() == "PLAYER_TWO_ARROW"){
-		if (collider->GetGameObject()->GetName() == "Player_1")
-			playerOneHP--;
-
-			curGameState = PLAYER_ONE_TURN;
-			turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player One's Turn");
-	}	
-
-	if (playerOneHP <= 0 || playerTwoHP <= 0){
-		curGameState = GAME_OVER;
-	}
-
-	// Disable arrow
-	activeArrow->GetComponentOfType<Rigidbody>()->SetEnabled(false);
-}
-
-// Setup HUD
-void MyDemoGame::CreateHUD(){
-
-	// Player one HP counter
-	playerOneHealth = _testScene->AddGameObject( "Player_One_Health" );
-	std::shared_ptr<Font> font = std::make_shared<Font>(playerOneHealth->GetDevice(), playerOneHealth->GetDeviceContext());
-	assert(font->LoadFromFile("Fonts\\OpenSans-Regular.ttf"));
-	TextRenderer* tr1 = playerOneHealth->AddComponent<TextRenderer>();
-	tr1->SetFont(font);
-	tr1->SetFontSize(20U);
-
-	TextMaterial* tm1 = playerOneHealth->AddComponent<TextMaterial>();
-	tm1->SetTextColor(XMFLOAT4(Colors::Black));
-
-	tr1->SetEnabled(true);
-
-	XMFLOAT3 tp1(	0, 
-					0, 
-					0);
-	tr1->GetGameObject()->GetTransform()->SetPosition(tp1);
-
-	tr1->SetText("Player One Health: " + std::to_string(playerOneHP));
-	tr1->Update();
-
-	// Player two HP counter
-	playerTwoHealth = _testScene->AddGameObject( "Player_Two_Health" );
-	TextRenderer* tr2 = playerTwoHealth->AddComponent<TextRenderer>();
-	tr2->SetFont(font);
-	tr2->SetFontSize(20U);
-
-	TextMaterial* tm2 = playerTwoHealth->AddComponent<TextMaterial>();
-	tm2->SetTextColor(XMFLOAT4(Colors::Black));
-
-	tr2->SetEnabled(true);
-
-	XMFLOAT3 tp2(	1080,
-					0,
-					0);
-	tr2->GetGameObject()->GetTransform()->SetPosition(tp2);
-
-	tr2->SetText("Player Two Health: " + std::to_string(playerTwoHP));
-	tr2->Update();
-
-	// Turn indicator
-	turnIndicator = _testScene->AddGameObject("Turn_Indicator");
-	TextRenderer* tr3 = turnIndicator->AddComponent<TextRenderer>();
-	tr3->SetFont(font);
-	tr3->SetFontSize(20U);
-
-	TextMaterial* tm3 = turnIndicator->AddComponent<TextMaterial>();
-	tm3->SetTextColor(XMFLOAT4(Colors::Black));
-
-	tr3->SetEnabled(true);
-
-	XMFLOAT3 tp3(	540,
-					670,
-					0);
-	tr3->GetGameObject()->GetTransform()->SetPosition(tp3);
-
-	tr3->SetText("Player One's Turn");
-	tr3->Update();
 }
 
 // ----------------
@@ -452,158 +152,19 @@ void MyDemoGame::UpdateScene()
         return;
     }
     
-    _testScene->Update();
-
-    Camera::GetActiveCamera()->UpdateViewMatrix();
-
-    switch (curGameState){
-		Transform* t;
-
-        case PLAYER_ONE_TURN:
-			// Move camera to active player
-			t = p1->GetComponentOfType<Transform>();
-			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
-													t->GetPosition().y, 
-													t->GetPosition().z - 15);
-
-            if ( Input::IsButtonDown( MouseButton::Left ) && !chargingShot ) {
-                chargingShot = true;
-				chargeShotStart = XMFLOAT2( currMousePos.x, currMousePos.y );
-            }else if ( Input::IsButtonDown( MouseButton::Left) && chargingShot){
-				chargeShotEnd = XMFLOAT2( currMousePos.x, currMousePos.y );
-            } else if ( Input::IsButtonUp( MouseButton::Left ) && chargingShot ){
-
-				// Calculate shot power
-				shotPower = sqrt(
-					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
-					pow((chargeShotStart.y - chargeShotEnd.y), 2));
-
-				shotPower /= 10;
-
-				if (shotPower > 50.0f)
-					shotPower = 50.0f;
-
-                GameObject* arrowObj1 = SpawnArrow(XMFLOAT3(
-                    p1->GetTransform()->GetPosition().x + 2,
-                    p1->GetTransform()->GetPosition().y,
-                    p1->GetTransform()->GetPosition().z));
-                arrows.push_back(arrowObj1);
-
-				activeArrow = arrowObj1;
-
-                Rigidbody* rb1 = arrowObj1->GetComponentOfType<Rigidbody>();
-                rb1->ApplyImpulse(XMFLOAT3(shotPower, shotPower/5.0f, +0.0f));
-
-                shotPower = +0.0f;
-                chargingShot = false;
-
-				arrowCamera->SetActive();
-                curGameState = ARROW_IN_FLIGHT;
-            }
-            break;
-        case PLAYER_TWO_TURN:
-			// Move camera to active player
-			t = p2->GetComponentOfType<Transform>();
-			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
-													t->GetPosition().y,
-													t->GetPosition().z - 15);
-
-			if (Input::IsButtonDown(MouseButton::Left) && !chargingShot) {
-				chargingShot = true;
-				chargeShotStart = XMFLOAT2(currMousePos.x, currMousePos.y);
-			}
-			else if (Input::IsButtonDown(MouseButton::Left) && chargingShot){
-				chargeShotEnd = XMFLOAT2(currMousePos.x, currMousePos.y);
-			}
-			else if (Input::IsButtonUp(MouseButton::Left) && chargingShot){
-
-				// Calculate shot power
-				shotPower = sqrt(
-					pow((chargeShotStart.x - chargeShotEnd.x), 2) +
-					pow((chargeShotStart.y - chargeShotEnd.y), 2));
-
-				shotPower /= 10;
-
-				if (shotPower > 50.0f)
-					shotPower = 50.0f;
-
-				GameObject* arrowObj2 = SpawnArrow(XMFLOAT3(
-					p2->GetTransform()->GetPosition().x - 2,
-					p2->GetTransform()->GetPosition().y,
-					p2->GetTransform()->GetPosition().z));
-				arrows.push_back(arrowObj2);
-
-				activeArrow = arrowObj2;
-
-                Rigidbody* rb2 = arrowObj2->GetComponentOfType<Rigidbody>();
-                rb2->ApplyImpulse(XMFLOAT3(-shotPower, shotPower/5.0f, +0.0f));
-
-                shotPower = +0.0f;
-                chargingShot = false;
-
-				arrowCamera->SetActive();
-                curGameState = ARROW_IN_FLIGHT;
-            }
-            break;
-		case ARROW_IN_FLIGHT: 
-			// Follow active arrow with camera
-			t = activeArrow->GetComponentOfType<Transform>();
-			Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
-													t->GetPosition().y,
-													t->GetPosition().z - 20);
-			break;
-        case GAME_OVER: 
-			if (playerOneHP <= 0){
-				t = p2->GetComponentOfType<Transform>();
-				Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
-					t->GetPosition().y,
-					t->GetPosition().z - 15);
-
-				turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player Two Wins!");
-			} else {
-				t = p1->GetComponentOfType<Transform>();
-				Camera::GetActiveCamera()->MoveAbsolute(t->GetPosition().x,
-					t->GetPosition().y,
-					t->GetPosition().z - 15);
-
-				turnIndicator->GetComponentOfType<TextRenderer>()->SetText("Player One Wins!");
-			}
-            break;
-    }
-
-	// Update HUD
-	playerOneHealth->GetComponentOfType<TextRenderer>()->SetText("Player One Health: " + std::to_string(playerOneHP));
-	playerTwoHealth->GetComponentOfType<TextRenderer>()->SetText("Player Two Health: " + std::to_string(playerTwoHP));
-
-    // After everything, we can get rid of mouse delta positions
-    prevMousePos = currMousePos;
+    Scene::GetInstance()->Update();
 }
 
 // Draws the scene
 void MyDemoGame::DrawScene()
 {
-    // Background color (Cornflower Blue in this case) for clearing
     const float* color = Colors::CornflowerBlue;
 
-
-    // Clear the render target and depth buffer (erases what's on the screen)
-    //  - Do this ONCE PER FRAME
-    //  - At the beginning of DrawScene (before drawing *anything*)
     deviceContext->ClearRenderTargetView( renderTargetView, color );
     deviceContext->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-
-
-    // Draw the scene
-    //_testScene->Draw();
     RenderManager::Draw();
 
-
-
-    // Present the buffer
-    //  - Puts the image we're drawing into the window so the user can see it
-    //  - Do this exactly ONCE PER FRAME
-    //  - Always at the very end of the frame
     HR( swapChain->Present( 1, 0 ) );
 }
 
@@ -650,10 +211,4 @@ void MyDemoGame::OnMouseUp( WPARAM btnState, int x, int y )
 // --------------------------------------------------------
 void MyDemoGame::OnMouseMove( WPARAM btnState, int x, int y )
 {
-    // Save the previous mouse position, so we have it for the future
-    prevMousePos.x = currMousePos.x;
-    prevMousePos.y = currMousePos.y;
-
-    currMousePos.x = x;
-    currMousePos.y = y;
 }

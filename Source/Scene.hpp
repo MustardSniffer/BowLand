@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Config.hpp"
 #include "DirectX.hpp"
 #include "GameObject.hpp"
 #include <JSON.h>
@@ -9,6 +10,12 @@
 /// </summary>
 class Scene
 {
+    ImplementNonCopyableClass( Scene );
+    ImplementNonMovableClass( Scene );
+
+private:
+    static std::shared_ptr<Scene> _instance;
+
     std::unordered_map<std::string, size_t> _gameObjectCache;
     std::vector<std::shared_ptr<GameObject>> _gameObjects;
     std::string _name;
@@ -47,15 +54,6 @@ class Scene
     /// </summary>
     void Dispose();
 
-    // Prevent the use of the copy constructor and assignment operator
-    Scene( const Scene& ) = delete;
-    Scene& operator=( const Scene& ) = delete;
-
-    // Prevent the use of the move constructor and assignment operator
-    Scene( Scene&& ) = delete;
-    Scene& operator=( Scene&& ) = delete;
-
-public:
     /// <summary>
     /// Creates a new, empty scene.
     /// </summary>
@@ -63,6 +61,7 @@ public:
     /// <param name="deviceContext">The device context to use when creating game objects.</param>
     Scene( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
 
+public:
     /// <summary>
     /// Destroys this scene.
     /// </summary>
@@ -73,6 +72,18 @@ public:
     /// </summary>
     /// <param name="name">The game object's name.</param>
     GameObject* AddGameObject( const std::string& name );
+
+    /// <summary>
+    /// Creates the scene instance.
+    /// </summary>
+    /// <param name="device">The device to use when creating game objects.</param>
+    /// <param name="deviceContext">The device context to use when creating game objects.</param>
+    static Scene* CreateInstance( ID3D11Device* device, ID3D11DeviceContext* deviceContext );
+
+    /// <summary>
+    /// Gets the scene instance.
+    /// </summary>
+    static Scene* GetInstance();
 
     /// <summary>
     /// Loads scene data from the given file.

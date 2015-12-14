@@ -42,6 +42,11 @@ template<typename T> typename Cache<T>::Iterator Cache<T>::End()
 // Removes the given item from this cache
 template<typename T> bool Cache<T>::Remove( T& item )
 {
+    if ( !_itemsCache.size() )
+    {
+        return false;
+    }
+
     // Ensure we contain the item
     auto search = _itemsCache.find( item );
     if ( search == _itemsCache.end() )

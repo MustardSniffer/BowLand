@@ -29,6 +29,12 @@ XMFLOAT3 TweenPosition::GetEndValue() const
     return _endValue.GetFloat3();
 }
 
+// Get the current value
+DirectX::XMFLOAT3 TweenPosition::GetValue() const
+{
+    return _position;
+}
+
 // Sets the starting value
 void TweenPosition::SetStartValue( const XMFLOAT3& value )
 {

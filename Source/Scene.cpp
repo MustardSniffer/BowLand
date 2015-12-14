@@ -15,6 +15,8 @@ using namespace DirectX;
 #define CheckTweenPlayMode(mode, string) if (#mode == string) return TweenPlayMode::##mode
 #define CheckTweenMethod(method, string) if (#method == string) return TweenMethod::##method
 
+std::shared_ptr<Scene> Scene::_instance;
+
 // Parses a float3 from the given value
 static XMFLOAT3 ParseFloat3( const json::Value& value )
 {
@@ -492,6 +494,22 @@ std::shared_ptr<GameObject> Scene::CreateGameObject( const std::string& name )
     return go;
 }
 
+// Creates the scene instance
+Scene* Scene::CreateInstance( ID3D11Device* device, ID3D11DeviceContext* deviceContext )
+{
+    if ( !_instance )
+    {
+        _instance.reset( new (std::nothrow) Scene( device, deviceContext ) );
+    }
+    return _instance.get();
+}
+
+// Gets the scene instance
+Scene* Scene::GetInstance()
+{
+    return _instance.get();
+}
+
 // Disposes of this scene
 void Scene::Dispose()
 {
@@ -671,8 +689,8 @@ bool Scene::RemoveGameObject( const std::string& name )
 // Updates all objects in this scene
 void Scene::Update()
 {
-    for ( auto& gameObject : _gameObjects )
+    for ( size_t index = 0; index < _gameObjects.size(); ++index )
     {
-        gameObject->Update();
+        _gameObjects[ index ]->Update();
     }
 }

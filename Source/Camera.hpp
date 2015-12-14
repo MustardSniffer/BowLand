@@ -35,6 +35,7 @@ public:
     void UpdateProjectionMatrix(float aspectRatio);
 
     // Mutators
+    void SetPosition( const DirectX::XMFLOAT3& position ) { _position = position; }
     void SetNearClip(const float nClip) { nearClip = nClip; }
     void SetFarClip(const float fClip){ farClip = fClip; }
     void SetActive();

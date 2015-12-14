@@ -151,6 +151,10 @@ void RenderManager::DrawTextAndLineRenderers()
 
         // Get the text material and mesh
         std::shared_ptr<Mesh> mesh = renderer->GetMesh();
+        if ( !mesh )
+        {
+            continue;
+        }
         TextMaterial* material = renderer->GetGameObject()->GetComponent<TextMaterial>();
         if ( !material )
         {

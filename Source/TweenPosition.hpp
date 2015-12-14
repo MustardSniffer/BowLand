@@ -26,6 +26,11 @@ public:
     DirectX::XMFLOAT3 GetEndValue() const;
 
     /// <summary>
+    /// Gets the current value.
+    /// </summary>
+    DirectX::XMFLOAT3 GetValue() const;
+
+    /// <summary>
     /// Sets the starting position value.
     /// </summary>
     /// <param name="value">The new starting value.</param>

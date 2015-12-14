@@ -5,36 +5,8 @@
 			"Rotation": [0.0, 0.0, 0.0]
         },
         "Camera": {
-            "NearClip": 0.01,
+            "NearClip": 0.1,
             "FarClip": 1024.0
-        }
-    },
-    "Floor": {
-        "Transform": {
-            "Position": [0, -10, 0],
-            "Scale": [30, 0.5, 30]
-        },
-        "BoxCollider": {
-            "Size": [1, 1, 1]
-        },
-        "Rigidbody": {
-            "Mass": 0
-        },
-        "DefaultMaterial": {
-            "DiffuseMap": "Textures\\DryDirt.jpg",
-            "NormalMap": "Textures\\DryDirtNormals.jpg",
-            "DirectionalLight": {
-                "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
-                "Direction": [0, -1, 0]
-            },
-            "PointLight": {
-                "DiffuseColor": [0.960784376, 0.870588303, 0.701960802, 1.0],
-                "Position": [0, -100, 0]
-            }
-        },
-        "MeshRenderer": {
-            "Mesh": "Models\\cube.obj",
-            "Material": "this DefaultMaterial"
         }
     }
 }
