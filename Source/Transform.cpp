@@ -1,4 +1,5 @@
 #include "Transform.hpp"
+#include "GameObject.hpp"
 #include <iostream>
 
 using namespace DirectX;
@@ -39,7 +40,7 @@ XMFLOAT4 Transform::GetRotation() const
 }
 
 // Get the world matrix representing this transform
-DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() const
+XMFLOAT4X4 Transform::GetWorldMatrix() const
 {
     if (_isWorldMatrixDirty)
     {
@@ -59,7 +60,22 @@ DirectX::XMFLOAT4X4 Transform::GetWorldMatrix() const
         _isWorldMatrixDirty = false;
     }
 
-    return _worldMatrix;
+    XMFLOAT4X4 world = _worldMatrix;
+
+    // If we have a parent, we need to account for them
+    if ( _gameObject->HasParent() )
+    {
+        XMFLOAT4X4 parent = _gameObject->GetParent()->GetTransform()->GetWorldMatrix();
+        XMStoreFloat4x4(
+            &world,
+            XMMatrixMultiply(
+                XMLoadFloat4x4( &world ),
+                XMLoadFloat4x4( &parent )
+            )
+        );
+    }
+
+    return world;
 }
 
 // Set the position

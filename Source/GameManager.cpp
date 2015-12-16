@@ -3,22 +3,21 @@
 #include "GameObject.hpp"
 #include "Input.hpp"
 #include "MeshLoader.hpp"
+#include "RenderManager.hpp"
 #include "Scene.hpp"
 #include "Time.hpp"
 #include <DirectXColors.h>
+#include <algorithm>
 
 using namespace DirectX;
 
-static const DirectionalLight DIRECTIONAL_LIGHT =
-{
-    XMFLOAT4( 0.960784376f, 0.870588303f, 0.701960802f, 1.0f ),
-    XMFLOAT3( 0, -1, 0 )
-};
+#define CLAMP(value, mn, mx) std::min(mx, std::max(mn, value))
 
-static const PointLight POINT_LIGHT =
+static const float MaxForce = 75.0f;
+static const DirectionalLight StageLight
 {
-    XMFLOAT4( 0.960784376f, 0.870588303f, 0.701960802f, 1.0f ),
-    XMFLOAT3( 0, -100, 0 )
+    XMFLOAT4( Colors::MintCream ),
+    XMFLOAT3( -0.1f, -0.5f, 0.1f )
 };
 
 // Creates a new game manager
@@ -31,7 +30,7 @@ GameManager::GameManager( GameObject* gameObject )
     , _currentArrow( nullptr )
     , _player1( nullptr )
     , _player1Collider( nullptr )
-    , _player1Health( 5 )
+    , _player1Health( 1 )
     , _player1HealthUI( nullptr )
     , _player1Rigidbody( nullptr )
     , _player2( nullptr )
@@ -47,6 +46,8 @@ GameManager::GameManager( GameObject* gameObject )
     , _nextGameState( GameState::PlayerOneTurn )
     , _arrowCount( 0 )
 {
+    RenderManager::SetLightDirection( XMFLOAT3( 0.0f, -0.1f, 1.0f ) );
+
     // Create the players
     _player1 = CreatePlayer( 1, XMFLOAT3( -20, 0, 10 ), XMFLOAT3( 1, 1, 1 ) );
     _player2 = CreatePlayer( 2, XMFLOAT3(  20, 0, 10 ), XMFLOAT3( 1, 1, 1 ) );
@@ -58,7 +59,7 @@ GameManager::GameManager( GameObject* gameObject )
     // Get the ridigbodies
     _player1Rigidbody = _player1->GetComponentOfType<Rigidbody>();
     _player2Rigidbody = _player2->GetComponentOfType<Rigidbody>();
-
+    
     // Create the UI
     CreateUI();
 
@@ -66,13 +67,6 @@ GameManager::GameManager( GameObject* gameObject )
     _camera = Camera::GetActiveCamera();
     _cameraTween = _camera->GetGameObject()->AddComponent<TweenPosition>();
     _cameraTween->SetTweenMethod( TweenMethod::ExponentialEaseInOut );
-
-    // Add a ground object (just so that balls always collide with something)
-    GameObject* ground = Scene::GetInstance()->AddGameObject( _gameObject->GetName() + "_Ground" );
-    ground->GetTransform()->SetPosition( XMFLOAT3( 0, -20, 0 ) );
-    ground->GetTransform()->SetScale( XMFLOAT3( 100000, 10, 100000 ) );
-    ground->AddComponent<BoxCollider>()->SetSize( XMFLOAT3( 1, 1, 1 ) );
-    ground->AddComponent<Rigidbody>()->SetMass( 0 );
 }
 
 // Destroys this game object
@@ -88,8 +82,10 @@ bool GameManager::CanShootArrow() const
 }
 
 // Creates an arrow game object
-GameObject* GameManager::CreateArrow( const XMFLOAT3& position )
+GameObject* GameManager::CreateArrow( const XMFLOAT3& position, const XMFLOAT3& force )
 {
+    static const XMFLOAT3 ArrowSize = { 1, 0.1f, 1.0f };
+
     Scene* scene = Scene::GetInstance();
     ID3D11Device* device = _gameObject->GetDevice();
     ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
@@ -100,11 +96,10 @@ GameObject* GameManager::CreateArrow( const XMFLOAT3& position )
     // Set some transform info
     Transform* transform = arrow->GetTransform();
     transform->SetPosition( position );
-    transform->SetScale( XMFLOAT3( 0.4f, 0.4f, 0.4f ) );
 
     // Add the arrow's collider
-    SphereCollider* collider = arrow->AddComponent<SphereCollider>();
-    collider->SetRadius( 0.4f );
+    BoxCollider* collider = arrow->AddComponent<BoxCollider>();
+    collider->SetSize( ArrowSize );
 
     // Add the arrow's rigidbody
     Rigidbody* rigidbody = arrow->AddComponent<Rigidbody>();
@@ -116,15 +111,13 @@ GameObject* GameManager::CreateArrow( const XMFLOAT3& position )
 
     // Add a default material
     DefaultMaterial* material = arrow->AddComponent<DefaultMaterial>();
-    material->SetDiffuseMap( Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" ) );
-    material->SetNormalMap( Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" ) );
-    material->SetDirectionalLight( DIRECTIONAL_LIGHT );
-    material->SetPointLight( POINT_LIGHT );
+    material->LoadDiffuseMap( "Textures\\SolidWhite.png" );
+    material->SetDirectionalLight( StageLight );
 
     // Add a mesh renderer
     MeshRenderer* meshRenderer = arrow->AddComponent<MeshRenderer>();
     meshRenderer->SetMaterial( material );
-    meshRenderer->SetMesh( MeshLoader::Load( "Models\\sphere.obj", device, deviceContext ) );
+    meshRenderer->SetMesh( MeshLoader::Load( "Models\\arrow.obj", device, deviceContext ) );
 
     return arrow;
 }
@@ -152,10 +145,9 @@ GameObject* GameManager::CreatePlayer( uint32_t index, const XMFLOAT3& position,
 
     // Add the default material to the player
     DefaultMaterial* material = player->AddComponent<DefaultMaterial>();
-    material->SetDiffuseMap( Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2.jpg" ) );
-    material->SetNormalMap( Texture2D::FromFile( device, deviceContext, "Textures\\Rocks2Normals.jpg" ) );
-    material->SetDirectionalLight( DIRECTIONAL_LIGHT );
-    material->SetPointLight( POINT_LIGHT );
+    material->LoadDiffuseMap( "Textures\\Rocks2.jpg" );
+    material->LoadNormalMap( "Textures\\Rocks2Normals.jpg" );
+    material->SetDirectionalLight( StageLight );
 
     // Add the mesh renderer to the player
     MeshRenderer* meshRenderer = player->AddComponent<MeshRenderer>();
@@ -176,19 +168,22 @@ void GameManager::CreateUI()
     GameObject* lineObj = _gameObject->AddChild( _gameObject->GetName() + "_UILine" );
     _line = lineObj->AddComponent<LineRenderer>();
     _line->SetEnabled( false );
-    lineObj->AddComponent<LineMaterial>()->SetLineColor( XMFLOAT4( Colors::Black ) );
+    lineObj->AddComponent<LineMaterial>()->SetLineColor( XMFLOAT4( Colors::White ) );
 
     // Load our font
     std::shared_ptr<Font> font = std::make_shared<Font>( _gameObject->GetDevice(), _gameObject->GetDeviceContext() );
-    assert( font->LoadFromFile( "Fonts\\OpenSans-Regular.ttf" ) );
+    std::shared_ptr<Font> bigFont = std::make_shared<Font>( _gameObject->GetDevice(), _gameObject->GetDeviceContext() );
+    assert( font   ->LoadFromFile( "Fonts\\OpenSans-Regular.ttf" ) &&
+            bigFont->LoadFromFile( "Fonts\\OpenSans-Regular.ttf" ) );
+    font->SetCurrentSize( 21U );
+    bigFont->SetCurrentSize( 80U );
 
     // Create the text renderer
     GameObject* textObj = _gameObject->AddChild( _gameObject->GetName() + "_UIText" );
     _lineText = textObj->AddComponent<TextRenderer>();
     _lineText->SetFont( font );
-    _lineText->SetFontSize( 18U );
     _lineText->SetEnabled( false );
-    textObj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::Black ) );
+    textObj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::White ) );
 
 
 
@@ -197,26 +192,24 @@ void GameManager::CreateUI()
     obj->GetTransform()->SetPosition( XMFLOAT3( 10, 10, 0 ) );
     _player1HealthUI = obj->AddComponent<TextRenderer>();
     _player1HealthUI->SetFont( font );
-    _player1HealthUI->SetFontSize( 18U );
-    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::Black ) );
+    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::White ) );
 
     // Create the UI for player 2
     obj = scene->AddGameObject( _gameObject->GetName() + "_UIP2Health" );
     obj->GetTransform()->SetPosition( XMFLOAT3( 1100, 10, 0 ) );
     _player2HealthUI = obj->AddComponent<TextRenderer>();
     _player2HealthUI->SetFont( font );
-    _player2HealthUI->SetFontSize( 18U );
-    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::Black ) );
+    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::White ) );
 
 
 
     // Create the UI for the turn indicator
     obj = scene->AddGameObject( _gameObject->GetName() + "_UITurnIndicator" );
     obj->GetTransform()->SetPosition( XMFLOAT3( 540, 670, 0 ) );
+    obj->GetTransform()->SetScale( XMFLOAT3( 0.25f, 0.25f, 0.25f ) );
     _turnIndicator = obj->AddComponent<TextRenderer>();
-    _turnIndicator->SetFont( font );
-    _turnIndicator->SetFontSize( 20U );
-    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::Black ) );
+    _turnIndicator->SetFont( bigFont );
+    obj->AddComponent<TextMaterial>()->SetTextColor( XMFLOAT4( Colors::White ) );
 }
 
 // Handles the current game state
@@ -229,7 +222,7 @@ void GameManager::HandleGameState()
             XMFLOAT3 position = _player1->GetTransform()->GetPosition();
             position.z = 0.0f;
             
-            MoveCameraTo( position, 2.0f );
+            MoveCameraTo( position, 3.0f );
             _currentGameState = GameState::PlayerOneTurn;
         }
         break;
@@ -307,8 +300,8 @@ void GameManager::HandleUI()
             XMStoreFloat2( &_currentArrowDirection, XMVector2Normalize( XMLoadFloat2( &dm ) ) );
 
             // Calculate the mouse's power
-            float power = sqrtf( dm.x * dm.x + dm.y * dm.y ) / 10.0f;
-            if ( power > 50.0f ) power = 50.0f;
+            float power = sqrtf( dm.x * dm.x + dm.y * dm.y ) / 8.0f;
+            if ( power > MaxForce ) power = MaxForce;
             _currentArrowPower = power;
 
             // Set the relevant UI info
@@ -340,7 +333,8 @@ void GameManager::HandleUI()
                               : _player2->GetTransform()->GetPosition();
 
             // Create and launch the arrow
-            GameObject* arrow = CreateArrow( position );
+            XMFLOAT3 direction( _currentArrowDirection.x, _currentArrowDirection.y, 0.0f );
+            GameObject* arrow = CreateArrow( position, direction );
             LaunchArrow( arrow, _currentArrowDirection, _currentArrowPower );
         }
     }
@@ -353,21 +347,30 @@ void GameManager::HandleUI()
     switch ( _currentGameState )
     {
         case GameState::GameOver:
+        {
+            // Set the text
             if ( _player1Health > _player2Health )
             {
                 _turnIndicator->SetText( "Player 1 wins!" );
             }
             else
             {
-                _turnIndicator->SetText( "Player 1 wins!" );
+                _turnIndicator->SetText( "Player 2 wins!" );
             }
-            break;
+        }
+        break;
+
         case GameState::PlayerOneTurn:
+        {
             _turnIndicator->SetText( "Player 1's Turn" );
-            break;
+        }
+        break;
+
         case GameState::PlayerTwoTurn:
+        {
             _turnIndicator->SetText( "Player 2's Turn" );
-            break;
+        }
+        break;
     }
 }
 
@@ -397,6 +400,12 @@ void GameManager::MoveCameraTo( const DirectX::XMFLOAT3& position, float duratio
 // Handles when an arrow collides with something
 void GameManager::OnArrowCollide( Collider* collider )
 {
+    // Don't do anything if there is no current arrow
+    if ( !_currentArrow )
+    {
+        return;
+    }
+
     // Disable the rigidbody
     Rigidbody* rb = _currentArrow->GetComponent<Rigidbody>();
     if ( rb )
@@ -422,6 +431,24 @@ void GameManager::OnArrowCollide( Collider* collider )
     // If either player's health is zero, the game is over
     if ( _player1Health <= 0 || _player2Health <= 0 )
     {
+        // Add a tween scale to the text
+        TweenScale* ts = _turnIndicator->GetGameObject()->AddComponent<TweenScale>();
+        ts->SetStartValue( XMFLOAT3( 0.25f, 0.25f, 0.25f ) );
+        ts->SetEndValue( XMFLOAT3( 1, 1, 1 ) );
+        ts->SetDuration( 1.0f );
+        ts->SetTweenMethod( TweenMethod::ExponentialEaseInOut );
+        ts->Play();
+
+        // Add a tween position to the text
+        XMFLOAT3 tip = _turnIndicator->GetGameObject()->GetTransform()->GetPosition();
+        TweenPosition* tp = _turnIndicator->GetGameObject()->AddComponent<TweenPosition>();
+        tp->SetStartValue( tip );
+        tp->SetEndValue( XMFLOAT3( tip.x - 120, tip.y - 100, tip.z ) );
+        tp->SetDuration( 1.0f );
+        tp->SetTweenMethod( TweenMethod::ExponentialEaseInOut );
+        tp->Play();
+
+        // Set the next state, position, and duration
         _nextGameState = GameState::GameOver;
         position.z = -20;
         duration = 2.0f;
@@ -442,6 +469,7 @@ void GameManager::OnArrowCollide( Collider* collider )
     // Change the game state and move the camera
     _currentGameState = _nextGameState;
     MoveCameraTo( position, duration );
+    _currentArrow = nullptr;
 }
 
 // Updates this game manager
@@ -449,4 +477,27 @@ void GameManager::Update()
 {
     HandleGameState();
     HandleUI();
+
+    // If there is a current arrow, let's modify its rotation
+    if ( _currentArrow )
+    {
+        // Get the transform and rigidbody
+        Transform* transform = _currentArrow->GetTransform();
+        Rigidbody* rigidbody = _currentArrow->GetComponent<Rigidbody>();
+        XMFLOAT3 currentArrowPos = transform->GetPosition();
+
+        // Set the rotation based on the velocity
+        XMFLOAT3 velocity = rigidbody->GetVelocity();
+        float yaw = -XM_PIDIV2;
+        float pitch = atan2( currentArrowPos.y - _lastArrowPos.y,
+                             currentArrowPos.x - _lastArrowPos.x );
+        if ( velocity.x < 0.0f )
+        {
+            yaw = -yaw;
+            pitch = -pitch + XM_PI;
+        }
+        transform->SetRotation( pitch, yaw, 0.0f );
+
+        _lastArrowPos = currentArrowPos;
+    }
 }

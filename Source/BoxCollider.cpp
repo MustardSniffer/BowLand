@@ -21,7 +21,7 @@ BoxCollider::~BoxCollider()
 // Get this collider's size
 DirectX::XMFLOAT3 BoxCollider::GetSize() const
 {
-    btVector3 halfSize = _myBoxShape->getHalfExtentsWithoutMargin();
+    btVector3 halfSize = _myBoxShape->getHalfExtentsWithMargin();
     return DirectX::XMFLOAT3(
         halfSize.getX() * 2.0f,
         halfSize.getY() * 2.0f,

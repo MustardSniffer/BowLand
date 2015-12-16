@@ -18,9 +18,18 @@ class RenderManager
     ImplementStaticClass( RenderManager );
 
 private:
+    static const int ShadowMapSize;
+
+    static DirectX::XMFLOAT4X4              _shadowView;
+    static DirectX::XMFLOAT4X4              _shadowProj;
     static Cache<LineRenderer*>             _lineRenderers;
     static Cache<MeshRenderer*>             _meshRenderers;
     static Cache<TextRenderer*>             _textRenderers;
+    static std::shared_ptr<SimpleVertexShader> _shadowVS;
+    static ComPtr<ID3D11DepthStencilView>   _shadowDSV;
+    static ComPtr<ID3D11ShaderResourceView> _shadowSRV;
+    static ComPtr<ID3D11SamplerState>       _shadowSampler;
+    static ComPtr<ID3D11RasterizerState>    _shadowRS;
     static const float                      _textBlendFactor[ 4 ];
     static std::shared_ptr<DeviceState>     _deviceState;
     static ComPtr<ID3D11BlendState>         _textBlendState;
@@ -40,6 +49,11 @@ private:
     /// Draws all of the mesh renderers.
     /// </summary>
     static void DrawMeshRenderers();
+
+    /// <summary>
+    /// Draws to the shadow map.
+    /// </summary>
+    static void DrawShadowMap();
 
     /// <summary>
     /// Draws all of the text and line renderers.
@@ -94,4 +108,10 @@ public:
     /// </summary>
     /// <param name="renderer">The text renderer.</param>
     static void RemoveTextRenderer( TextRenderer* renderer );
+
+    /// <summary>
+    /// Sets the directional light's direction.
+    /// </summary>
+    /// <param name="direction">The new direction.</param>
+    static void SetLightDirection( const DirectX::XMFLOAT3& direction );
 };

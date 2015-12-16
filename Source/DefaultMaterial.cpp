@@ -10,10 +10,8 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
     , _diffuseMap( nullptr )
     , _normalMap( nullptr )
     , _samplerState( nullptr )
-    , _ambientColor( 0.05f, 0.05f, 0.05f, 1.0f )
+    , _ambientColor( 0.4f, 0.4f, 0.4f, 1.0f )
     , _useNormalMap( false )
-    , _useSpecularity( false )
-    , _specularPower( 64.0f )
 {
     // Create our default sampler state
     CreateSamplerState( &_samplerState, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, 1, 0, D3D11_FLOAT32_MAX );
@@ -27,10 +25,7 @@ DefaultMaterial::DefaultMaterial( GameObject* gameObject )
 DefaultMaterial::~DefaultMaterial()
 {
     ReleaseMacro( _samplerState );
-    
-    _specularPower = 0.0f;
     _useNormalMap = false;
-    _useSpecularity = false;
 }
 
 // Get our ambient color
@@ -39,22 +34,10 @@ DirectX::XMFLOAT4 DefaultMaterial::GetAmbientColor() const
     return _ambientColor;
 }
 
-// Get our specular power
-float DefaultMaterial::GetSpecularPower() const
-{
-    return _specularPower;
-}
-
 // Check if we use the normal map
 bool DefaultMaterial::UsesNormalMap() const
 {
     return _useNormalMap;
-}
-
-// Check if we use specularity
-bool DefaultMaterial::UsesSpecularity() const
-{
-    return _useSpecularity;
 }
 
 // Load a diffuse map from a file
@@ -80,35 +63,10 @@ bool DefaultMaterial::LoadNormalMap( const std::string& fname )
     return _useNormalMap;
 }
 
-// Set our diffuse map
-void DefaultMaterial::SetDiffuseMap( std::shared_ptr<Texture2D> map )
-{
-    _diffuseMap = map;
-}
-
 // Set the first test light
 void DefaultMaterial::SetDirectionalLight( const DirectionalLight& light )
 {
-    assert( _pixelShader->SetData( "Light0", &light, sizeof( DirectionalLight ) ) );
-}
-
-// Set our normal map
-void DefaultMaterial::SetNormalMap( std::shared_ptr<Texture2D> map )
-{
-    _normalMap = map;
-    _useNormalMap = static_cast<bool>( _normalMap );
-}
-
-// Set the second test light
-void DefaultMaterial::SetPointLight( const PointLight& light )
-{
-    assert( _pixelShader->SetData( "Light1", &light, sizeof( PointLight ) ) );
-}
-
-// Set the specular power
-void DefaultMaterial::SetSpecularPower( float value )
-{
-    _specularPower = value;
+    assert( _pixelShader->SetData( "Light", &light, sizeof( DirectionalLight ) ) );
 }
 
 // Send shader data
@@ -124,9 +82,7 @@ void DefaultMaterial::UpdateShaderData()
     if ( _normalMap  ) assert( _pixelShader->SetShaderResourceView( "NormalMap", _normalMap->GetShaderResourceView() ) );
     assert( _pixelShader->SetSamplerState( "TextureSampler", _samplerState ) );
     assert( _pixelShader->SetFloat4( "AmbientColor", _ambientColor ) );
-    assert( _pixelShader->SetFloat( "SpecularPower", _specularPower ) );
     assert( _pixelShader->SetFloat( "UseNormalMap", static_cast<float>( _useNormalMap ) ) );
-    assert( _pixelShader->SetFloat( "UseSpecularity", static_cast<float>( _useSpecularity ) ) );
 
     // Perform the base update
     Material::UpdateShaderData();
@@ -136,10 +92,4 @@ void DefaultMaterial::UpdateShaderData()
 void DefaultMaterial::UseNormalMap( bool value )
 {
     _useNormalMap = value;
-}
-
-// Set whether or not to use specularity
-void DefaultMaterial::UseSpecularity( bool value )
-{
-    _useSpecularity = value;
 }

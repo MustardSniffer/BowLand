@@ -119,6 +119,18 @@ std::string GameObject::GetName() const
     return _name;
 }
 
+// Gets this game object's parent
+const GameObject* GameObject::GetParent() const
+{
+    return _parent;
+}
+
+// Gets this game object's parent
+GameObject* GameObject::GetParent()
+{
+    return _parent;
+}
+
 // Get the transform
 const Transform* GameObject::GetTransform() const
 {
@@ -131,22 +143,28 @@ Transform* GameObject::GetTransform()
     return _transform;
 }
 
+// Checks to see if this game object has a parent
+bool GameObject::HasParent() const
+{
+    return _parent != nullptr;
+}
+
 /// Disables all components
 void GameObject::disable(){
-	for ( auto& pair : _components )
+    for ( auto& pair : _components )
     {
         auto& component = pair.second;
-		component->SetEnabled(false);
+        component->SetEnabled(false);
     }
 }
 
 /// Enables all components.
 void GameObject::enable(){
-	for (auto& pair : _components)
-	{
-		auto& component = pair.second;
-		component->SetEnabled(true);
-	}
+    for (auto& pair : _components)
+    {
+        auto& component = pair.second;
+        component->SetEnabled(true);
+    }
 }
 
 // Update all components

@@ -9,13 +9,12 @@ cbuffer __extern__ : register( b0 )
     matrix World;
     matrix View;
     matrix Projection;
-    DirectionalLight Light0;
-    PointLight       Light1;
+    DirectionalLight Light;
     float4 AmbientColor;
     float3 CameraPosition;
-    float  SpecularPower;
-    float  UseSpecularity; // Float, but treated as a bool
     float  UseNormalMap;   // Float, but treated as a bool
+    matrix ShadowView;
+    matrix ShadowProjection;
 };
 
 /// <summary>
@@ -39,4 +38,5 @@ struct VertexToPixel
     float3 Tangent      : TANGENT;
     float2 UV           : TEXCOORD0;
     float3 WorldPosition : TEXCOORD1;
+    float4 ShadowPosition : TEXCOORD2;
 };

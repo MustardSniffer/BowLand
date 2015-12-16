@@ -5,16 +5,24 @@
 
 using namespace DirectX;
 
-Cache<LineRenderer*>             RenderManager::_lineRenderers;
-Cache<MeshRenderer*>             RenderManager::_meshRenderers;
-Cache<TextRenderer*>             RenderManager::_textRenderers;
-const float                      RenderManager::_textBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
-std::shared_ptr<DeviceState>     RenderManager::_deviceState;
-ComPtr<ID3D11BlendState>         RenderManager::_textBlendState;
-ComPtr<ID3D11SamplerState>       RenderManager::_textSamplerState;
-ComPtr<ID3D11DepthStencilState>  RenderManager::_textDepthStencilState;
-ComPtr<ID3D11RasterizerState>    RenderManager::_textRasterizerState;
-ID3D11DeviceContext*             RenderManager::_deviceContext;
+const int                           RenderManager::ShadowMapSize = 4096;
+Cache<LineRenderer*>                RenderManager::_lineRenderers;
+Cache<MeshRenderer*>                RenderManager::_meshRenderers;
+Cache<TextRenderer*>                RenderManager::_textRenderers;
+const float                         RenderManager::_textBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
+std::shared_ptr<DeviceState>        RenderManager::_deviceState;
+ComPtr<ID3D11BlendState>            RenderManager::_textBlendState;
+ComPtr<ID3D11SamplerState>          RenderManager::_textSamplerState;
+ComPtr<ID3D11DepthStencilState>     RenderManager::_textDepthStencilState;
+ComPtr<ID3D11RasterizerState>       RenderManager::_textRasterizerState;
+ID3D11DeviceContext*                RenderManager::_deviceContext;
+std::shared_ptr<SimpleVertexShader> RenderManager::_shadowVS;
+ComPtr<ID3D11DepthStencilView>      RenderManager::_shadowDSV;
+ComPtr<ID3D11ShaderResourceView>    RenderManager::_shadowSRV;
+ComPtr<ID3D11SamplerState>          RenderManager::_shadowSampler;
+ComPtr<ID3D11RasterizerState>       RenderManager::_shadowRS;
+DirectX::XMFLOAT4X4                 RenderManager::_shadowView;
+DirectX::XMFLOAT4X4                 RenderManager::_shadowProj;
 
 // Adds a line renderer
 void RenderManager::AddLineRenderer( LineRenderer* renderer )
@@ -37,6 +45,7 @@ void RenderManager::AddTextRenderer( TextRenderer* renderer )
 // Draws all of the renderers
 void RenderManager::Draw()
 {
+    DrawShadowMap();
     DrawMeshRenderers();
     DrawTextAndLineRenderers();
 }
@@ -74,10 +83,9 @@ void RenderManager::DrawMeshRenderers()
     Material* material;
     XMFLOAT4X4 world;
 
-    for ( auto iter = _meshRenderers.Begin(); iter != _meshRenderers.End(); ++iter )
+    for ( auto& renderer : _meshRenderers )
     {
         // Get the mesh and material
-        MeshRenderer* renderer = *iter;
         if ( !renderer->IsEnabled() )
         {
             continue;
@@ -108,7 +116,11 @@ void RenderManager::DrawMeshRenderers()
         // Get and set the world matrix, then activate the shader
         XMFLOAT4X4 world = renderer->GetGameObject()->GetTransform()->GetWorldMatrix();
         XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
-        material->GetVertexShader()->SetMatrix4x4( "World", world );
+        assert( material->GetVertexShader()->SetMatrix4x4( "World", world ) );
+        assert( material->GetVertexShader()->SetMatrix4x4( "ShadowView", _shadowView ) );
+        assert( material->GetVertexShader()->SetMatrix4x4( "ShadowProjection", _shadowProj ) );
+        assert( material->GetPixelShader()->SetShaderResourceView( "ShadowMap", _shadowSRV.Get() ) );
+        assert( material->GetPixelShader()->SetSamplerState( "ShadowSampler", _shadowSampler.Get() ) );
         material->Activate();
 
 
@@ -116,6 +128,69 @@ void RenderManager::DrawMeshRenderers()
         // Draw the mesh
         DrawMesh( mesh, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     }
+}
+
+// Draws to the shadow map
+void RenderManager::DrawShadowMap()
+{
+    _deviceState->Cache();
+
+    // Initial setup
+    _deviceContext->OMSetRenderTargets( 0, 0, _shadowDSV.Get() );
+    _deviceContext->ClearDepthStencilView( _shadowDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
+    _deviceContext->RSSetState( _shadowRS.Get() );
+
+    // We need a viewport!  This defines how much of the render target to render into
+    D3D11_VIEWPORT viewport = MyDemoGame::GetInstance()->GetViewport();
+    D3D11_VIEWPORT shadowVP = viewport;
+    shadowVP.MaxDepth = 1.0f;
+    shadowVP.Width = static_cast<float>( ShadowMapSize );
+    shadowVP.Height = static_cast<float>( ShadowMapSize );
+    _deviceContext->RSSetViewports( 1, &shadowVP );
+
+    // Turn on the correct shaders
+    _shadowVS->SetShader( false ); // Don't copy any data yet
+    assert( _shadowVS->SetMatrix4x4( "View", _shadowView ) );
+    assert( _shadowVS->SetMatrix4x4( "Projection", _shadowProj ) );
+    _deviceContext->PSSetShader( 0, 0, 0 ); // Turn off the pixel shader
+
+    // Now render everything :D
+    for ( auto& renderer : _meshRenderers )
+    {
+        // Get the mesh and material
+        if ( !renderer->IsEnabled() )
+        {
+            continue;
+        }
+        auto mesh = renderer->GetMesh();
+
+
+
+        // Ensure that the mesh and material exist
+        if ( !mesh )
+        {
+            continue;
+        }
+
+
+
+        // Get and set the world matrix, then activate the shader
+        XMFLOAT4X4 world = renderer->GetGameObject()->GetTransform()->GetWorldMatrix();
+        XMStoreFloat4x4( &world, XMMatrixTranspose( XMLoadFloat4x4( &world ) ) );
+        _shadowVS->SetMatrix4x4( "World", world );
+        _shadowVS->CopyAllBufferData();
+
+
+        // Draw the mesh
+        DrawMesh( mesh, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    }
+
+    // Revert to original DX state
+    auto rtv = MyDemoGame::GetInstance()->GetRenderTargetView();
+    auto dsv = MyDemoGame::GetInstance()->GetDepthStencilView();
+    _deviceContext->OMSetRenderTargets( 1, &rtv, dsv );
+    _deviceContext->RSSetViewports( 1, &viewport );
+    _deviceState->Restore();
 }
 
 // Draw all text and line renderer
@@ -140,10 +215,9 @@ void RenderManager::DrawTextAndLineRenderers()
 
 
     // Now iterate over all of the text renderers
-    for ( auto iter = _textRenderers.Begin(); iter != _textRenderers.End(); ++iter )
+    for ( auto& renderer : _textRenderers )
     {
         // Ensure we can render the text
-        TextRenderer* renderer = *iter;
         if ( !renderer->IsEnabled() || !renderer->IsValid() )
         {
             continue;
@@ -187,10 +261,9 @@ void RenderManager::DrawTextAndLineRenderers()
 
     // Now we need to draw the line renderers!
     _deviceContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_LINELIST );
-    for ( auto iter = _lineRenderers.Begin(); iter != _lineRenderers.End(); ++iter )
+    for ( auto& renderer : _lineRenderers )
     {
         // Get the line renderer
-        LineRenderer* renderer = *iter;
         if ( !renderer->IsEnabled() )
         {
             continue;
@@ -241,8 +314,6 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
 {
     _deviceContext = deviceContext;
 
-
-
     // Try to create the device state
     _deviceState = std::make_shared<DeviceState>( device, deviceContext );
     if ( !_deviceContext )
@@ -250,7 +321,9 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
         return false;
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
+    #pragma region Text Initialization
 
     // First, create the blend state (values from XNA BlendState.AlphaBlend)
     D3D11_BLEND_DESC blendDesc;
@@ -264,8 +337,7 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
     blendDesc.RenderTarget[ 0 ].SrcBlend = D3D11_BLEND_SRC_ALPHA;
     blendDesc.RenderTarget[ 0 ].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
 
-    HR( device->CreateBlendState( &blendDesc, _textBlendState.GetAddress() ) );
-    if ( !_textBlendState )
+    if ( FAILED( device->CreateBlendState( &blendDesc, _textBlendState.GetAddress() ) ) )
     {
         return false;
     }
@@ -282,8 +354,7 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
     samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
     samplerDesc.MaxAnisotropy = 4;
 
-    HR( device->CreateSamplerState( &samplerDesc, _textSamplerState.GetAddress() ) );
-    if ( !_textSamplerState )
+    if ( FAILED( device->CreateSamplerState( &samplerDesc, _textSamplerState.GetAddress() ) ) )
     {
         return false;
     }
@@ -308,8 +379,7 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
     dsDesc.StencilReadMask = 0xFF;
     dsDesc.StencilWriteMask = 0xFF;
 
-    HR( device->CreateDepthStencilState( &dsDesc, _textDepthStencilState.GetAddress() ) );
-    if ( !_textDepthStencilState )
+    if ( FAILED( device->CreateDepthStencilState( &dsDesc, _textDepthStencilState.GetAddress() ) ) )
     {
         return false;
     }
@@ -324,12 +394,109 @@ bool RenderManager::Initialize( ID3D11Device* device, ID3D11DeviceContext* devic
     rasterDesc.FillMode = D3D11_FILL_SOLID;
     rasterDesc.MultisampleEnable = true;
 
-    HR( device->CreateRasterizerState( &rasterDesc, _textRasterizerState.GetAddress() ) );
-    if ( !_textRasterizerState )
+    if ( FAILED( device->CreateRasterizerState( &rasterDesc, _textRasterizerState.GetAddress() ) ) )
     {
         return false;
     }
 
+    #pragma endregion
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    #pragma region Shadow Initialization
+
+    D3D11_TEXTURE2D_DESC shadowMapDesc;
+    shadowMapDesc.Width = ShadowMapSize;
+    shadowMapDesc.Height = ShadowMapSize;
+    shadowMapDesc.ArraySize = 1;
+    shadowMapDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+    shadowMapDesc.CPUAccessFlags = 0;
+    shadowMapDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+    shadowMapDesc.MipLevels = 1;
+    shadowMapDesc.MiscFlags = 0;
+    shadowMapDesc.SampleDesc.Count = 1;
+    shadowMapDesc.SampleDesc.Quality = 0;
+    shadowMapDesc.Usage = D3D11_USAGE_DEFAULT;
+    ID3D11Texture2D* shadowTexture;
+    if ( FAILED( device->CreateTexture2D( &shadowMapDesc, 0, &shadowTexture ) ) )
+    {
+        return false;
+    }
+
+    // Create the depth/stencil view for the shadow map
+    D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+    dsvDesc.Flags = 0;
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // Gotta give it the D
+    dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Texture2D.MipSlice = 0;
+    if ( FAILED( device->CreateDepthStencilView( shadowTexture, &dsvDesc, _shadowDSV.GetAddress() ) ) )
+    {
+        return false;
+    }
+
+    // Create the SRV for the shadow map
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    if ( FAILED( device->CreateShaderResourceView( shadowTexture, &srvDesc, _shadowSRV.GetAddress() ) ) )
+    {
+        return false;
+    }
+
+    // Done with this texture ref
+    shadowTexture->Release();
+    shadowTexture = nullptr;
+
+    // Create a better sampler specifically for the shadow map
+    D3D11_SAMPLER_DESC sampDesc = {};
+    sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.BorderColor[ 0 ] = 1.0f;
+    sampDesc.BorderColor[ 1 ] = 1.0f;
+    sampDesc.BorderColor[ 2 ] = 1.0f;
+    sampDesc.BorderColor[ 3 ] = 1.0f;
+    if ( FAILED( device->CreateSamplerState( &sampDesc, _shadowSampler.GetAddress() ) ) )
+    {
+        return false;
+    }
+
+    // Create a rasterizer for the shadow creation stage (to apply a bias for us)
+    D3D11_RASTERIZER_DESC shRastDesc = {};
+    shRastDesc.FillMode = D3D11_FILL_SOLID;
+    shRastDesc.CullMode = D3D11_CULL_BACK;
+    shRastDesc.FrontCounterClockwise = false;
+    shRastDesc.DepthClipEnable = true;
+    shRastDesc.DepthBias = 1000; // Not world units - this gets multiplied by the "smallest possible value > 0 in depth buffer"
+    shRastDesc.DepthBiasClamp = 0.0f;
+    shRastDesc.SlopeScaledDepthBias = 1.0f;
+    if ( FAILED( device->CreateRasterizerState( &shRastDesc, _shadowRS.GetAddress() ) ) )
+    {
+        return false;
+    }
+
+    // Load the shadow vertex shader
+    _shadowVS = std::make_shared<SimpleVertexShader>( device, deviceContext );
+    if ( !_shadowVS || !_shadowVS->LoadShaderFile( L"Shaders\\ShadowVertexShader.cso" ) )
+    {
+        return false;
+    }
+
+    // Create the shadow projection matrix
+    XMMATRIX shProj = XMMatrixOrthographicLH(
+        100.0f,     // Width in world units
+        100.0f,     // Height in world units
+        0.1f,       // Near plane distance
+        100.0f );   // Far plane distance
+    XMStoreFloat4x4( &_shadowProj, XMMatrixTranspose( shProj ) );
+
+    #pragma endregion
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
     return true;
 }
@@ -350,4 +517,22 @@ void RenderManager::RemoveMeshRenderer( MeshRenderer* renderer )
 void RenderManager::RemoveTextRenderer( TextRenderer* renderer )
 {
     _textRenderers.Remove( renderer );
+}
+
+// Sets the directional light's direction
+void RenderManager::SetLightDirection( const DirectX::XMFLOAT3& direction )
+{
+    XMFLOAT3 position(
+        direction.x * -10.0f,
+        direction.y * -10.0f,
+        direction.z * -10.0f
+    );
+
+    // Recreate the shadow view matrix
+    XMMATRIX shView = XMMatrixLookToLH(
+        XMLoadFloat3( &position ),      // Eye position
+        XMLoadFloat3( &direction ),     // Eye direction
+        XMVectorSet( 0, 1, 0, 0 )       // Up direction
+    );
+    XMStoreFloat4x4( &_shadowView, XMMatrixTranspose( shView ) );
 }

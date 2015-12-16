@@ -25,5 +25,9 @@ VertexToPixel main( ProgramToVertex input )
     // Pass the UV through
     output.UV = input.UV;
 
+    // Calculate output position in relation to the light
+    matrix shadowWVP = mul( mul( World, ShadowView ), ShadowProjection );
+    output.ShadowPosition = mul( float4( input.Position, 1.0f ), shadowWVP );
+
     return output;
 }

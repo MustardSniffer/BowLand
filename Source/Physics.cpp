@@ -83,6 +83,15 @@ void Physics::RemoveRigidbody( Rigidbody* rigidbody )
 // Updates the physics system
 void Physics::Update()
 {
+    // Copy all rigidbody transforms to Bullet
+    //for ( auto& rb : _rigidbodies )
+    //{
+    //    if ( rb )
+    //    {
+    //        rb->CopyTransformToBullet();
+    //    }
+    //}
+
     // Update Bullet
     float elapsedTime = Time::GetElapsedTime();
     _world->stepSimulation( elapsedTime, 1 );

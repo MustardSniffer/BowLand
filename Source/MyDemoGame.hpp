@@ -15,11 +15,15 @@
 // --------------------------------------------------------
 class MyDemoGame : public DirectXGameCore
 {
-    bool firstRun = true;
+    static std::shared_ptr<MyDemoGame> _instance;
+    bool firstRun;
 
 public:
     MyDemoGame( HINSTANCE hInstance );
     ~MyDemoGame();
+
+    static MyDemoGame* CreateInstance( HINSTANCE hInstance );
+    static MyDemoGame* GetInstance();
 
     // Overrides for base level methods
     bool Init();

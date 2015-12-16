@@ -23,6 +23,10 @@ public:
     DirectXGameCore( HINSTANCE hInstance );
     virtual ~DirectXGameCore( void );
 
+    D3D11_VIEWPORT GetViewport() const { return viewport; }
+    ID3D11RenderTargetView* GetRenderTargetView() { return renderTargetView; }
+    ID3D11DepthStencilView* GetDepthStencilView() { return depthStencilView; }
+
     // The game loop
     int Run();
 

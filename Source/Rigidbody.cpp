@@ -136,14 +136,14 @@ void Rigidbody::CopyTransformFromBullet()
     myTrans.SetPosition( position );
 
     // Copy the rotation
-    btQuaternion btRot = btTrans.getRotation();
-    XMFLOAT4 xmRot(
-        btRot.getX(),
-        btRot.getY(),
-        btRot.getZ(),
-        btRot.getW()
-    );
-    myTrans.SetRotation( xmRot );
+    //btQuaternion btRot = btTrans.getRotation();
+    //XMFLOAT4 xmRot(
+    //    btRot.getX(),
+    //    btRot.getY(),
+    //    btRot.getZ(),
+    //    btRot.getW()
+    //);
+    //myTrans.SetRotation( xmRot );
 }
 
 // Copies our transform to Bullet's transform
@@ -242,8 +242,4 @@ void Rigidbody::SetMass( float mass )
 // Updates this rigid body
 void Rigidbody::Update()
 {
-    /*if ( fabsf( GetVelocity().y ) <= 0.01f )
-    {
-        ApplyImpulse( XMFLOAT3( 0, 10, 0 ) );
-    }*/
 }

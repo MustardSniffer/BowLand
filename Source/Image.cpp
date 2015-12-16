@@ -51,13 +51,13 @@ Image::~Image()
 // Get image height
 unsigned int Image::GetHeight() const
 {
-    return _width;
+    return _height;
 }
 
 // Get image width
 unsigned int Image::GetWidth() const
 {
-    return _height;
+    return _width;
 }
 
 // Attempt to save the image
@@ -196,7 +196,6 @@ bool Image::LoadFromFile( const std::string& fname )
         // We only need to swap the red and blue components
         std::swap( _pixels[ i + 0 ], _pixels[ i + 2 ] );
     }
-
 
     return true;
 }

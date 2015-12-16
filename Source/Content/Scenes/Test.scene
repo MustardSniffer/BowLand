@@ -1,12 +1,112 @@
 {
-	"CameraObject": {
+    "CameraObject": {
         "Transform": {
             "Position": [0, 0, -20],
-			"Rotation": [0.0, 0.0, 0.0]
+            "Rotation": [0.0, 0.0, 0.0]
         },
         "Camera": {
             "NearClip": 0.1,
             "FarClip": 1024.0
+        }
+    },
+    "Ground": {
+        "Transform": {
+            "Position": [0, -15, 0],
+            "Scale": [1000, 10, 1000]
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
+        }
+    },
+    "LeftWall": {
+        "Transform": {
+            "Position": [-32, 0, 10],
+            "Scale": [1, 1000, 1]
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
+        }
+    },
+    "RightWall": {
+        "Transform": {
+            "Position": [32, 0, 10],
+            "Scale": [1, 1000, 1]
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
+        }
+    },
+    "Player1Platform": {
+        "Transform": {
+            "Position": [-20, -1, 10],
+            "Scale": [2, 0.5, 2]
+        },
+        "DefaultMaterial": {
+            "DiffuseMap": "Textures\\SolidWhite.png",
+            "DirectionalLight": {
+                "DiffuseColor": [0.960784376, 1.000000000, 0.980392218, 1.0],
+                "Direction": [-0.1, -0.5, 0.1]
+            }
+        },
+        "MeshRenderer": {
+            "Mesh": "Models\\cylinder.obj",
+            "Material": "this DefaultMaterial"
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
+        }
+    },
+    "Player2Platform": {
+        "Transform": {
+            "Position": [20, -1, 10],
+            "Scale": [2, 0.5, 2]
+        },
+        "DefaultMaterial": {
+            "DiffuseMap": "Textures\\SolidWhite.png",
+            "DirectionalLight": {
+                "DiffuseColor": [0.960784376, 1.0, 0.980392218, 1.0],
+                "Direction": [-0.1, -0.5, 0.1]
+            }
+        },
+        "MeshRenderer": {
+            "Mesh": "Models\\cylinder.obj",
+            "Material": "this DefaultMaterial"
+        },
+        "BoxCollider": {
+            "Size": [1, 1, 1]
+        },
+        "Rigidbody": {
+            "Mass": 0
+        }
+    },
+    "Backdrop": {
+        "Transform": {
+            "Position": [0, 0, 15],
+            "Scale": [20, 64, 0.1],
+            "Rotation": [0, 0, -1.5707963267948966192313216916398]
+        },
+        "DefaultMaterial": {
+            "DiffuseMap": "Textures\\StageCurtains.png",
+            "DirectionalLight": {
+                "DiffuseColor": [0.960784376, 1.0, 0.980392218, 1.0],
+                "Direction": [-0.1, -0.5, 0.1]
+            }
+        },
+        "MeshRenderer": {
+            "Mesh": "Models\\cube.obj",
+            "Material": "this DefaultMaterial"
         }
     }
 }

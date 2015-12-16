@@ -27,6 +27,7 @@ class GameManager : public Component
 private:
     DirectX::XMFLOAT2 _mouseDownPos;
     DirectX::XMFLOAT2 _currentArrowDirection;
+    DirectX::XMFLOAT3 _lastArrowPos;
     GameObject* _player1;
     GameObject* _player2;
     GameObject* _currentArrow;
@@ -56,7 +57,7 @@ private:
     /// <summary>
     /// Creates an arrow game object.
     /// </summary>
-    GameObject* CreateArrow( const DirectX::XMFLOAT3& position );
+    GameObject* CreateArrow( const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& force );
 
     /// <summary>
     /// Creates a player.

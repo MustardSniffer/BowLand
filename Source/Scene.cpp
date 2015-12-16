@@ -152,31 +152,10 @@ static void ParseDefaultMaterial( DefaultMaterial* value, json::Object& object )
         {
             value->LoadDiffuseMap( iter->second );
         }
-        else if ( "NormalMap" == iter->first )
-        {
-            value->LoadNormalMap( iter->second );
-        }
-        else if ( "UseNormalMap" == iter->first )
-        {
-            value->UseNormalMap( iter->second );
-        }
-        else if ( "UseSpecularity" == iter->first )
-        {
-            value->UseSpecularity( iter->second );
-        }
-        else if ( "SpecularPower" == iter->first )
-        {
-            value->SetSpecularPower( iter->second );
-        }
         else if ( "DirectionalLight" == iter->first )
         {
-            json::Object& dirLight = iter->second.ToObject();
-            value->SetDirectionalLight( ParseDirectionalLight( dirLight ) );
-        }
-        else if ( "PointLight" == iter->first )
-        {
-            json::Object& pointLight = iter->second.ToObject();
-            value->SetPointLight( ParsePointLight( pointLight ) );
+            DirectionalLight light = ParseDirectionalLight( iter->second.ToObject() );
+            value->SetDirectionalLight( light );
         }
         else
         {

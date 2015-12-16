@@ -25,7 +25,10 @@ std::shared_ptr<Texture2D> Texture2D::FromFile( ID3D11Device* device, ID3D11Devi
     if ( image.LoadFromFile( fname ) )
     {
         texture = Texture2D::FromImage( device, deviceContext, image );
-        _textureCache[ fname ] = texture;
+        if ( texture )
+        {
+            _textureCache[ fname ] = texture;
+        }
     }
 
     return texture;

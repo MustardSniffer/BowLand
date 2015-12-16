@@ -48,6 +48,8 @@
 // For the DirectX Math library
 using namespace DirectX;
 
+std::shared_ptr<MyDemoGame> MyDemoGame::_instance;
+
 // --------------------------------------------------------
 // Win32 Entry Point - Where your program starts
 // --------------------------------------------------------
@@ -59,20 +61,21 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, i
     #endif
 
     // Create the game object.
-    MyDemoGame game( hInstance );
+    MyDemoGame* game = MyDemoGame::CreateInstance( hInstance );
 
     // This is where we'll create the window, initialize DirectX, 
     // set up geometry and shaders, etc.
-    if ( !game.Init() )
+    if ( !game->Init() )
         return 0;
 
     // All set to run the game loop
-    return game.Run();
+    return game->Run();
 }
 
 // Creates a new game
 MyDemoGame::MyDemoGame( HINSTANCE hInstance )
     : DirectXGameCore( hInstance )
+    , firstRun( true )
 {
     // Set up a custom caption for the game window.
     // - The "L" before the string signifies a "wide character" string
@@ -93,6 +96,20 @@ MyDemoGame::MyDemoGame( HINSTANCE hInstance )
 MyDemoGame::~MyDemoGame()
 {
     DirectXGameCore::~DirectXGameCore();
+}
+
+MyDemoGame* MyDemoGame::CreateInstance( HINSTANCE hInstance )
+{
+    if ( !_instance )
+    {
+        _instance = std::make_shared<MyDemoGame>( hInstance );
+    }
+    return _instance.get();
+}
+
+MyDemoGame* MyDemoGame::GetInstance()
+{
+    return _instance.get();
 }
 
 // Initialize the game

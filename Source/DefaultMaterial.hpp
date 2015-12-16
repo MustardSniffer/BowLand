@@ -14,9 +14,7 @@ class DefaultMaterial : public Material
     ID3D11SamplerState* _samplerState;
     std::shared_ptr<Texture2D> _diffuseMap;
     std::shared_ptr<Texture2D> _normalMap;
-    float _specularPower;
     bool _useNormalMap;
-    bool _useSpecularity;
 
 public:
     /// <summary>
@@ -36,19 +34,9 @@ public:
     DirectX::XMFLOAT4 GetAmbientColor() const;
 
     /// <summary>
-    /// Gets this material's specular power.
-    /// </summary>
-    float GetSpecularPower() const;
-
-    /// <summary>
     /// Checks to see if this material uses the normal map.
     /// </summary>
     bool UsesNormalMap() const;
-
-    /// <summary>
-    /// Checks to see if this material uses specularity.
-    /// </summary>
-    bool UsesSpecularity() const;
 
     /// <summary>
     /// Loads the diffuse map for this material from a file.
@@ -63,34 +51,10 @@ public:
     bool LoadNormalMap( const std::string& fname );
 
     /// <summary>
-    /// Sets this material's diffuse map.
-    /// </summary>
-    /// <param name="map">The diffuse map.</param>
-    void SetDiffuseMap( std::shared_ptr<Texture2D> map );
-
-    /// <summary>
     /// Sets the first directional light's value.
     /// </summary>
     /// <param name="light">The light value.</param>
     void SetDirectionalLight( const DirectionalLight& light );
-
-    /// <summary>
-    /// Sets this material's normal map.
-    /// </summary>
-    /// <param name="map">The normal map.</param>
-    void SetNormalMap( std::shared_ptr<Texture2D> map );
-
-    /// <summary>
-    /// Sets the second directional light's value.
-    /// </summary>
-    /// <param name="light">The light value.</param>
-    void SetPointLight( const PointLight& light );
-
-    /// <summary>
-    /// Sets this material's specular power.
-    /// </summary>
-    /// <param name="value">The new specular power.</param>
-    void SetSpecularPower( float value );
 
     /// <summary>
     /// Sends this material's information to the shaders.
@@ -102,10 +66,4 @@ public:
     /// </summary>
     /// <param name="value">True to use the normal map, false to not.</param>
     void UseNormalMap( bool value );
-
-    /// <summary>
-    /// Tells this material whether or not to use specularity.
-    /// </summary>
-    /// <param name="value">True to use the specularity, false to not.</param>
-    void UseSpecularity( bool value );
 };

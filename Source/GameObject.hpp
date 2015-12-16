@@ -170,6 +170,16 @@ public:
     std::string GetName() const;
 
     /// <summary>
+    /// Gets this game object's parent.
+    /// </summary>
+    const GameObject* GetParent() const;
+
+    /// <summary>
+    /// Gets this game object's parent.
+    /// </summary>
+    GameObject* GetParent();
+
+    /// <summary>
     /// Gets this game object's transform.
     /// </summary>
     const Transform* GetTransform() const;
@@ -179,15 +189,20 @@ public:
     /// </summary>
     Transform* GetTransform();
 
-	/// <summary>
-	/// Disables all componets of this object.
-	/// </summary>
-	void disable();
+    /// <summary>
+    /// Checks to see if this game object has a parent.
+    /// </summary>
+    bool HasParent() const;
 
-	/// <summary>
-	/// Enables all components of this object.
-	/// </summary>
-	void enable();
+    /// <summary>
+    /// Disables all componets of this object.
+    /// </summary>
+    void disable();
+
+    /// <summary>
+    /// Enables all components of this object.
+    /// </summary>
+    void enable();
 
     /// <summary>
     /// Updates this game object and all components inside of it.

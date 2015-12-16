@@ -43,6 +43,9 @@
     <Filter Include="Shader Files\TextMaterial">
       <UniqueIdentifier>{85f1888e-2297-413f-bd7f-253cbd02668d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\Shadows">
+      <UniqueIdentifier>{1cbbe45c-814a-44fc-bc61-6fb345ac6fe0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dxerr.cpp">
@@ -172,6 +175,9 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="GameManager.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -335,6 +341,9 @@
     <ClInclude Include="GameManager.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject.inl">
@@ -398,6 +407,9 @@
     </FxCompile>
     <FxCompile Include="Shaders\TextVertexShader.hlsl">
       <Filter>Shader Files\TextMaterial</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowVertexShader.hlsl">
+      <Filter>Shader Files\Shadows</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

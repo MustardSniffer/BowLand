@@ -52,22 +52,22 @@ public:
     /// <summary>
     /// Gets the iterator at the beginning of this cache.
     /// </summary>
-    ConstIterator Begin() const;
+    ConstIterator begin() const;
 
     /// <summary>
     /// Gets the iterator at the beginning of this cache.
     /// </summary>
-    Iterator Begin();
+    Iterator begin();
 
     /// <summary>
     /// Gets the iterator at the end of this cache.
     /// </summary>
-    ConstIterator End() const;
+    ConstIterator end() const;
 
     /// <summary>
     /// Gets the iterator at the end of this cache.
     /// </summary>
-    Iterator End();
+    Iterator end();
 
     /// <summary>
     /// Removes the given item from this cache.

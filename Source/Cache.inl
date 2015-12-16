@@ -16,25 +16,25 @@ template<typename T> bool Cache<T>::Add( T& item )
 }
 
 // Gets the iterator at the beginning of this cache
-template<typename T> typename Cache<T>::ConstIterator Cache<T>::Begin() const
+template<typename T> typename Cache<T>::ConstIterator Cache<T>::begin() const
 {
     return _items.begin();
 }
 
 // Gets the iterator at the beginning of this cache
-template<typename T> typename Cache<T>::Iterator Cache<T>::Begin()
+template<typename T> typename Cache<T>::Iterator Cache<T>::begin()
 {
     return _items.begin();
 }
 
 // Gets the iterator at the end of this cache
-template<typename T> typename Cache<T>::ConstIterator Cache<T>::End() const
+template<typename T> typename Cache<T>::ConstIterator Cache<T>::end() const
 {
     return _items.end();
 }
 
 // Gets the iterator at the end of this cache
-template<typename T> typename Cache<T>::Iterator Cache<T>::End()
+template<typename T> typename Cache<T>::Iterator Cache<T>::end()
 {
     return _items.end();
 }
