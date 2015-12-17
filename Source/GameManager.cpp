@@ -157,6 +157,41 @@ GameObject* GameManager::CreatePlayer( uint32_t index, const XMFLOAT3& position,
     return player;
 }
 
+//Create particles
+ParticleSystem* GameManager::CreateParticleSystem(XMFLOAT3 startPos, XMFLOAT3 startVel)
+{
+	//Texture* bloodTexture = new Texture("Textures\\Blood.png");
+	/*DefaultMaterial* bloodMaterial = new DefaultMaterial(_gameObject);
+	bloodMaterial->LoadDiffuseMap("Textures\\Blood.png");
+	//Texture2D* bloodTexture = new Texture2D()
+
+	//set some default values
+	XMFLOAT4 particleStartColor = XMFLOAT4(1, 0, 0, 1);
+	XMFLOAT4 particleMidColor = XMFLOAT4(1, 0, 0, 0.1f);
+	XMFLOAT4 particleEndColor = XMFLOAT4(1, 0, 0, 0);
+	float particleStartSize = 5;
+	float particleMidSize = 10;
+	float particleEndSize = 3;
+
+	float particleAgeToSpawn = 0.00001f;
+	float particleMaxLifetime = 5.0f;
+	XMFLOAT3 particleConstantAccel = XMFLOAT3(0, -1.0f, 0);
+
+	//initialize the particle system
+	_particleSystem = new ParticleSystem(startPos, startVel, particleStartColor, particleMidColor, particleEndColor,
+		particleStartSize, particleMidSize, particleEndSize, particleAgeToSpawn, particleMaxLifetime, particleConstantAccel, bloodTexture);
+	
+	//create geometry and load shaders
+	ID3D11Device* device = _gameObject->GetDevice();
+	ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
+	_particleSystem->CreateGeometry(device);
+	_particleSystem->LoadShaders(device, deviceContext);*/
+
+
+
+	return _particleSystem;
+}
+
 // Creates the UI
 void GameManager::CreateUI()
 {

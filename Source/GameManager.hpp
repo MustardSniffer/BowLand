@@ -6,6 +6,7 @@
 #include "Rigidbody.hpp"
 #include "TextRenderer.hpp"
 #include "TweenPosition.hpp"
+#include "ParticleSystem.h"
 
 /// <summary>
 /// Defines a game manager.
@@ -49,6 +50,8 @@ private:
     int _player2Health;
     int _arrowCount;
 
+	ParticleSystem* _particleSystem;
+
     /// <summary>
     /// Checks to see if we can shoot an arrow.
     /// </summary>
@@ -71,6 +74,11 @@ private:
     /// Creates the game UI.
     /// </summary>
     void CreateUI();
+
+	/// <summary>
+	/// Creates the blood particle system
+	/// </summary>
+	ParticleSystem* CreateParticleSystem(XMFLOAT3 startPos, XMFLOAT3 startVel);
 
     /// <summary>
     /// Handles the current game state.
