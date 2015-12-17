@@ -40,6 +40,9 @@ public:
     /// </summary>
     void Cache();
 
+    ID3D11Device* GetDevice() { return _device; }
+    ID3D11DeviceContext* GetDeviceContext() { return _deviceContext; }
+
     /// <summary>
     /// Restores the device's state information.
     /// </summary>

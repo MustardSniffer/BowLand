@@ -7,6 +7,7 @@
 #include "LineRenderer.hpp"
 #include "MeshRenderer.hpp"
 #include "TextRenderer.hpp"
+#include "ParticleSystem.h"
 #include <unordered_map>
 #include <vector>
 
@@ -25,6 +26,7 @@ private:
     static Cache<LineRenderer*>             _lineRenderers;
     static Cache<MeshRenderer*>             _meshRenderers;
     static Cache<TextRenderer*>             _textRenderers;
+    static Cache<ParticleSystem*>            _particleSystems;
     static std::shared_ptr<SimpleVertexShader> _shadowVS;
     static ComPtr<ID3D11DepthStencilView>   _shadowDSV;
     static ComPtr<ID3D11ShaderResourceView> _shadowSRV;
@@ -49,6 +51,8 @@ private:
     /// Draws all of the mesh renderers.
     /// </summary>
     static void DrawMeshRenderers();
+
+    static void DrawParticleSystems();
 
     /// <summary>
     /// Draws to the shadow map.
@@ -79,6 +83,8 @@ public:
     /// <param name="renderer">The text renderer.</param>
     static void AddTextRenderer( TextRenderer* renderer );
 
+    static void AddParticleSystem( ParticleSystem* ps ) { _particleSystems.Add( ps ); }
+
     /// <summary>
     /// Draws all of the renderers.
     /// </summary>
@@ -108,6 +114,8 @@ public:
     /// </summary>
     /// <param name="renderer">The text renderer.</param>
     static void RemoveTextRenderer( TextRenderer* renderer );
+
+    static void RemoveParticleSystem( ParticleSystem* ps ) { _particleSystems.Remove( ps ); }
 
     /// <summary>
     /// Sets the directional light's direction.

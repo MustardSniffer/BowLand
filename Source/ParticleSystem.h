@@ -14,7 +14,7 @@ class ParticleSystem
 {
 public:
 	ParticleSystem();
-	ParticleSystem(XMFLOAT3, XMFLOAT3, XMFLOAT4, XMFLOAT4, XMFLOAT4, float, float, float, float, float, XMFLOAT3, Texture2D*);
+	ParticleSystem(XMFLOAT3, XMFLOAT3, XMFLOAT4, XMFLOAT4, XMFLOAT4, float, float, float, float, float, XMFLOAT3, std::shared_ptr<Texture2D>);
 	~ParticleSystem();
 
 	void DrawSpawn(float dt, float totalTime, ID3D11Device*, ID3D11DeviceContext*);
@@ -24,7 +24,7 @@ public:
 	void LoadShaders(ID3D11Device*, ID3D11DeviceContext*);
 	
 private:
-	ID3D11ShaderResourceView* texture;
+	std::shared_ptr<Texture2D> texture;
 	ID3D11SamplerState* sampler;
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* soBufferRead;

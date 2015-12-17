@@ -1,6 +1,7 @@
 #include "RenderManager.hpp"
 #include "Components.hpp"
 #include "MyDemoGame.hpp"
+#include "Time.hpp"
 #include <iostream>
 
 using namespace DirectX;
@@ -9,6 +10,7 @@ const int                           RenderManager::ShadowMapSize = 4096;
 Cache<LineRenderer*>                RenderManager::_lineRenderers;
 Cache<MeshRenderer*>                RenderManager::_meshRenderers;
 Cache<TextRenderer*>                RenderManager::_textRenderers;
+Cache<ParticleSystem*>              RenderManager::_particleSystems;
 const float                         RenderManager::_textBlendFactor[ 4 ] = { 1.0f, 1.0f, 1.0f, 1.0f };
 std::shared_ptr<DeviceState>        RenderManager::_deviceState;
 ComPtr<ID3D11BlendState>            RenderManager::_textBlendState;
@@ -47,6 +49,7 @@ void RenderManager::Draw()
 {
     DrawShadowMap();
     DrawMeshRenderers();
+    DrawParticleSystems();
     DrawTextAndLineRenderers();
 }
 
@@ -128,6 +131,21 @@ void RenderManager::DrawMeshRenderers()
         // Draw the mesh
         DrawMesh( mesh, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
     }
+}
+
+void RenderManager::DrawParticleSystems()
+{
+    _deviceState->Cache();
+
+    auto device = _deviceState->GetDevice();
+    auto dc = _deviceState->GetDeviceContext();
+    for ( auto& ps : _particleSystems )
+    {
+        ps->DrawSpawn( Time::GetElapsedTime(), Time::GetTotalTime(), device, dc );
+        ps->DrawParticles( Camera::GetActiveCamera(), device, dc );
+    }
+
+    _deviceState->Restore();
 }
 
 // Draws to the shadow map

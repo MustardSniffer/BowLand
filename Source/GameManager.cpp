@@ -30,12 +30,12 @@ GameManager::GameManager( GameObject* gameObject )
     , _currentArrow( nullptr )
     , _player1( nullptr )
     , _player1Collider( nullptr )
-    , _player1Health( 1 )
+    , _player1Health( 3 )
     , _player1HealthUI( nullptr )
     , _player1Rigidbody( nullptr )
     , _player2( nullptr )
     , _player2Collider( nullptr )
-    , _player2Health( 1 )
+    , _player2Health( 3 )
     , _player2HealthUI( nullptr )
     , _player2Rigidbody( nullptr )
     , _line( nullptr )
@@ -160,36 +160,31 @@ GameObject* GameManager::CreatePlayer( uint32_t index, const XMFLOAT3& position,
 //Create particles
 ParticleSystem* GameManager::CreateParticleSystem(XMFLOAT3 startPos, XMFLOAT3 startVel)
 {
-	//Texture* bloodTexture = new Texture("Textures\\Blood.png");
-	/*DefaultMaterial* bloodMaterial = new DefaultMaterial(_gameObject);
-	bloodMaterial->LoadDiffuseMap("Textures\\Blood.png");
-	//Texture2D* bloodTexture = new Texture2D()
+    auto device = _gameObject->GetDevice();
+    auto deviceContext = _gameObject->GetDeviceContext();
+    auto bloodTexture = Texture2D::FromFile( device, deviceContext, "Textures\\Blood.png" );
 
-	//set some default values
-	XMFLOAT4 particleStartColor = XMFLOAT4(1, 0, 0, 1);
-	XMFLOAT4 particleMidColor = XMFLOAT4(1, 0, 0, 0.1f);
-	XMFLOAT4 particleEndColor = XMFLOAT4(1, 0, 0, 0);
-	float particleStartSize = 5;
-	float particleMidSize = 10;
-	float particleEndSize = 3;
+    //set some default values
+    XMFLOAT4 particleStartColor = XMFLOAT4(1, 0, 0, 1);
+    XMFLOAT4 particleMidColor = XMFLOAT4(1, 0, 0, 0.1f);
+    XMFLOAT4 particleEndColor = XMFLOAT4(1, 0, 0, 0);
+    float particleStartSize = 5;
+    float particleMidSize = 10;
+    float particleEndSize = 3;
 
-	float particleAgeToSpawn = 0.00001f;
-	float particleMaxLifetime = 5.0f;
-	XMFLOAT3 particleConstantAccel = XMFLOAT3(0, -1.0f, 0);
+    float particleAgeToSpawn = 0.00001f;
+    float particleMaxLifetime = 5.0f;
+    XMFLOAT3 particleConstantAccel = XMFLOAT3(startVel.x, -1.0f, 0);
 
-	//initialize the particle system
-	_particleSystem = new ParticleSystem(startPos, startVel, particleStartColor, particleMidColor, particleEndColor,
-		particleStartSize, particleMidSize, particleEndSize, particleAgeToSpawn, particleMaxLifetime, particleConstantAccel, bloodTexture);
-	
-	//create geometry and load shaders
-	ID3D11Device* device = _gameObject->GetDevice();
-	ID3D11DeviceContext* deviceContext = _gameObject->GetDeviceContext();
-	_particleSystem->CreateGeometry(device);
-	_particleSystem->LoadShaders(device, deviceContext);*/
+    //initialize the particle system
+    _particleSystem = new ParticleSystem(startPos, startVel, particleStartColor, particleMidColor, particleEndColor,
+        particleStartSize, particleMidSize, particleEndSize, particleAgeToSpawn, particleMaxLifetime, particleConstantAccel, bloodTexture);
+    
+    //create geometry and load shaders
+    _particleSystem->CreateGeometry(device);
+    _particleSystem->LoadShaders(device, deviceContext);
 
-
-
-	return _particleSystem;
+    return _particleSystem;
 }
 
 // Creates the UI
@@ -454,11 +449,17 @@ void GameManager::OnArrowCollide( Collider* collider )
     // Check which player's health needs to be modified
     if ( collider == _player1Collider )
     {
+        XMFLOAT3 velocity( 1, 0, 0 );
+        CreateParticleSystem( _player1->GetTransform()->GetPosition(), velocity );
+
         _player1Health--;
         duration = 0.5f;
     }
     else if ( collider == _player2Collider )
     {
+        XMFLOAT3 velocity( -1, 0, 0 );
+        CreateParticleSystem( _player2->GetTransform()->GetPosition(), velocity );
+
         _player2Health--;
         duration = 0.5f;
     }
